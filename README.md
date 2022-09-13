@@ -39,6 +39,12 @@ The interactive Installation script supports installation on KDE Neon, K/Ubuntu 
     cd mycroft-gui
     bash dev_setup.sh    
    ```
+   
+   Build Android APK:
+   
+   ```
+   docker run --rm -v /home/$USER/mycroft-gui:/home/$USER/mycroft-gui -v /home/$USER/mycroft-gui:/home/user/src/mycroft-gui -v /home/$USER/mycroft-gui/output:/output -e BUILD_NUMBER=001 kdeorg/android-sdk /home/$USER/mycroft-gui/application/android-build-apk
+   ```
 
 2) Running Mycroft GUI:
    
