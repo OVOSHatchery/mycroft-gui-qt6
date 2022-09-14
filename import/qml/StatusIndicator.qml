@@ -35,7 +35,7 @@ Item {
             PropertyChanges {
                 target: innerCircle
                 graphicsColor: "white"
-                backgroundColor: "deepskyblue"
+                backgroundColor: "transparent"
             }
             PropertyChanges {
                 target: root
@@ -60,7 +60,7 @@ Item {
             PropertyChanges {
                 target: innerCircle
                 graphicsColor: "white"
-                backgroundColor: "deepskyblue"
+                backgroundColor: "transparent"
             }
             PropertyChanges {
                 target: root
@@ -86,7 +86,7 @@ Item {
                 target: innerCircle
                 targetRotation: 0
                 graphicsColor: "white"
-                backgroundColor: "deepskyblue"
+                backgroundColor: "transparent"
             }
             PropertyChanges {
                 target: root

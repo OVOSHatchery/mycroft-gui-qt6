@@ -93,7 +93,7 @@ Kirigami.ApplicationWindow {
     // Uses Android's voice popup for speech recognition
     MycroftGui.SpeechIntent {
         id: speechIntent
-        title: "Say something to Mycroft" // TODO i18n
+        title: "Say something to OVOS" // TODO i18n
         onSpeechRecognized: {
             Mycroft.MycroftController.sendText(text)
         }
@@ -180,7 +180,7 @@ Kirigami.ApplicationWindow {
         running: Mycroft.GlobalSettings.autoConnect && Mycroft.MycroftController.status != Mycroft.MycroftController.Open
         triggeredOnStart: true
         onTriggered: {
-            print("Trying to connect to Mycroft");
+            print("Trying to connect to OVOS");
             Mycroft.MycroftController.start();
         }
     }
@@ -198,6 +198,7 @@ Kirigami.ApplicationWindow {
                 mainView.goBack();
             }
         }
+        
         Rectangle {
             color: nightSwitch.checked ? "black" : Kirigami.Theme.backgroundColor
             rotation: globalScreenRotation || 0
@@ -343,7 +344,7 @@ Kirigami.ApplicationWindow {
                     id: qinput
                     Layout.fillWidth: true
 
-                    placeholderText: "Ask Mycroft..."
+                    placeholderText: "Ask OVOS..."
                     onAccepted: {
                         Mycroft.MycroftController.sendText(qinput.text)
                     }

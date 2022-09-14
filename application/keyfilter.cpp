@@ -27,6 +27,7 @@ KeyFilter::KeyFilter(QObject *parent)
 bool KeyFilter::eventFilter(QObject *watched, QEvent *event)
 {
     QKeyEvent *key = static_cast<QKeyEvent *>(event);
+
     if (event->type() == QEvent::KeyPress && key->key() == Qt::Key_Back) {
             globalBackReceived();
             return true;

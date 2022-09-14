@@ -216,8 +216,7 @@ Mycroft.AbstractSkillView {
                     
                     function globalBackRequest(){
                         if(delegatesView.currentIndex !== 0){
-                            delegatesView.currentIndex--
-                            delegatesView.currentItem.contentItem.forceActiveFocus()
+                            Mycroft.MycroftController.sendRequest("mycroft.gui.screen.request.page.back", {})
                         } else {
                             Mycroft.MycroftController.sendRequest("mycroft.gui.screen.close", {})
                         }
@@ -253,7 +252,7 @@ Mycroft.AbstractSkillView {
                             signal backRequested
                                                         
                             Component.onCompleted: {
-                                    backRequested.connect(delegatesView.globalBackRequest)
+                                backRequested.connect(delegatesView.globalBackRequest)
                             }
                             
                             Connections {

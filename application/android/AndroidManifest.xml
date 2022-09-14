@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<manifest package="ai.openvoiceos.kirigami" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="0.001" android:versionCode="1662369995" android:installLocation="auto">
+<manifest package="ai.openvoice.kirigami" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="0.002" android:versionCode="1663149461" android:installLocation="auto">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <application android:hardwareAccelerated="true" android:name="org.qtproject.qt5.android.bindings.QtApplication" android:label="OpenVoiceOS" android:icon="@drawable/icon">

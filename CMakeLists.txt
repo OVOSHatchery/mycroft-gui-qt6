@@ -16,10 +16,6 @@ PROJECT(mycroft-gui VERSION "1.0.1")
 # Use Extra CMake Modules (ECM) for common functionality.
 # See http://api.kde.org/ecm/manual/ecm.7.html
 # and http://api.kde.org/ecm/manual/ecm-kde-modules.7.html
-IF(POLICY CMP0063)
-    CMAKE_POLICY(SET CMP0063 NEW)
-ENDIF(POLICY CMP0063)
-
 find_package(ECM 1.6.0 REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 
@@ -27,8 +23,6 @@ include(KDEInstallDirs)
 include(KDECMakeSettings)
 include(ECMInstallIcons)
 set(CMAKE_AUTOMOC ON)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -Werror")
 
 #this is used for mycroft spawning. It's horrible and should not be needed, but mycroft packaging is questionable at best
 #in any sane world mycroft would install something in $PATH
