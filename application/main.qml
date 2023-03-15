@@ -38,6 +38,7 @@ Kirigami.ApplicationWindow {
     y: deviceHeight ? Screen.desktopAvailableHeight - height : undefined
 
     color: "black"
+
     //HACK!! needs proper api in kirigami
     Component.onCompleted: {
         globalDrawer.handle.handleAnchor = handleAnchor;
@@ -45,6 +46,10 @@ Kirigami.ApplicationWindow {
         // Maximize and auto connect if set
         if (deviceMaximized) {
             showMaximized()
+        }
+        if(webSocketAddress) {
+           print("Setting webSocketAddress to " + webSocketAddress);
+           Mycroft.GlobalSettings.webSocketAddress = webSocketAddress
         }
 
         if (singleSkillHome.length > 0 && Mycroft.MycroftController.status === Mycroft.MycroftController.Open) {
@@ -55,6 +60,7 @@ Kirigami.ApplicationWindow {
             applicationSettings.usesRemoteSTT = true
             Mycroft.GlobalSettings.usesRemoteTTS = true
         }
+    
     }
 
     Connections {
@@ -175,7 +181,7 @@ Kirigami.ApplicationWindow {
         running: Mycroft.GlobalSettings.autoConnect && Mycroft.MycroftController.status != Mycroft.MycroftController.Open
         triggeredOnStart: true
         onTriggered: {
-            print("Trying to connect to Mycroft");
+            print("Trying to connect to Mycroft @ " + Mycroft.GlobalSettings.webSocketAddress);
             Mycroft.MycroftController.start();
         }
     }

@@ -58,10 +58,11 @@ int main(int argc, char *argv[])
     auto skillOption = QCommandLineOption(QStringLiteral("skill"), QStringLiteral("Single skill to load"), QStringLiteral("skill"));
     auto maximizeOption = QCommandLineOption(QStringLiteral("maximize"), QStringLiteral("When set, start maximized."));
     auto rotateScreen = QCommandLineOption(QStringLiteral("rotateScreen"), QStringLiteral("When set, rotate the screen by set degrees."), QStringLiteral("degrees"));
+    auto webSocketAddressOption = QCommandLineOption(QStringLiteral("webSocketAddress"), QStringLiteral("ws:// url of mycroft's websocket server"), QStringLiteral("url"));
     auto helpOption = QCommandLineOption(QStringLiteral("help"), QStringLiteral("Show this help message"));
     parser.addOptions({widthOption, heightOption, hideTextInputOption, skillOption,
                        dpiOption, maximizeOption,
-                       rotateScreen, helpOption});
+                       rotateScreen, helpOption, webSocketAddressOption});
     parser.process(arguments);
 
 
@@ -101,10 +102,12 @@ int main(int argc, char *argv[])
     int rotation = parser.value(rotateScreen).toInt();
     bool maximize = parser.isSet(maximizeOption);
 
+
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty(QStringLiteral("deviceWidth"), width);
     engine.rootContext()->setContextProperty(QStringLiteral("deviceHeight"), height);
     engine.rootContext()->setContextProperty(QStringLiteral("deviceMaximized"), maximize);
+    engine.rootContext()->setContextProperty(QStringLiteral("webSocketAddress"), parser.value(webSocketAddressOption));
     engine.rootContext()->setContextProperty(QStringLiteral("hideTextInput"), parser.isSet(hideTextInputOption));
     engine.rootContext()->setContextProperty(QStringLiteral("globalScreenRotation"), parser.isSet(rotateScreen) ? rotation : 0);
     engine.rootContext()->setContextProperty(QStringLiteral("versionNumber"), QStringLiteral(mycroftguiapp_VERSION_STRING));
