@@ -3,11 +3,7 @@ Mycroft GUI
 
 Graphical User Interface powered by Qt and Kirigami for [Mycroft AI](https://github.com/MycroftAI/mycroft-core)
 
-This fork represents the last commit of mycroft-gui licensed under Apache2.0, the upstream repository is now licensed as GPL3.0 and no further updates will be shared with the OVOS ecosystem
-
-Eventually this fork will evolve into a ovos branded equivalent code base, we had not intention of forking and if upstream reverts their licensing changes this repo will be archived
-
-The main intention of this fork is to be a dependency of ovos-shell
+This repo contains the QT6 code base, for the older Qt5 see [OpenVoiceOS/mycroft-gui-qt5](https://github.com/OpenVoiceOS/mycroft-gui-qt5)
 _______________________________________________________________________
 
 - [Getting Started](#getting-started)
