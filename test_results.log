@@ -1,32 +1,30 @@
 DEBUG    test.e2e.conftest:conftest.py:52 Looking for mock service script at: /home/miro/PycharmProjects/OpenVoiceOS Workspace/mycroft-gui-qt6/tools/mock_gui_service.py (exists: True)
 DEBUG    asyncio:selector_events.py:54 Using selector: EpollSelector
 DEBUG    asyncio:selector_events.py:54 Using selector: EpollSelector
-INFO     test.e2e.conftest:conftest.py:62 Starting mock service on port 34315
+INFO     test.e2e.conftest:conftest.py:62 Starting mock service on port 37291
 DEBUG    test.e2e.conftest:conftest.py:66 Using Python: /home/miro/PycharmProjects/OpenVoiceOS Workspace/.venv/bin/python3
-INFO     test.e2e.conftest:conftest.py:110 Connecting client to ws://localhost:34315
+INFO     test.e2e.conftest:conftest.py:110 Connecting client to ws://localhost:37291
 DEBUG    websockets.client:protocol.py:178 = connection is CONNECTING
 DEBUG    websockets.client:client.py:294 > GET / HTTP/1.1
-DEBUG    websockets.client:client.py:296 > Host: localhost:34315
+DEBUG    websockets.client:client.py:296 > Host: localhost:37291
 DEBUG    websockets.client:client.py:296 > Upgrade: websocket
 DEBUG    websockets.client:client.py:296 > Connection: Upgrade
-DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Key: pC5nItH2vW5vFo834NwD1A==
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Key: mLHnYWHb4PwBvGTMnLEozA==
 DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Version: 13
 DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
 DEBUG    websockets.client:client.py:296 > User-Agent: Python/3.11 websockets/16.0
 DEBUG    websockets.client:client.py:320 < HTTP/1.1 101 Switching Protocols
-DEBUG    websockets.client:client.py:322 < Date: Thu, 12 Mar 2026 17:23:07 GMT
+DEBUG    websockets.client:client.py:322 < Date: Thu, 12 Mar 2026 17:59:07 GMT
 DEBUG    websockets.client:client.py:322 < Upgrade: websocket
 DEBUG    websockets.client:client.py:322 < Connection: Upgrade
-DEBUG    websockets.client:client.py:322 < Sec-WebSocket-Accept: nfKZ59VEwKzcKCqdPQUh8IgukF4=
+DEBUG    websockets.client:client.py:322 < Sec-WebSocket-Accept: PGn4cdhqEEWrM9mX4Mor7hjtJS8=
 DEBUG    websockets.client:client.py:322 < Sec-WebSocket-Extensions: permessage-deflate; server_max_window_bits=12; client_max_window_bits=12
 DEBUG    websockets.client:client.py:322 < Server: Python/3.11 websockets/16.0
 DEBUG    websockets.client:protocol.py:178 = connection is OPEN
 DEBUG    websockets.client:protocol.py:609 < TEXT '{"type": "mycroft.gui.connected", "data": {"ver... "1.0"}, "context": {}}' [76 bytes]
-INFO     test.e2e.test_skills:test_skills.py:18 Testing weather skill response
-DEBUG    websockets.client:protocol.py:755 > TEXT '{"type": "mycroft.gui.list.insert", "data": {"g...ex": 0}, "context": {}}' [128 bytes]
-INFO     test.e2e.test_skills:test_skills.py:26 Sent: mycroft.gui.list.insert
-DEBUG    websockets.client:protocol.py:755 > TEXT '{"type": "mycroft.session.set", "data": {"weath..._id": "weather-skill"}}' [295 bytes]
-INFO     test.e2e.test_skills:test_skills.py:26 Sent: mycroft.session.set
+INFO     test.e2e.test_protocol:test_protocol.py:18 Testing gui.list.insert message
+DEBUG    websockets.client:protocol.py:755 > TEXT '{"type": "mycroft.gui.list.insert", "data": {"g...ex": 0}, "context": {}}' [124 bytes]
+INFO     test.e2e.test_protocol:test_protocol.py:26 Sent skill insert: hello-world
 DEBUG    websockets.client:protocol.py:755 > CLOSE 1000 (OK) [2 bytes]
 DEBUG    websockets.client:protocol.py:178 = connection is CLOSING
 DEBUG    websockets.client:protocol.py:609 < CLOSE 1000 (OK) [2 bytes]
@@ -36,11 +34,343 @@ DEBUG    websockets.client:protocol.py:178 = connection is CLOSED
 DEBUG    websockets.client:connection.py:979 x half-closing TCP connection
 INFO     test.e2e.conftest:conftest.py:91 Stopping mock service
 ERROR    test.e2e.conftest:conftest.py:96 Mock service stderr:
-2026-03-12 17:23:06,094 - MockGUIService - INFO - Starting MockGUIService on ws://0.0.0.0:34315
-2026-03-12 17:23:06,102 - websockets.server - INFO - server listening on 0.0.0.0:34315
-2026-03-12 17:23:07,520 - websockets.server - INFO - connection open
-2026-03-12 17:23:07,520 - MockGUIService - INFO - Client connected: ('127.0.0.1', 34836)
-2026-03-12 17:23:07,522 - MockGUIService - INFO - Received: mycroft.gui.list.insert
-2026-03-12 17:23:07,522 - MockGUIService - INFO - Active skill: weather-skill
-2026-03-12 17:23:07,573 - MockGUIService - INFO - Received: mycroft.session.set
+2026-03-12 17:59:05,815 - MockGUIService - INFO - Starting MockGUIService on ws://0.0.0.0:37291/gui
+2026-03-12 17:59:05,824 - websockets.server - INFO - server listening on 0.0.0.0:37291
+2026-03-12 17:59:07,242 - websockets.server - INFO - connection open
+2026-03-12 17:59:07,242 - MockGUIService - INFO - Client connected: ('127.0.0.1', 55854)
+2026-03-12 17:59:07,244 - MockGUIService - INFO - Received: mycroft.gui.list.insert
+2026-03-12 17:59:07,244 - MockGUIService - INFO - Active skill: hello-world
+
+DEBUG    test.e2e.conftest:conftest.py:52 Looking for mock service script at: /home/miro/PycharmProjects/OpenVoiceOS Workspace/mycroft-gui-qt6/tools/mock_gui_service.py (exists: True)
+DEBUG    asyncio:selector_events.py:54 Using selector: EpollSelector
+INFO     test.e2e.conftest:conftest.py:62 Starting mock service on port 49531
+DEBUG    test.e2e.conftest:conftest.py:66 Using Python: /home/miro/PycharmProjects/OpenVoiceOS Workspace/.venv/bin/python3
+INFO     test.e2e.conftest:conftest.py:110 Connecting client to ws://localhost:49531
+DEBUG    websockets.client:protocol.py:178 = connection is CONNECTING
+DEBUG    websockets.client:client.py:294 > GET / HTTP/1.1
+DEBUG    websockets.client:client.py:296 > Host: localhost:49531
+DEBUG    websockets.client:client.py:296 > Upgrade: websocket
+DEBUG    websockets.client:client.py:296 > Connection: Upgrade
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Key: J02DQUNqC94mMj1e/kfqAg==
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Version: 13
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+DEBUG    websockets.client:client.py:296 > User-Agent: Python/3.11 websockets/16.0
+DEBUG    websockets.client:client.py:320 < HTTP/1.1 101 Switching Protocols
+DEBUG    websockets.client:client.py:322 < Date: Thu, 12 Mar 2026 17:59:08 GMT
+DEBUG    websockets.client:client.py:322 < Upgrade: websocket
+DEBUG    websockets.client:client.py:322 < Connection: Upgrade
+DEBUG    websockets.client:client.py:322 < Sec-WebSocket-Accept: /J2Caevwl97kLsdpJEFsVxgMDQw=
+DEBUG    websockets.client:client.py:322 < Sec-WebSocket-Extensions: permessage-deflate; server_max_window_bits=12; client_max_window_bits=12
+DEBUG    websockets.client:client.py:322 < Server: Python/3.11 websockets/16.0
+DEBUG    websockets.client:protocol.py:178 = connection is OPEN
+DEBUG    websockets.client:protocol.py:609 < TEXT '{"type": "mycroft.gui.connected", "data": {"ver... "1.0"}, "context": {}}' [76 bytes]
+INFO     test.e2e.test_protocol:test_protocol.py:32 Testing session.set message
+DEBUG    websockets.client:protocol.py:755 > TEXT '{"type": "mycroft.session.set", "data": {"weath..._id": "weather-skill"}}' [295 bytes]
+INFO     test.e2e.test_protocol:test_protocol.py:40 Sent session data for skill: weather-skill
+DEBUG    websockets.client:protocol.py:755 > CLOSE 1000 (OK) [2 bytes]
+DEBUG    websockets.client:protocol.py:178 = connection is CLOSING
+DEBUG    websockets.client:protocol.py:609 < CLOSE 1000 (OK) [2 bytes]
+DEBUG    websockets.client:protocol.py:659 < EOF
+DEBUG    websockets.client:protocol.py:767 > EOF
+DEBUG    websockets.client:protocol.py:178 = connection is CLOSED
+DEBUG    websockets.client:connection.py:979 x half-closing TCP connection
+INFO     test.e2e.conftest:conftest.py:91 Stopping mock service
+ERROR    test.e2e.conftest:conftest.py:96 Mock service stderr:
+2026-03-12 17:59:07,332 - MockGUIService - INFO - Starting MockGUIService on ws://0.0.0.0:49531/gui
+2026-03-12 17:59:07,340 - websockets.server - INFO - server listening on 0.0.0.0:49531
+2026-03-12 17:59:08,751 - websockets.server - INFO - connection open
+2026-03-12 17:59:08,751 - MockGUIService - INFO - Client connected: ('127.0.0.1', 39074)
+2026-03-12 17:59:08,752 - MockGUIService - INFO - Received: mycroft.session.set
+
+DEBUG    test.e2e.conftest:conftest.py:52 Looking for mock service script at: /home/miro/PycharmProjects/OpenVoiceOS Workspace/mycroft-gui-qt6/tools/mock_gui_service.py (exists: True)
+DEBUG    asyncio:selector_events.py:54 Using selector: EpollSelector
+INFO     test.e2e.conftest:conftest.py:62 Starting mock service on port 56191
+DEBUG    test.e2e.conftest:conftest.py:66 Using Python: /home/miro/PycharmProjects/OpenVoiceOS Workspace/.venv/bin/python3
+INFO     test.e2e.conftest:conftest.py:110 Connecting client to ws://localhost:56191
+DEBUG    websockets.client:protocol.py:178 = connection is CONNECTING
+DEBUG    websockets.client:client.py:294 > GET / HTTP/1.1
+DEBUG    websockets.client:client.py:296 > Host: localhost:56191
+DEBUG    websockets.client:client.py:296 > Upgrade: websocket
+DEBUG    websockets.client:client.py:296 > Connection: Upgrade
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Key: WNYT7xvQBCcKDhHjB65nvw==
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Version: 13
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+DEBUG    websockets.client:client.py:296 > User-Agent: Python/3.11 websockets/16.0
+DEBUG    websockets.client:client.py:320 < HTTP/1.1 101 Switching Protocols
+DEBUG    websockets.client:client.py:322 < Date: Thu, 12 Mar 2026 17:59:10 GMT
+DEBUG    websockets.client:client.py:322 < Upgrade: websocket
+DEBUG    websockets.client:client.py:322 < Connection: Upgrade
+DEBUG    websockets.client:client.py:322 < Sec-WebSocket-Accept: r/s1IaP94I0a6dSP/3ngtP9gzCo=
+DEBUG    websockets.client:client.py:322 < Sec-WebSocket-Extensions: permessage-deflate; server_max_window_bits=12; client_max_window_bits=12
+DEBUG    websockets.client:client.py:322 < Server: Python/3.11 websockets/16.0
+DEBUG    websockets.client:protocol.py:178 = connection is OPEN
+DEBUG    websockets.client:protocol.py:609 < TEXT '{"type": "mycroft.gui.connected", "data": {"ver... "1.0"}, "context": {}}' [76 bytes]
+INFO     test.e2e.test_protocol:test_protocol.py:46 Testing full skill response sequence
+DEBUG    websockets.client:protocol.py:755 > TEXT '{"type": "mycroft.gui.list.insert", "data": {"g...ex": 0}, "context": {}}' [128 bytes]
+INFO     test.e2e.test_protocol:test_protocol.py:54 Sent skill insert: weather-skill
+DEBUG    websockets.client:protocol.py:755 > TEXT '{"type": "mycroft.session.set", "data": {"weath..._id": "weather-skill"}}' [295 bytes]
+INFO     test.e2e.test_protocol:test_protocol.py:61 Sent session data
+DEBUG    websockets.client:protocol.py:755 > CLOSE 1000 (OK) [2 bytes]
+DEBUG    websockets.client:protocol.py:178 = connection is CLOSING
+DEBUG    websockets.client:protocol.py:609 < CLOSE 1000 (OK) [2 bytes]
+DEBUG    websockets.client:protocol.py:659 < EOF
+DEBUG    websockets.client:protocol.py:767 > EOF
+DEBUG    websockets.client:protocol.py:178 = connection is CLOSED
+DEBUG    websockets.client:connection.py:979 x half-closing TCP connection
+INFO     test.e2e.conftest:conftest.py:91 Stopping mock service
+ERROR    test.e2e.conftest:conftest.py:96 Mock service stderr:
+2026-03-12 17:59:08,845 - MockGUIService - INFO - Starting MockGUIService on ws://0.0.0.0:56191/gui
+2026-03-12 17:59:08,854 - websockets.server - INFO - server listening on 0.0.0.0:56191
+2026-03-12 17:59:10,259 - websockets.server - INFO - connection open
+2026-03-12 17:59:10,260 - MockGUIService - INFO - Client connected: ('127.0.0.1', 60050)
+2026-03-12 17:59:10,261 - MockGUIService - INFO - Received: mycroft.gui.list.insert
+2026-03-12 17:59:10,261 - MockGUIService - INFO - Active skill: weather-skill
+2026-03-12 17:59:10,362 - MockGUIService - INFO - Received: mycroft.session.set
+
+DEBUG    test.e2e.conftest:conftest.py:52 Looking for mock service script at: /home/miro/PycharmProjects/OpenVoiceOS Workspace/mycroft-gui-qt6/tools/mock_gui_service.py (exists: True)
+DEBUG    asyncio:selector_events.py:54 Using selector: EpollSelector
+INFO     test.e2e.conftest:conftest.py:62 Starting mock service on port 36963
+DEBUG    test.e2e.conftest:conftest.py:66 Using Python: /home/miro/PycharmProjects/OpenVoiceOS Workspace/.venv/bin/python3
+INFO     test.e2e.conftest:conftest.py:110 Connecting client to ws://localhost:36963
+DEBUG    websockets.client:protocol.py:178 = connection is CONNECTING
+DEBUG    websockets.client:client.py:294 > GET / HTTP/1.1
+DEBUG    websockets.client:client.py:296 > Host: localhost:36963
+DEBUG    websockets.client:client.py:296 > Upgrade: websocket
+DEBUG    websockets.client:client.py:296 > Connection: Upgrade
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Key: cuzh51MpM1bmXgLXWs00gA==
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Version: 13
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+DEBUG    websockets.client:client.py:296 > User-Agent: Python/3.11 websockets/16.0
+DEBUG    websockets.client:client.py:320 < HTTP/1.1 101 Switching Protocols
+DEBUG    websockets.client:client.py:322 < Date: Thu, 12 Mar 2026 17:59:11 GMT
+DEBUG    websockets.client:client.py:322 < Upgrade: websocket
+DEBUG    websockets.client:client.py:322 < Connection: Upgrade
+DEBUG    websockets.client:client.py:322 < Sec-WebSocket-Accept: gfpFE30FDlDy9a0oeL7Kd08yWg4=
+DEBUG    websockets.client:client.py:322 < Sec-WebSocket-Extensions: permessage-deflate; server_max_window_bits=12; client_max_window_bits=12
+DEBUG    websockets.client:client.py:322 < Server: Python/3.11 websockets/16.0
+DEBUG    websockets.client:protocol.py:178 = connection is OPEN
+DEBUG    websockets.client:protocol.py:609 < TEXT '{"type": "mycroft.gui.connected", "data": {"ver... "1.0"}, "context": {}}' [76 bytes]
+INFO     test.e2e.test_protocol:test_protocol.py:71 Testing message with context
+DEBUG    websockets.client:protocol.py:755 > TEXT '{"type": "mycroft.session.set", "data": {"key":..., "user": "test-user"}}' [117 bytes]
+INFO     test.e2e.test_protocol:test_protocol.py:83 Sent message with context: {'skill_id': 'test-skill', 'user': 'test-user'}
+DEBUG    websockets.client:protocol.py:755 > CLOSE 1000 (OK) [2 bytes]
+DEBUG    websockets.client:protocol.py:178 = connection is CLOSING
+DEBUG    websockets.client:protocol.py:609 < CLOSE 1000 (OK) [2 bytes]
+DEBUG    websockets.client:protocol.py:659 < EOF
+DEBUG    websockets.client:protocol.py:767 > EOF
+DEBUG    websockets.client:protocol.py:178 = connection is CLOSED
+DEBUG    websockets.client:connection.py:979 x half-closing TCP connection
+INFO     test.e2e.conftest:conftest.py:91 Stopping mock service
+ERROR    test.e2e.conftest:conftest.py:96 Mock service stderr:
+2026-03-12 17:59:10,454 - MockGUIService - INFO - Starting MockGUIService on ws://0.0.0.0:36963/gui
+2026-03-12 17:59:10,462 - websockets.server - INFO - server listening on 0.0.0.0:36963
+2026-03-12 17:59:11,868 - websockets.server - INFO - connection open
+2026-03-12 17:59:11,869 - MockGUIService - INFO - Client connected: ('127.0.0.1', 42342)
+2026-03-12 17:59:11,870 - MockGUIService - INFO - Received: mycroft.session.set
+
+DEBUG    test.e2e.conftest:conftest.py:52 Looking for mock service script at: /home/miro/PycharmProjects/OpenVoiceOS Workspace/mycroft-gui-qt6/tools/mock_gui_service.py (exists: True)
+DEBUG    asyncio:selector_events.py:54 Using selector: EpollSelector
+INFO     test.e2e.conftest:conftest.py:62 Starting mock service on port 57125
+DEBUG    test.e2e.conftest:conftest.py:66 Using Python: /home/miro/PycharmProjects/OpenVoiceOS Workspace/.venv/bin/python3
+INFO     test.e2e.conftest:conftest.py:110 Connecting client to ws://localhost:57125
+DEBUG    websockets.client:protocol.py:178 = connection is CONNECTING
+DEBUG    websockets.client:client.py:294 > GET / HTTP/1.1
+DEBUG    websockets.client:client.py:296 > Host: localhost:57125
+DEBUG    websockets.client:client.py:296 > Upgrade: websocket
+DEBUG    websockets.client:client.py:296 > Connection: Upgrade
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Key: NnEylpEH8jQJbr3aJ0MlSQ==
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Version: 13
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+DEBUG    websockets.client:client.py:296 > User-Agent: Python/3.11 websockets/16.0
+DEBUG    websockets.client:client.py:320 < HTTP/1.1 101 Switching Protocols
+DEBUG    websockets.client:client.py:322 < Date: Thu, 12 Mar 2026 17:59:13 GMT
+DEBUG    websockets.client:client.py:322 < Upgrade: websocket
+DEBUG    websockets.client:client.py:322 < Connection: Upgrade
+DEBUG    websockets.client:client.py:322 < Sec-WebSocket-Accept: s6l6BWcl3l5lTiZEEy56ONzv4yo=
+DEBUG    websockets.client:client.py:322 < Sec-WebSocket-Extensions: permessage-deflate; server_max_window_bits=12; client_max_window_bits=12
+DEBUG    websockets.client:client.py:322 < Server: Python/3.11 websockets/16.0
+DEBUG    websockets.client:protocol.py:178 = connection is OPEN
+DEBUG    websockets.client:protocol.py:609 < TEXT '{"type": "mycroft.gui.connected", "data": {"ver... "1.0"}, "context": {}}' [76 bytes]
+INFO     test.e2e.test_protocol:test_protocol.py:89 Testing message without context
+DEBUG    websockets.client:protocol.py:755 > TEXT '{"type": "mycroft.session.set", "data": {"key": "value"}}' [57 bytes]
+INFO     test.e2e.test_protocol:test_protocol.py:101 Sent message without context
+DEBUG    websockets.client:protocol.py:755 > CLOSE 1000 (OK) [2 bytes]
+DEBUG    websockets.client:protocol.py:178 = connection is CLOSING
+DEBUG    websockets.client:protocol.py:609 < CLOSE 1000 (OK) [2 bytes]
+DEBUG    websockets.client:protocol.py:659 < EOF
+DEBUG    websockets.client:protocol.py:767 > EOF
+DEBUG    websockets.client:protocol.py:178 = connection is CLOSED
+DEBUG    websockets.client:connection.py:979 x half-closing TCP connection
+INFO     test.e2e.conftest:conftest.py:91 Stopping mock service
+ERROR    test.e2e.conftest:conftest.py:96 Mock service stderr:
+2026-03-12 17:59:11,960 - MockGUIService - INFO - Starting MockGUIService on ws://0.0.0.0:57125/gui
+2026-03-12 17:59:11,969 - websockets.server - INFO - server listening on 0.0.0.0:57125
+2026-03-12 17:59:13,375 - websockets.server - INFO - connection open
+2026-03-12 17:59:13,376 - MockGUIService - INFO - Client connected: ('127.0.0.1', 38724)
+2026-03-12 17:59:13,377 - MockGUIService - INFO - Received: mycroft.session.set
+
+DEBUG    test.e2e.conftest:conftest.py:52 Looking for mock service script at: /home/miro/PycharmProjects/OpenVoiceOS Workspace/mycroft-gui-qt6/tools/mock_gui_service.py (exists: True)
+DEBUG    asyncio:selector_events.py:54 Using selector: EpollSelector
+INFO     test.e2e.conftest:conftest.py:62 Starting mock service on port 39837
+DEBUG    test.e2e.conftest:conftest.py:66 Using Python: /home/miro/PycharmProjects/OpenVoiceOS Workspace/.venv/bin/python3
+INFO     test.e2e.conftest:conftest.py:110 Connecting client to ws://localhost:39837
+DEBUG    websockets.client:protocol.py:178 = connection is CONNECTING
+DEBUG    websockets.client:client.py:294 > GET / HTTP/1.1
+DEBUG    websockets.client:client.py:296 > Host: localhost:39837
+DEBUG    websockets.client:client.py:296 > Upgrade: websocket
+DEBUG    websockets.client:client.py:296 > Connection: Upgrade
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Key: o+YoP1CjPAf4z6dJ+aGQRw==
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Version: 13
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+DEBUG    websockets.client:client.py:296 > User-Agent: Python/3.11 websockets/16.0
+DEBUG    websockets.client:client.py:320 < HTTP/1.1 101 Switching Protocols
+DEBUG    websockets.client:client.py:322 < Date: Thu, 12 Mar 2026 17:59:14 GMT
+DEBUG    websockets.client:client.py:322 < Upgrade: websocket
+DEBUG    websockets.client:client.py:322 < Connection: Upgrade
+DEBUG    websockets.client:client.py:322 < Sec-WebSocket-Accept: q7qeKqEdml6w8jM2oP49ijj+y8k=
+DEBUG    websockets.client:client.py:322 < Sec-WebSocket-Extensions: permessage-deflate; server_max_window_bits=12; client_max_window_bits=12
+DEBUG    websockets.client:client.py:322 < Server: Python/3.11 websockets/16.0
+DEBUG    websockets.client:protocol.py:178 = connection is OPEN
+DEBUG    websockets.client:protocol.py:609 < TEXT '{"type": "mycroft.gui.connected", "data": {"ver... "1.0"}, "context": {}}' [76 bytes]
+INFO     test.e2e.test_protocol:test_protocol.py:107 Testing message with empty data
+DEBUG    websockets.client:protocol.py:755 > TEXT '{"type": "mycroft.gui.list.insert", "data": {}, "context": {}}' [62 bytes]
+INFO     test.e2e.test_protocol:test_protocol.py:119 Sent message with empty data
+DEBUG    websockets.client:protocol.py:755 > CLOSE 1000 (OK) [2 bytes]
+DEBUG    websockets.client:protocol.py:178 = connection is CLOSING
+DEBUG    websockets.client:protocol.py:609 < CLOSE 1000 (OK) [2 bytes]
+DEBUG    websockets.client:protocol.py:659 < EOF
+DEBUG    websockets.client:protocol.py:767 > EOF
+DEBUG    websockets.client:protocol.py:178 = connection is CLOSED
+DEBUG    websockets.client:connection.py:979 x half-closing TCP connection
+INFO     test.e2e.conftest:conftest.py:91 Stopping mock service
+ERROR    test.e2e.conftest:conftest.py:96 Mock service stderr:
+2026-03-12 17:59:13,466 - MockGUIService - INFO - Starting MockGUIService on ws://0.0.0.0:39837/gui
+2026-03-12 17:59:13,475 - websockets.server - INFO - server listening on 0.0.0.0:39837
+2026-03-12 17:59:14,883 - websockets.server - INFO - connection open
+2026-03-12 17:59:14,883 - MockGUIService - INFO - Client connected: ('127.0.0.1', 41642)
+2026-03-12 17:59:14,884 - MockGUIService - INFO - Received: mycroft.gui.list.insert
+2026-03-12 17:59:14,884 - MockGUIService - INFO - Active skill: None
+
+DEBUG    test.e2e.conftest:conftest.py:52 Looking for mock service script at: /home/miro/PycharmProjects/OpenVoiceOS Workspace/mycroft-gui-qt6/tools/mock_gui_service.py (exists: True)
+DEBUG    asyncio:selector_events.py:54 Using selector: EpollSelector
+INFO     test.e2e.conftest:conftest.py:62 Starting mock service on port 45563
+DEBUG    test.e2e.conftest:conftest.py:66 Using Python: /home/miro/PycharmProjects/OpenVoiceOS Workspace/.venv/bin/python3
+INFO     test.e2e.conftest:conftest.py:110 Connecting client to ws://localhost:45563
+DEBUG    websockets.client:protocol.py:178 = connection is CONNECTING
+DEBUG    websockets.client:client.py:294 > GET / HTTP/1.1
+DEBUG    websockets.client:client.py:296 > Host: localhost:45563
+DEBUG    websockets.client:client.py:296 > Upgrade: websocket
+DEBUG    websockets.client:client.py:296 > Connection: Upgrade
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Key: 0VS4Wn60v8rbaluVN8T8mA==
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Version: 13
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+DEBUG    websockets.client:client.py:296 > User-Agent: Python/3.11 websockets/16.0
+DEBUG    websockets.client:client.py:320 < HTTP/1.1 101 Switching Protocols
+DEBUG    websockets.client:client.py:322 < Date: Thu, 12 Mar 2026 17:59:16 GMT
+DEBUG    websockets.client:client.py:322 < Upgrade: websocket
+DEBUG    websockets.client:client.py:322 < Connection: Upgrade
+DEBUG    websockets.client:client.py:322 < Sec-WebSocket-Accept: FKN/d2369ChyOsYz3l1iMVp9bV0=
+DEBUG    websockets.client:client.py:322 < Sec-WebSocket-Extensions: permessage-deflate; server_max_window_bits=12; client_max_window_bits=12
+DEBUG    websockets.client:client.py:322 < Server: Python/3.11 websockets/16.0
+DEBUG    websockets.client:protocol.py:178 = connection is OPEN
+DEBUG    websockets.client:protocol.py:609 < TEXT '{"type": "mycroft.gui.connected", "data": {"ver... "1.0"}, "context": {}}' [76 bytes]
+INFO     test.e2e.test_protocol:test_protocol.py:125 Testing nested data structures
+DEBUG    websockets.client:protocol.py:755 > TEXT '{"type": "mycroft.session.set", "data": {"skill...d"}}}}}, "context": {}}' [129 bytes]
+INFO     test.e2e.test_protocol:test_protocol.py:147 Sent message with nested structure
+DEBUG    websockets.client:protocol.py:755 > CLOSE 1000 (OK) [2 bytes]
+DEBUG    websockets.client:protocol.py:178 = connection is CLOSING
+DEBUG    websockets.client:protocol.py:609 < CLOSE 1000 (OK) [2 bytes]
+DEBUG    websockets.client:protocol.py:659 < EOF
+DEBUG    websockets.client:protocol.py:767 > EOF
+DEBUG    websockets.client:protocol.py:178 = connection is CLOSED
+DEBUG    websockets.client:connection.py:979 x half-closing TCP connection
+INFO     test.e2e.conftest:conftest.py:91 Stopping mock service
+ERROR    test.e2e.conftest:conftest.py:96 Mock service stderr:
+2026-03-12 17:59:14,975 - MockGUIService - INFO - Starting MockGUIService on ws://0.0.0.0:45563/gui
+2026-03-12 17:59:14,984 - websockets.server - INFO - server listening on 0.0.0.0:45563
+2026-03-12 17:59:16,391 - websockets.server - INFO - connection open
+2026-03-12 17:59:16,391 - MockGUIService - INFO - Client connected: ('127.0.0.1', 45322)
+2026-03-12 17:59:16,392 - MockGUIService - INFO - Received: mycroft.session.set
+
+DEBUG    test.e2e.conftest:conftest.py:52 Looking for mock service script at: /home/miro/PycharmProjects/OpenVoiceOS Workspace/mycroft-gui-qt6/tools/mock_gui_service.py (exists: True)
+DEBUG    asyncio:selector_events.py:54 Using selector: EpollSelector
+INFO     test.e2e.conftest:conftest.py:62 Starting mock service on port 48331
+DEBUG    test.e2e.conftest:conftest.py:66 Using Python: /home/miro/PycharmProjects/OpenVoiceOS Workspace/.venv/bin/python3
+INFO     test.e2e.conftest:conftest.py:110 Connecting client to ws://localhost:48331
+DEBUG    websockets.client:protocol.py:178 = connection is CONNECTING
+DEBUG    websockets.client:client.py:294 > GET / HTTP/1.1
+DEBUG    websockets.client:client.py:296 > Host: localhost:48331
+DEBUG    websockets.client:client.py:296 > Upgrade: websocket
+DEBUG    websockets.client:client.py:296 > Connection: Upgrade
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Key: d/qfXzfP9c6ApEL98tCShw==
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Version: 13
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+DEBUG    websockets.client:client.py:296 > User-Agent: Python/3.11 websockets/16.0
+DEBUG    websockets.client:client.py:320 < HTTP/1.1 101 Switching Protocols
+DEBUG    websockets.client:client.py:322 < Date: Thu, 12 Mar 2026 17:59:17 GMT
+DEBUG    websockets.client:client.py:322 < Upgrade: websocket
+DEBUG    websockets.client:client.py:322 < Connection: Upgrade
+DEBUG    websockets.client:client.py:322 < Sec-WebSocket-Accept: 6+mmED6fCWAGg2cM8C1JEpXedAA=
+DEBUG    websockets.client:client.py:322 < Sec-WebSocket-Extensions: permessage-deflate; server_max_window_bits=12; client_max_window_bits=12
+DEBUG    websockets.client:client.py:322 < Server: Python/3.11 websockets/16.0
+DEBUG    websockets.client:protocol.py:178 = connection is OPEN
+DEBUG    websockets.client:protocol.py:609 < TEXT '{"type": "mycroft.gui.connected", "data": {"ver... "1.0"}, "context": {}}' [76 bytes]
+INFO     test.e2e.test_protocol:test_protocol.py:153 Testing message with arrays
+DEBUG    websockets.client:protocol.py:755 > TEXT '{"type": "mycroft.session.set", "data": {"items...m 3"}]}, "context": {}}' [154 bytes]
+INFO     test.e2e.test_protocol:test_protocol.py:171 Sent message with 3 array items
+DEBUG    websockets.client:protocol.py:755 > CLOSE 1000 (OK) [2 bytes]
+DEBUG    websockets.client:protocol.py:178 = connection is CLOSING
+DEBUG    websockets.client:protocol.py:609 < CLOSE 1000 (OK) [2 bytes]
+DEBUG    websockets.client:protocol.py:659 < EOF
+DEBUG    websockets.client:protocol.py:767 > EOF
+DEBUG    websockets.client:protocol.py:178 = connection is CLOSED
+DEBUG    websockets.client:connection.py:979 x half-closing TCP connection
+INFO     test.e2e.conftest:conftest.py:91 Stopping mock service
+ERROR    test.e2e.conftest:conftest.py:96 Mock service stderr:
+2026-03-12 17:59:16,484 - MockGUIService - INFO - Starting MockGUIService on ws://0.0.0.0:48331/gui
+2026-03-12 17:59:16,492 - websockets.server - INFO - server listening on 0.0.0.0:48331
+2026-03-12 17:59:17,899 - websockets.server - INFO - connection open
+2026-03-12 17:59:17,899 - MockGUIService - INFO - Client connected: ('127.0.0.1', 49752)
+2026-03-12 17:59:17,900 - MockGUIService - INFO - Received: mycroft.session.set
+
+DEBUG    test.e2e.conftest:conftest.py:52 Looking for mock service script at: /home/miro/PycharmProjects/OpenVoiceOS Workspace/mycroft-gui-qt6/tools/mock_gui_service.py (exists: True)
+DEBUG    asyncio:selector_events.py:54 Using selector: EpollSelector
+INFO     test.e2e.conftest:conftest.py:62 Starting mock service on port 51469
+DEBUG    test.e2e.conftest:conftest.py:66 Using Python: /home/miro/PycharmProjects/OpenVoiceOS Workspace/.venv/bin/python3
+INFO     test.e2e.conftest:conftest.py:110 Connecting client to ws://localhost:51469
+DEBUG    websockets.client:protocol.py:178 = connection is CONNECTING
+DEBUG    websockets.client:client.py:294 > GET / HTTP/1.1
+DEBUG    websockets.client:client.py:296 > Host: localhost:51469
+DEBUG    websockets.client:client.py:296 > Upgrade: websocket
+DEBUG    websockets.client:client.py:296 > Connection: Upgrade
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Key: 8lTn29hyPoWPgfWNro5Z5Q==
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Version: 13
+DEBUG    websockets.client:client.py:296 > Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+DEBUG    websockets.client:client.py:296 > User-Agent: Python/3.11 websockets/16.0
+DEBUG    websockets.client:client.py:320 < HTTP/1.1 101 Switching Protocols
+DEBUG    websockets.client:client.py:322 < Date: Thu, 12 Mar 2026 17:59:19 GMT
+DEBUG    websockets.client:client.py:322 < Upgrade: websocket
+DEBUG    websockets.client:client.py:322 < Connection: Upgrade
+DEBUG    websockets.client:client.py:322 < Sec-WebSocket-Accept: DlZTZt2SSbPzFo1QzgHvg+L0+zA=
+DEBUG    websockets.client:client.py:322 < Sec-WebSocket-Extensions: permessage-deflate; server_max_window_bits=12; client_max_window_bits=12
+DEBUG    websockets.client:client.py:322 < Server: Python/3.11 websockets/16.0
+DEBUG    websockets.client:protocol.py:178 = connection is OPEN
+DEBUG    websockets.client:protocol.py:609 < TEXT '{"type": "mycroft.gui.connected", "data": {"ver... "1.0"}, "context": {}}' [76 bytes]
+INFO     test.e2e.test_protocol:test_protocol.py:177 Testing unicode characters
+DEBUG    websockets.client:protocol.py:755 > TEXT '{"type": "mycroft.session.set", "data": {"text"...ude01"}, "context": {}}' [219 bytes]
+INFO     test.e2e.test_protocol:test_protocol.py:192 Sent unicode message: Hello 世界 🌍 Привет мир
+DEBUG    websockets.client:protocol.py:755 > CLOSE 1000 (OK) [2 bytes]
+DEBUG    websockets.client:protocol.py:178 = connection is CLOSING
+DEBUG    websockets.client:protocol.py:609 < CLOSE 1000 (OK) [2 bytes]
+DEBUG    websockets.client:protocol.py:659 < EOF
+DEBUG    websockets.client:protocol.py:767 > EOF
+DEBUG    websockets.client:protocol.py:178 = connection is CLOSED
+DEBUG    websockets.client:connection.py:979 x half-closing TCP connection
+INFO     test.e2e.conftest:conftest.py:91 Stopping mock service
+ERROR    test.e2e.conftest:conftest.py:96 Mock service stderr:
+2026-03-12 17:59:18,002 - MockGUIService - INFO - Starting MockGUIService on ws://0.0.0.0:51469/gui
+2026-03-12 17:59:18,011 - websockets.server - INFO - server listening on 0.0.0.0:51469
+2026-03-12 17:59:19,407 - websockets.server - INFO - connection open
+2026-03-12 17:59:19,407 - MockGUIService - INFO - Client connected: ('127.0.0.1', 48280)
+2026-03-12 17:59:19,408 - MockGUIService - INFO - Received: mycroft.session.set
 
