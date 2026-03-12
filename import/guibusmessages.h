@@ -23,21 +23,31 @@
 
 /**
  * @file guibusmessages.h
- * @brief Central registry of all OVOS bus messages supported by mycroft-gui-qt5
+ * @brief Central registry of all OVOS bus messages supported by mycroft-gui-qt6
  *
  * This file documents the complete set of OVOS Message Bus events that are forwarded
  * from ovos-core to GUI clients via the WebSocket protocol. This is a SUBSET of all
- * OVOS bus messages — only those relevant to GUI rendering and user interaction.
+ * OVOS bus messages — only those relevant to GUI rendering, state changes, and user interaction.
  *
- * CRITICAL: mycroft-gui-qt5 does NOT connect to the OVOS Message Bus directly.
+ * Includes all 41 messages forwarded from ovos-gui/namespace.py:_define_messages_to_forward():
+ * - Core: skill lifecycle, utterance handling, intent failure
+ * - Audio: speak, audio output start/end
+ * - Speech Recognition: wakeword, recording, sleep/wake, utterance state
+ * - Enclosure Eyes: on/off, blink, look, color, animations (13 commands)
+ * - Enclosure Mouth: talk, think, listen, smile, viseme, animations (9 commands)
+ * - Display: mouth text/image, weather display
+ * - Shell Features: brightness, color schemes, notifications, widgets, configuration (protocol extensions)
+ *
+ * CRITICAL: mycroft-gui-qt6 does NOT connect to the OVOS Message Bus directly (port 8181).
  * All messages flow through the legacy-plugin adapter (ovos-legacy-mycroft-gui-plugin)
- * which translates between the Qt WebSocket protocol and OVOS Message Bus format.
+ * which translates between the Qt WebSocket protocol (port 18181) and OVOS Message Bus format.
  *
  * ARCHITECTURE:
- *   OVOS Core Bus → legacy-plugin (Tornado server) → mycroft-gui-qt5 (Qt WebSocket client)
+ *   OVOS Core Bus (8181) → legacy-plugin (Tornado server) → mycroft-gui-qt6 WebSocket (18181)
  *
- * See: docs/PROTOCOL.md for full message format specifications
- * See: BUS_EVENTS_AUDIT.md for message-to-handler mapping
+ * See: ovos-legacy-mycroft-gui-plugin/docs/TWO_BUS_ARCHITECTURE.md for architecture details
+ * See: ovos-legacy-mycroft-gui-plugin/docs/PROTOCOL_EXTENSIONS.md for shell feature protocol
+ * See: ovos-gui/ovos_gui/namespace.py:419-471 for forwarded message list
  */
 
 namespace GuiBusMessages {
@@ -79,21 +89,63 @@ enum class GUIBusMessageType {
     // Inform client of audio I/O activity (not used for rendering, state only)
     RECOGNIZER_AUDIO_OUTPUT_START,  // "recognizer_loop:audio_output_start"
     RECOGNIZER_AUDIO_OUTPUT_END,    // "recognizer_loop:audio_output_end"
+    SPEAK,                          // "speak" (TTS output started)
 
     // ==================== SPEECH RECOGNITION STATE ====================
     RECOGNIZER_WAKEWORD,       // "recognizer_loop:wakeword"
     RECOGNIZER_RECORD_BEGIN,   // "recognizer_loop:record_begin"
     RECOGNIZER_RECORD_END,     // "recognizer_loop:record_end"
-    SPEECH_RECOGNITION_UNKNOWN, // "mycroft.speech.recognition.unknown"
+    SPEECH_RECOGNITION_UNKNOWN, // "recognizer_loop:recognition_unknown"
+    RECOGNIZER_SLEEP,          // "recognizer_loop:sleep"
+    RECOGNIZER_WAKE_UP,        // "recognizer_loop:wake_up"
+    MYCROFT_AWOKEN,            // "mycroft.awoken"
 
     // ==================== SKILL LIFECYCLE STATE ====================
     // Inform client of skill status (not used for rendering, state only)
     STOP_HANDLED,   // "mycroft.stop.handled" or "mycroft.stop"
     INTENT_FAILURE, // "complete_intent_failure"
+    UTTERANCE_HANDLED,  // "ovos.utterance.handled"
+    UTTERANCE_CANCELLED,  // "ovos.utterance.cancelled"
+    SKILL_HANDLER_START,  // "mycroft.skill.handler.start"
+    SKILL_HANDLER_COMPLETE,  // "mycroft.skill.handler.complete"
 
     // ==================== CORE LIFECYCLE STATE ====================
     SKILLS_LOADED_RESPONSE,  // "mycroft.skills.all_loaded.response"
     READY,                   // "mycroft.ready"
+
+    // ==================== ENCLOSURE EYES COMMANDS ====================
+    // Device LED/eye animation control
+    ENCLOSURE_EYES_ON,        // "enclosure.eyes.on"
+    ENCLOSURE_EYES_OFF,       // "enclosure.eyes.off"
+    ENCLOSURE_EYES_BLINK,     // "enclosure.eyes.blink"
+    ENCLOSURE_EYES_NARROW,    // "enclosure.eyes.narrow"
+    ENCLOSURE_EYES_LOOK,      // "enclosure.eyes.look"
+    ENCLOSURE_EYES_COLOR,     // "enclosure.eyes.color"
+    ENCLOSURE_EYES_LEVEL,     // "enclosure.eyes.level"
+    ENCLOSURE_EYES_VOLUME,    // "enclosure.eyes.volume"
+    ENCLOSURE_EYES_SPIN,      // "enclosure.eyes.spin"
+    ENCLOSURE_EYES_TIMEDSPIN, // "enclosure.eyes.timedspin"
+    ENCLOSURE_EYES_RESET,     // "enclosure.eyes.reset"
+    ENCLOSURE_EYES_SETPIXEL,  // "enclosure.eyes.setpixel"
+    ENCLOSURE_EYES_FILL,      // "enclosure.eyes.fill"
+
+    // ==================== ENCLOSURE MOUTH COMMANDS ====================
+    // Device mouth/mouth animations
+    ENCLOSURE_MOUTH_EVENTS_ACTIVATE,    // "enclosure.mouth.events.activate"
+    ENCLOSURE_MOUTH_EVENTS_DEACTIVATE,  // "enclosure.mouth.events.deactivate"
+    ENCLOSURE_MOUTH_TALK,      // "enclosure.mouth.talk"
+    ENCLOSURE_MOUTH_THINK,     // "enclosure.mouth.think"
+    ENCLOSURE_MOUTH_LISTEN,    // "enclosure.mouth.listen"
+    ENCLOSURE_MOUTH_SMILE,     // "enclosure.mouth.smile"
+    ENCLOSURE_MOUTH_VISEME,    // "enclosure.mouth.viseme"
+    ENCLOSURE_MOUTH_VISEME_LIST,  // "enclosure.mouth.viseme_list"
+    ENCLOSURE_MOUTH_RESET,     // "enclosure.mouth.reset"
+    ENCLOSURE_MOUTH_TEXT,      // "enclosure.mouth.text"
+    ENCLOSURE_MOUTH_DISPLAY,   // "enclosure.mouth.display"
+
+    // ==================== DISPLAY MESSAGES ====================
+    // Display weather and other widgets
+    ENCLOSURE_WEATHER_DISPLAY,  // "enclosure.weather.display"
 
     // ==================== SCREEN/HOMESCREEN ====================
     // Return to idle screen
@@ -182,24 +234,96 @@ inline GUIBusMessageType fromString(const QString &typeStr) {
         return GUIBusMessageType::RECOGNIZER_AUDIO_OUTPUT_START;
     if (typeStr == QLatin1String("recognizer_loop:audio_output_end"))
         return GUIBusMessageType::RECOGNIZER_AUDIO_OUTPUT_END;
+    if (typeStr == QLatin1String("speak"))
+        return GUIBusMessageType::SPEAK;
     if (typeStr == QLatin1String("recognizer_loop:wakeword"))
         return GUIBusMessageType::RECOGNIZER_WAKEWORD;
     if (typeStr == QLatin1String("recognizer_loop:record_begin"))
         return GUIBusMessageType::RECOGNIZER_RECORD_BEGIN;
     if (typeStr == QLatin1String("recognizer_loop:record_end"))
         return GUIBusMessageType::RECOGNIZER_RECORD_END;
-    if (typeStr == QLatin1String("mycroft.speech.recognition.unknown"))
+    if (typeStr == QLatin1String("recognizer_loop:recognition_unknown"))
         return GUIBusMessageType::SPEECH_RECOGNITION_UNKNOWN;
+    if (typeStr == QLatin1String("recognizer_loop:sleep"))
+        return GUIBusMessageType::RECOGNIZER_SLEEP;
+    if (typeStr == QLatin1String("recognizer_loop:wake_up"))
+        return GUIBusMessageType::RECOGNIZER_WAKE_UP;
+    if (typeStr == QLatin1String("mycroft.awoken"))
+        return GUIBusMessageType::MYCROFT_AWOKEN;
     if (typeStr == QLatin1String("mycroft.stop.handled") || typeStr == QLatin1String("mycroft.stop"))
         return GUIBusMessageType::STOP_HANDLED;
     if (typeStr == QLatin1String("complete_intent_failure"))
         return GUIBusMessageType::INTENT_FAILURE;
+    if (typeStr == QLatin1String("ovos.utterance.handled"))
+        return GUIBusMessageType::UTTERANCE_HANDLED;
+    if (typeStr == QLatin1String("ovos.utterance.cancelled"))
+        return GUIBusMessageType::UTTERANCE_CANCELLED;
+    if (typeStr == QLatin1String("mycroft.skill.handler.start"))
+        return GUIBusMessageType::SKILL_HANDLER_START;
+    if (typeStr == QLatin1String("mycroft.skill.handler.complete"))
+        return GUIBusMessageType::SKILL_HANDLER_COMPLETE;
     if (typeStr == QLatin1String("mycroft.skills.all_loaded.response"))
         return GUIBusMessageType::SKILLS_LOADED_RESPONSE;
     if (typeStr == QLatin1String("mycroft.ready"))
         return GUIBusMessageType::READY;
     if (typeStr == QLatin1String("screen.close.idle.event"))
         return GUIBusMessageType::SCREEN_CLOSE_IDLE_EVENT;
+
+    // Enclosure eyes
+    if (typeStr == QLatin1String("enclosure.eyes.on"))
+        return GUIBusMessageType::ENCLOSURE_EYES_ON;
+    if (typeStr == QLatin1String("enclosure.eyes.off"))
+        return GUIBusMessageType::ENCLOSURE_EYES_OFF;
+    if (typeStr == QLatin1String("enclosure.eyes.blink"))
+        return GUIBusMessageType::ENCLOSURE_EYES_BLINK;
+    if (typeStr == QLatin1String("enclosure.eyes.narrow"))
+        return GUIBusMessageType::ENCLOSURE_EYES_NARROW;
+    if (typeStr == QLatin1String("enclosure.eyes.look"))
+        return GUIBusMessageType::ENCLOSURE_EYES_LOOK;
+    if (typeStr == QLatin1String("enclosure.eyes.color"))
+        return GUIBusMessageType::ENCLOSURE_EYES_COLOR;
+    if (typeStr == QLatin1String("enclosure.eyes.level"))
+        return GUIBusMessageType::ENCLOSURE_EYES_LEVEL;
+    if (typeStr == QLatin1String("enclosure.eyes.volume"))
+        return GUIBusMessageType::ENCLOSURE_EYES_VOLUME;
+    if (typeStr == QLatin1String("enclosure.eyes.spin"))
+        return GUIBusMessageType::ENCLOSURE_EYES_SPIN;
+    if (typeStr == QLatin1String("enclosure.eyes.timedspin"))
+        return GUIBusMessageType::ENCLOSURE_EYES_TIMEDSPIN;
+    if (typeStr == QLatin1String("enclosure.eyes.reset"))
+        return GUIBusMessageType::ENCLOSURE_EYES_RESET;
+    if (typeStr == QLatin1String("enclosure.eyes.setpixel"))
+        return GUIBusMessageType::ENCLOSURE_EYES_SETPIXEL;
+    if (typeStr == QLatin1String("enclosure.eyes.fill"))
+        return GUIBusMessageType::ENCLOSURE_EYES_FILL;
+
+    // Enclosure mouth
+    if (typeStr == QLatin1String("enclosure.mouth.events.activate"))
+        return GUIBusMessageType::ENCLOSURE_MOUTH_EVENTS_ACTIVATE;
+    if (typeStr == QLatin1String("enclosure.mouth.events.deactivate"))
+        return GUIBusMessageType::ENCLOSURE_MOUTH_EVENTS_DEACTIVATE;
+    if (typeStr == QLatin1String("enclosure.mouth.talk"))
+        return GUIBusMessageType::ENCLOSURE_MOUTH_TALK;
+    if (typeStr == QLatin1String("enclosure.mouth.think"))
+        return GUIBusMessageType::ENCLOSURE_MOUTH_THINK;
+    if (typeStr == QLatin1String("enclosure.mouth.listen"))
+        return GUIBusMessageType::ENCLOSURE_MOUTH_LISTEN;
+    if (typeStr == QLatin1String("enclosure.mouth.smile"))
+        return GUIBusMessageType::ENCLOSURE_MOUTH_SMILE;
+    if (typeStr == QLatin1String("enclosure.mouth.viseme"))
+        return GUIBusMessageType::ENCLOSURE_MOUTH_VISEME;
+    if (typeStr == QLatin1String("enclosure.mouth.viseme_list"))
+        return GUIBusMessageType::ENCLOSURE_MOUTH_VISEME_LIST;
+    if (typeStr == QLatin1String("enclosure.mouth.reset"))
+        return GUIBusMessageType::ENCLOSURE_MOUTH_RESET;
+    if (typeStr == QLatin1String("enclosure.mouth.text"))
+        return GUIBusMessageType::ENCLOSURE_MOUTH_TEXT;
+    if (typeStr == QLatin1String("enclosure.mouth.display"))
+        return GUIBusMessageType::ENCLOSURE_MOUTH_DISPLAY;
+
+    // Display
+    if (typeStr == QLatin1String("enclosure.weather.display"))
+        return GUIBusMessageType::ENCLOSURE_WEATHER_DISPLAY;
 
     // User interaction
     if (typeStr == QLatin1String("mycroft.events.triggered"))
@@ -290,6 +414,8 @@ inline const char* toString(GUIBusMessageType type) {
             return "recognizer_loop:audio_output_start";
         case GUIBusMessageType::RECOGNIZER_AUDIO_OUTPUT_END:
             return "recognizer_loop:audio_output_end";
+        case GUIBusMessageType::SPEAK:
+            return "speak";
         case GUIBusMessageType::RECOGNIZER_WAKEWORD:
             return "recognizer_loop:wakeword";
         case GUIBusMessageType::RECOGNIZER_RECORD_BEGIN:
@@ -297,17 +423,81 @@ inline const char* toString(GUIBusMessageType type) {
         case GUIBusMessageType::RECOGNIZER_RECORD_END:
             return "recognizer_loop:record_end";
         case GUIBusMessageType::SPEECH_RECOGNITION_UNKNOWN:
-            return "mycroft.speech.recognition.unknown";
+            return "recognizer_loop:recognition_unknown";
+        case GUIBusMessageType::RECOGNIZER_SLEEP:
+            return "recognizer_loop:sleep";
+        case GUIBusMessageType::RECOGNIZER_WAKE_UP:
+            return "recognizer_loop:wake_up";
+        case GUIBusMessageType::MYCROFT_AWOKEN:
+            return "mycroft.awoken";
         case GUIBusMessageType::STOP_HANDLED:
             return "mycroft.stop.handled";
         case GUIBusMessageType::INTENT_FAILURE:
             return "complete_intent_failure";
+        case GUIBusMessageType::UTTERANCE_HANDLED:
+            return "ovos.utterance.handled";
+        case GUIBusMessageType::UTTERANCE_CANCELLED:
+            return "ovos.utterance.cancelled";
+        case GUIBusMessageType::SKILL_HANDLER_START:
+            return "mycroft.skill.handler.start";
+        case GUIBusMessageType::SKILL_HANDLER_COMPLETE:
+            return "mycroft.skill.handler.complete";
         case GUIBusMessageType::SKILLS_LOADED_RESPONSE:
             return "mycroft.skills.all_loaded.response";
         case GUIBusMessageType::READY:
             return "mycroft.ready";
         case GUIBusMessageType::SCREEN_CLOSE_IDLE_EVENT:
             return "screen.close.idle.event";
+        case GUIBusMessageType::ENCLOSURE_EYES_ON:
+            return "enclosure.eyes.on";
+        case GUIBusMessageType::ENCLOSURE_EYES_OFF:
+            return "enclosure.eyes.off";
+        case GUIBusMessageType::ENCLOSURE_EYES_BLINK:
+            return "enclosure.eyes.blink";
+        case GUIBusMessageType::ENCLOSURE_EYES_NARROW:
+            return "enclosure.eyes.narrow";
+        case GUIBusMessageType::ENCLOSURE_EYES_LOOK:
+            return "enclosure.eyes.look";
+        case GUIBusMessageType::ENCLOSURE_EYES_COLOR:
+            return "enclosure.eyes.color";
+        case GUIBusMessageType::ENCLOSURE_EYES_LEVEL:
+            return "enclosure.eyes.level";
+        case GUIBusMessageType::ENCLOSURE_EYES_VOLUME:
+            return "enclosure.eyes.volume";
+        case GUIBusMessageType::ENCLOSURE_EYES_SPIN:
+            return "enclosure.eyes.spin";
+        case GUIBusMessageType::ENCLOSURE_EYES_TIMEDSPIN:
+            return "enclosure.eyes.timedspin";
+        case GUIBusMessageType::ENCLOSURE_EYES_RESET:
+            return "enclosure.eyes.reset";
+        case GUIBusMessageType::ENCLOSURE_EYES_SETPIXEL:
+            return "enclosure.eyes.setpixel";
+        case GUIBusMessageType::ENCLOSURE_EYES_FILL:
+            return "enclosure.eyes.fill";
+        case GUIBusMessageType::ENCLOSURE_MOUTH_EVENTS_ACTIVATE:
+            return "enclosure.mouth.events.activate";
+        case GUIBusMessageType::ENCLOSURE_MOUTH_EVENTS_DEACTIVATE:
+            return "enclosure.mouth.events.deactivate";
+        case GUIBusMessageType::ENCLOSURE_MOUTH_TALK:
+            return "enclosure.mouth.talk";
+        case GUIBusMessageType::ENCLOSURE_MOUTH_THINK:
+            return "enclosure.mouth.think";
+        case GUIBusMessageType::ENCLOSURE_MOUTH_LISTEN:
+            return "enclosure.mouth.listen";
+        case GUIBusMessageType::ENCLOSURE_MOUTH_SMILE:
+            return "enclosure.mouth.smile";
+        case GUIBusMessageType::ENCLOSURE_MOUTH_VISEME:
+            return "enclosure.mouth.viseme";
+        case GUIBusMessageType::ENCLOSURE_MOUTH_VISEME_LIST:
+            return "enclosure.mouth.viseme_list";
+        case GUIBusMessageType::ENCLOSURE_MOUTH_RESET:
+            return "enclosure.mouth.reset";
+        case GUIBusMessageType::ENCLOSURE_MOUTH_TEXT:
+            return "enclosure.mouth.text";
+        case GUIBusMessageType::ENCLOSURE_MOUTH_DISPLAY:
+            return "enclosure.mouth.display";
+        case GUIBusMessageType::ENCLOSURE_WEATHER_DISPLAY:
+            return "enclosure.weather.display";
         case GUIBusMessageType::EVENTS_TRIGGERED:
             return "mycroft.events.triggered";
         case GUIBusMessageType::RECOGNIZER_UTTERANCE:
@@ -381,15 +571,48 @@ inline GUIBusMessageCategory getCategory(GUIBusMessageType type) {
             return GUIBusMessageCategory::SESSION_DATA;
         case GUIBusMessageType::RECOGNIZER_AUDIO_OUTPUT_START:
         case GUIBusMessageType::RECOGNIZER_AUDIO_OUTPUT_END:
+        case GUIBusMessageType::SPEAK:
         case GUIBusMessageType::RECOGNIZER_WAKEWORD:
         case GUIBusMessageType::RECOGNIZER_RECORD_BEGIN:
         case GUIBusMessageType::RECOGNIZER_RECORD_END:
+        case GUIBusMessageType::RECOGNIZER_SLEEP:
+        case GUIBusMessageType::RECOGNIZER_WAKE_UP:
+        case GUIBusMessageType::MYCROFT_AWOKEN:
         case GUIBusMessageType::SPEECH_RECOGNITION_UNKNOWN:
         case GUIBusMessageType::STOP_HANDLED:
         case GUIBusMessageType::INTENT_FAILURE:
+        case GUIBusMessageType::UTTERANCE_HANDLED:
+        case GUIBusMessageType::UTTERANCE_CANCELLED:
+        case GUIBusMessageType::SKILL_HANDLER_START:
+        case GUIBusMessageType::SKILL_HANDLER_COMPLETE:
         case GUIBusMessageType::SKILLS_LOADED_RESPONSE:
         case GUIBusMessageType::READY:
         case GUIBusMessageType::SCREEN_CLOSE_IDLE_EVENT:
+        case GUIBusMessageType::ENCLOSURE_EYES_ON:
+        case GUIBusMessageType::ENCLOSURE_EYES_OFF:
+        case GUIBusMessageType::ENCLOSURE_EYES_BLINK:
+        case GUIBusMessageType::ENCLOSURE_EYES_NARROW:
+        case GUIBusMessageType::ENCLOSURE_EYES_LOOK:
+        case GUIBusMessageType::ENCLOSURE_EYES_COLOR:
+        case GUIBusMessageType::ENCLOSURE_EYES_LEVEL:
+        case GUIBusMessageType::ENCLOSURE_EYES_VOLUME:
+        case GUIBusMessageType::ENCLOSURE_EYES_SPIN:
+        case GUIBusMessageType::ENCLOSURE_EYES_TIMEDSPIN:
+        case GUIBusMessageType::ENCLOSURE_EYES_RESET:
+        case GUIBusMessageType::ENCLOSURE_EYES_SETPIXEL:
+        case GUIBusMessageType::ENCLOSURE_EYES_FILL:
+        case GUIBusMessageType::ENCLOSURE_MOUTH_EVENTS_ACTIVATE:
+        case GUIBusMessageType::ENCLOSURE_MOUTH_EVENTS_DEACTIVATE:
+        case GUIBusMessageType::ENCLOSURE_MOUTH_TALK:
+        case GUIBusMessageType::ENCLOSURE_MOUTH_THINK:
+        case GUIBusMessageType::ENCLOSURE_MOUTH_LISTEN:
+        case GUIBusMessageType::ENCLOSURE_MOUTH_SMILE:
+        case GUIBusMessageType::ENCLOSURE_MOUTH_VISEME:
+        case GUIBusMessageType::ENCLOSURE_MOUTH_VISEME_LIST:
+        case GUIBusMessageType::ENCLOSURE_MOUTH_RESET:
+        case GUIBusMessageType::ENCLOSURE_MOUTH_TEXT:
+        case GUIBusMessageType::ENCLOSURE_MOUTH_DISPLAY:
+        case GUIBusMessageType::ENCLOSURE_WEATHER_DISPLAY:
             return GUIBusMessageCategory::STATE_CHANGE;
         case GUIBusMessageType::EVENTS_TRIGGERED:
         case GUIBusMessageType::RECOGNIZER_UTTERANCE:
