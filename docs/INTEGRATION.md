@@ -112,16 +112,16 @@ gui.show_weather_template({
 - **Repository**: https://github.com/OpenVoiceOS/ovos-legacy-mycroft-gui-plugin
 - **Entry Point**: OPM plugin `opm.gui_adapter`
 - **Role**:
-  - Bridges old mycroft-gui protocol (port 18181 WebSocket) to new ovos-gui
-  - Translates between mycroft-gui QML and ovos-gui templates
+  - Implements the mycroft gui protocol (WebSocket port 18181) — the standard protocol used by ALL Qt GUI clients (both Qt5 and Qt6)
+  - Translates between mycroft gui protocol messages and ovos-gui internal API
   - Manages Qt GUI client lifecycle (startup, connection, shutdown)
-  - **THIS IS HOW mycroft-gui-qt6 CONNECTS TO THE ECOSYSTEM**
+  - **Both mycroft-gui-qt5 AND mycroft-gui-qt6 connect through this same adapter**
 
 **Key Integration Points:**
 ```
-mycroft-gui-qt6 (Qt6 client)
-    │
-    ├─ Connects to port 18181 (legacy protocol)
+mycroft-gui-qt5 (Qt5 client) ─┐
+                               ├─ Connect to port 18181 (mycroft gui protocol)
+mycroft-gui-qt6 (Qt6 client) ─┘
     │
     └─ Protocol: WebSocket with JSON messages
        {
@@ -449,16 +449,16 @@ def handle_message(self, message):
 
 ## Comparing With Other GUI Clients
 
-### Qt5 Legacy GUI (mycroft-gui-qt5)
-- **Status**: Unmaintained, abandoned by original developers
-- **Connection**: Direct to port 18181 (no plugin bridge)
-- **Modern Features**: No, uses C++11 and outdated Qt5 APIs
-- **Maintenance**: Requires expert Qt knowledge, security updates needed
+### Qt5 GUI (mycroft-gui-qt5)
+- **Status**: Deprecated but functional — modernized in Q1 2026 (C++17, TLS/SSL, auth tokens, memory fixes)
+- **Connection**: Through the SAME legacy adapter plugin as Qt6 (WebSocket port 18181)
+- **Modern Features**: Yes — C++17, Qt5.15+, TLS/SSL, bearer token auth
+- **Maintenance**: Actively maintained alongside Qt6; recommended for systems where Qt6 is unavailable
 
 ### Qt6 Modern GUI (mycroft-gui-qt6) ← **You are here**
 - **Status**: AI-modernized, actively maintained
-- **Connection**: Through legacy adapter plugin (bridge pattern)
-- **Modern Features**: Yes, C++17, Qt6.5+, clean architecture
+- **Connection**: Through the same legacy adapter plugin as Qt5 (mycroft gui protocol, port 18181)
+- **Modern Features**: Yes — C++17, Qt6.5+, clean architecture
 - **Maintenance**: Well-documented, non-Qt developers can contribute
 
 ### Browser-Based GUI (pyhtmx-gui-client)
@@ -643,3 +643,33 @@ ldd /usr/local/lib/libmycroft-gui-qt6.so | grep Qt6
 ---
 
 **This is the bridge between legacy and modern.** mycroft-gui-qt6 is the first GUI client updated for the new OpenVoiceOS architecture. Use the legacy adapter plugin to connect seamlessly to ovos-gui, and enjoy a modern Qt6-based GUI experience.
+
+---
+
+## GUI History: Mycroft AI → OpenVoiceOS
+
+Understanding the GUI ecosystem requires knowing its history:
+
+### The Original Mycroft AI GUI (Pre-OVOS)
+- Skills shipped **arbitrary QML files** that were sent over the wire at runtime
+- The `mycroft-gui` client (created by KDE/Mycroft AI) received and rendered this QML dynamically
+- This was fragile: any QML change in a skill could break rendering on the client
+
+### The OVOS Modernization
+- OVOS replaced arbitrary QML with a **bundled template system** (SYSTEM_text, SYSTEM_weather, SYSTEM_media_player, etc.)
+- Templates are pre-installed in the Qt client — skills just send data, not UI code
+- The `ovos-legacy-mycroft-gui-plugin` implements the **mycroft gui protocol** (WebSocket port 18181) — this is the current standard for ALL Qt clients
+
+### Important: Incompatibility Warning
+- **Pre-OVOS `mycroft-gui` binaries will NOT work** with modern OVOS. The legacy adapter is not backwards-compatible with the original Mycroft AI GUI binaries.
+- You MUST recompile from the current `mycroft-gui-qt5` or `mycroft-gui-qt6` source code and use the latest `ovos-gui` service.
+
+### The Word "Legacy"
+- The word "legacy" in `ovos-legacy-mycroft-gui-plugin` refers to the **protocol's Mycroft AI origins**, not its current status
+- This protocol is the CURRENT, ACTIVE standard used by all Qt GUI clients
+- Both mycroft-gui-qt5 and mycroft-gui-qt6 connect through this same adapter
+
+### Legacy QML Still in the Wild
+- `ovos-media` still ships 15 QML files in `ovos_media/qt5/` using the old `Mycroft.Delegate` + `show_pages` pattern
+- The Qt clients already have bundled system templates (SYSTEM_ocp_now_playing, etc.) as the replacement
+- Migration: ovos-media should transition to using system template API calls instead of shipping raw QML

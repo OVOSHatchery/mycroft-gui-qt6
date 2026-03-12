@@ -8,7 +8,7 @@
 
 ## 🎯 Executive Summary
 
-This guide explains `mycroft-gui-qt6`, a modern Qt6 port of the abandoned `mycroft-gui-qt5` project, completed in Q1 2026 as a best-effort AI-driven modernization experiment. **No breaking changes, no deprecations** — this is a new client option alongside the modernized Qt5 version.
+This guide explains `mycroft-gui-qt6`, a modern Qt6 port of `mycroft-gui-qt5`, completed in Q1 2026 as a best-effort AI-driven modernization experiment. **No breaking changes, no deprecations** — this is a new client option alongside the modernized Qt5 version.
 
 ### What This Is
 - ✅ **New Qt6 GUI client** for OVOS voice assistant
@@ -48,12 +48,23 @@ This guide explains `mycroft-gui-qt6`, a modern Qt6 port of the abandoned `mycro
 ### Qt6 Benefits
 | Feature | Qt5 | Qt6 |
 |---------|-----|-----|
-| **C++ Standard** | C++11 | C++17 (minimum) |
+| **C++ Standard** | C++17 (modernized Q1 2026) | C++17 (minimum) |
 | **Security** | Passive | Active patches, newer deps |
 | **Long-term support** | Limited | Extended (LTS until 2026+) |
 | **Performance** | Good | Better (optimized rendering) |
 | **Type Safety** | Weaker | Stronger (C++17 features) |
 | **Modern APIs** | Some | Full (model/view, property bindings) |
+
+### GUI History: Mycroft AI → OpenVoiceOS
+
+Understanding the ecosystem requires knowing its history:
+
+- **Original Mycroft AI GUI**: Skills shipped arbitrary QML over the wire at runtime. Fragile and tightly coupled.
+- **OVOS modernization**: Replaced with bundled template system (SYSTEM_text, SYSTEM_weather, etc.). Skills send data, not UI code.
+- **The mycroft gui protocol** (WebSocket port 18181): Implemented by `ovos-legacy-mycroft-gui-plugin`. This is the CURRENT standard — both Qt5 and Qt6 connect through the SAME adapter.
+- **"Legacy" naming**: Refers to the protocol's Mycroft AI origins, NOT its current status.
+- **Incompatibility warning**: Pre-OVOS `mycroft-gui` binaries will NOT work. You must recompile from current source and use the latest ovos-gui service.
+- **Legacy QML example**: `ovos-media` still ships QML files using the old `show_pages` pattern in `ovos_media/qt5/`. The Qt clients already have bundled system templates as the replacement.
 
 ### Strategic Approach
 - **Qt5 NOT deprecated** — continues as option for legacy systems

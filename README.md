@@ -88,20 +88,20 @@ Same as Qt5 version with modernized APIs:
 
 - **[ovos-gui](https://github.com/OpenVoiceOS/ovos-gui)** — Central GUI messagebus service that manages GUI state and implements the protocol
 - **[ovos-gui-api-client](https://github.com/OpenVoiceOS/ovos-gui-api-client)** — Python library that skills use to send GUI data (templates, session data)
-- **[ovos-legacy-mycroft-gui-plugin](https://github.com/OpenVoiceOS/ovos-legacy-mycroft-gui-plugin)** — **Adapter bridge** that connects mycroft-gui-qt6 to the new ovos-gui service
+- **[ovos-legacy-mycroft-gui-plugin](https://github.com/OpenVoiceOS/ovos-legacy-mycroft-gui-plugin)** — **Adapter bridge** that connects Qt GUI clients (both Qt5 and Qt6) to the ovos-gui service via the mycroft gui protocol (port 18181)
 
 ### How It Connects
 
-mycroft-gui-qt6 uses the **legacy adapter plugin** to bridge the old WebSocket protocol (port 18181) to the new ovos-gui service. This allows modern Qt6 GUI clients to work seamlessly with the current OpenVoiceOS architecture.
+Both mycroft-gui-qt5 and mycroft-gui-qt6 connect to the ovos-gui service through the **legacy adapter plugin**, which implements the mycroft gui protocol (WebSocket port 18181). The word "legacy" refers to the protocol's Mycroft AI origins — it is the current, active standard for all Qt GUI clients.
 
 ```
 Skills (using ovos-gui-api-client)
          ↓
     ovos-gui (core service)
          ↓
-ovos-legacy-mycroft-gui-plugin (adapter)
+ovos-legacy-mycroft-gui-plugin (adapter, port 18181)
          ↓
-mycroft-gui-qt6 (this project)
+mycroft-gui-qt5 / mycroft-gui-qt6 / pyhtmx-gui-client
 ```
 
 **See [docs/INTEGRATION.md](docs/INTEGRATION.md) for detailed architecture, deployment scenarios, and how skills interact with the GUI.**
