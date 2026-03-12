@@ -69,15 +69,50 @@ Same as Qt5 version with modernized APIs:
 - Simplified module paths
 - Improved property binding syntax
 
-## Status
+## Project Status
 
-- ✅ CMakeLists.txt (Qt6-compatible)
-- ✅ README documentation
-- ⏳ C++ source porting (in progress)
-- ⏳ QML porting (in progress)
-- ⏳ Tests porting (in progress)
+- ✅ **Phase 1**: Build infrastructure (CMakeLists.txt, Qt6 configuration)
+- ✅ **Phase 2**: C++ source porting (13 files, QML_ELEMENT macro, 6.1 MB library)
+- ✅ **Phase 3**: QML file conversion (25 templates, 17 components)
+- ✅ **Phase 4**: Test suite (5 test executables, all passing)
+- ✅ **Phase 5**: Integration testing & documentation
+- ✅ **Phase 6**: Documentation complete (ARCHITECTURE.md, CODE_GUIDE.md, COMPONENTS.md, INTEGRATION.md)
 
-## See Also
+**Ready for deployment.** Build cleanly, all tests pass, comprehensive documentation for users and developers.
 
-- [mycroft-gui-qt5](../mycroft-gui-qt5/) — Qt5 original
-- [PORTING_GUIDE.md](docs/PORTING_GUIDE.md) — Qt5→Qt6 migration
+## OpenVoiceOS Ecosystem
+
+**mycroft-gui-qt6 is the first modern GUI client in the new OpenVoiceOS architecture.**
+
+### Core GUI Infrastructure
+
+- **[ovos-gui](https://github.com/OpenVoiceOS/ovos-gui)** — Central GUI messagebus service that manages GUI state and implements the protocol
+- **[ovos-gui-api-client](https://github.com/OpenVoiceOS/ovos-gui-api-client)** — Python library that skills use to send GUI data (templates, session data)
+- **[ovos-legacy-mycroft-gui-plugin](https://github.com/OpenVoiceOS/ovos-legacy-mycroft-gui-plugin)** — **Adapter bridge** that connects mycroft-gui-qt6 to the new ovos-gui service
+
+### How It Connects
+
+mycroft-gui-qt6 uses the **legacy adapter plugin** to bridge the old WebSocket protocol (port 18181) to the new ovos-gui service. This allows modern Qt6 GUI clients to work seamlessly with the current OpenVoiceOS architecture.
+
+```
+Skills (using ovos-gui-api-client)
+         ↓
+    ovos-gui (core service)
+         ↓
+ovos-legacy-mycroft-gui-plugin (adapter)
+         ↓
+mycroft-gui-qt6 (this project)
+```
+
+**See [INTEGRATION.md](INTEGRATION.md) for detailed architecture, deployment scenarios, and how skills interact with the GUI.**
+
+---
+
+## Related Resources
+
+- **[INTEGRATION.md](INTEGRATION.md)** — Architecture, deployment, and ecosystem overview (🔴 **START HERE** if you're new to OVOS GUI)
+- **[BUILD.md](BUILD.md)** — Comprehensive build instructions for all distributions
+- **[INSTALL.md](INSTALL.md)** — Distribution-specific installation (Ubuntu, Fedora, Arch, Alpine, AUR, PPA, etc.)
+- [mycroft-gui-qt5](../mycroft-gui-qt5/) — Qt5 original (unmaintained)
+- [PORTING_GUIDE.md](docs/PORTING_GUIDE.md) — Qt5→Qt6 migration details
+- [GUI Protocol Spec](https://github.com/OpenVoiceOS/ovos-gui/blob/dev/protocol.md) — Official protocol documentation
