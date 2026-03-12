@@ -12,8 +12,8 @@
 
 - ✅ **What you get**: A functional Qt6 GUI client that builds cleanly, passes tests, and implements all 25 OVOS templates
 - ⚠️ **What to expect**: Experimental code designed to validate the concept of AI-driven modernization on low-risk archived projects
-- 🔍 **Code transparency**: 100% AI-generated with detailed documentation (ARCHITECTURE.md, CODE_GUIDE.md, COMPONENTS.md) to enable human understanding and maintenance
-- 📋 **Before using**: Read the [ARCHITECTURE.md](docs/ARCHITECTURE.md), [CODE_GUIDE.md](docs/CODE_GUIDE.md), and [COMPONENTS.md](docs/COMPONENTS.md) to understand the design decisions and implementation details
+- 🔍 **Code transparency**: 100% AI-generated with comprehensive documentation to enable human understanding and maintenance
+- 📋 **Before using**: Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/CODE_GUIDE.md](docs/CODE_GUIDE.md), and [docs/COMPONENTS.md](docs/COMPONENTS.md) to understand the design decisions and implementation details
 
 **Use in production at your own risk.** While the code is functional and well-documented, this is an experiment in AI-assisted open source maintenance. Community contribution and human review are essential before considering this production-ready.
 
@@ -104,15 +104,31 @@ ovos-legacy-mycroft-gui-plugin (adapter)
 mycroft-gui-qt6 (this project)
 ```
 
-**See [INTEGRATION.md](INTEGRATION.md) for detailed architecture, deployment scenarios, and how skills interact with the GUI.**
+**See [docs/INTEGRATION.md](docs/INTEGRATION.md) for detailed architecture, deployment scenarios, and how skills interact with the GUI.**
 
 ---
 
-## Related Resources
+## 📚 Documentation
 
-- **[INTEGRATION.md](INTEGRATION.md)** — Architecture, deployment, and ecosystem overview (🔴 **START HERE** if you're new to OVOS GUI)
-- **[BUILD.md](BUILD.md)** — Comprehensive build instructions for all distributions
-- **[INSTALL.md](INSTALL.md)** — Distribution-specific installation (Ubuntu, Fedora, Arch, Alpine, AUR, PPA, etc.)
+**All documentation is in the [docs/](docs/) folder:**
+
+- **[docs/index.md](docs/index.md)** — 📍 **Documentation hub** (navigation for all doc types)
+- **[docs/QUICK_START.md](docs/QUICK_START.md)** — ⚡ 5-minute quickstart for first-time users
+- **[docs/INTEGRATION.md](docs/INTEGRATION.md)** — 🏗️ Architecture, deployment, and ecosystem overview
+- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — 🔧 System design and component interactions
+- **[docs/CODE_GUIDE.md](docs/CODE_GUIDE.md)** — 📖 Qt concepts for non-Qt developers
+- **[docs/COMPONENTS.md](docs/COMPONENTS.md)** — 📋 Complete API reference
+- **[docs/getting-started/BUILD.md](docs/getting-started/BUILD.md)** — 🏗️ Build from source
+- **[docs/getting-started/INSTALL.md](docs/getting-started/INSTALL.md)** — 📦 Installation for all distributions
+- **[docs/PORTING_GUIDE.md](docs/PORTING_GUIDE.md)** — Qt5→Qt6 migration guide
+- **[docs/development/CONTRIBUTING.md](docs/development/CONTRIBUTING.md)** — 🤝 Contributing guidelines
+- **[docs/development/TESTING.md](docs/development/TESTING.md)** — ✅ Testing and test writing
+- **[docs/development/DEBUGGING.md](docs/development/DEBUGGING.md)** — 🐛 Debugging techniques
+- **[docs/planning/](docs/planning/)** — 📊 Project planning and status documents
+
+---
+
+## More Information
+
 - [mycroft-gui-qt5](../mycroft-gui-qt5/) — Qt5 original (unmaintained)
-- [PORTING_GUIDE.md](docs/PORTING_GUIDE.md) — Qt5→Qt6 migration details
 - [GUI Protocol Spec](https://github.com/OpenVoiceOS/ovos-gui/blob/dev/protocol.md) — Official protocol documentation
