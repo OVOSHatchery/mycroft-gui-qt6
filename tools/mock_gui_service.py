@@ -117,7 +117,8 @@ class MockGUIService:
             
     async def run(self):
         """Start the WebSocket server."""
-        logger.info(f"Starting MockGUIService on ws://{self.host}:{self.port}")
+        logger.info(f"Starting MockGUIService on ws://{self.host}:{self.port}/gui")
+        # Note: websockets.serve() accepts all paths, clients should connect to /gui route
         async with websockets.serve(self.handle_client, self.host, self.port):
             await asyncio.Future()  # run forever
 
