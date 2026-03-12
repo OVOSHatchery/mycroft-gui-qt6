@@ -20,7 +20,6 @@ from typing import List, Dict, Any
 
 import pytest
 import websockets
-from websockets.client import WebSocketClientProtocol
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -45,10 +44,12 @@ def service_port():
 def mock_service_script(service_port):
     """Path to mock service script."""
     # Look in tools directory first (preferred location)
-    script_path = Path(__file__).parent.parent.parent.parent / "tools" / "mock_gui_service.py"
+    # conftest.py is in test/e2e/, so go up 3 levels to repo root
+    script_path = Path(__file__).parent.parent.parent / "tools" / "mock_gui_service.py"
     if not script_path.exists():
         # Fallback to /tmp location for development
         script_path = Path("/tmp/mock-gui-service/mock_gui_service.py")
+    logger.debug(f"Looking for mock service script at: {script_path} (exists: {script_path.exists()})")
     return script_path
 
 
@@ -60,20 +61,25 @@ async def mock_service(service_port, mock_service_script):
 
     logger.info(f"Starting mock service on port {service_port}")
 
-    # Start service process
+    # Start service process - use current Python executable to ensure venv is used
+    python_exe = sys.executable
+    logger.debug(f"Using Python: {python_exe}")
+
+    # Use PIPE for debugging to see if service crashes
     proc = subprocess.Popen(
-        [sys.executable, str(mock_service_script), f"--port", str(service_port)],
+        [python_exe, str(mock_service_script), f"--port", str(service_port)],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
-        text=True
+        text=True,
+        bufsize=1  # Line buffered
     )
 
     # Wait for service to start
-    time.sleep(1)
+    time.sleep(1.5)
 
     if proc.poll() is not None:
         stdout, stderr = proc.communicate()
-        pytest.fail(f"Mock service failed to start:\n{stderr}")
+        pytest.fail(f"Mock service failed to start:\nSTDOUT: {stdout}\nSTDERR: {stderr}")
 
     yield {
         'host': 'localhost',
@@ -85,10 +91,13 @@ async def mock_service(service_port, mock_service_script):
     logger.info("Stopping mock service")
     proc.terminate()
     try:
-        proc.wait(timeout=5)
+        stdout, stderr = proc.communicate(timeout=2)
+        if stderr:
+            logger.error(f"Mock service stderr:\n{stderr}")
     except subprocess.TimeoutExpired:
         proc.kill()
-        proc.wait()
+        stdout, stderr = proc.communicate()
+        logger.error(f"Mock service killed. stderr:\n{stderr}")
 
 
 @pytest.fixture

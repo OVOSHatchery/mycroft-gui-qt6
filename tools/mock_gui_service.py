@@ -14,7 +14,6 @@ import argparse
 from datetime import datetime
 from typing import Dict, Set, Any
 import websockets
-from websockets.server import WebSocketServerProtocol
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger('MockGUIService')
@@ -22,27 +21,27 @@ logger = logging.getLogger('MockGUIService')
 
 class MockGUIService:
     """Mock implementation of the GUI service protocol."""
-    
+
     def __init__(self, host='0.0.0.0', port=18181):
         self.host = host
         self.port = port
-        self.clients: Set[WebSocketServerProtocol] = set()
+        self.clients: Set[Any] = set()
         self.current_skill = None
         self.session_data: Dict[str, Any] = {}
         self.script = []
         self.script_idx = 0
-        
+
     def load_script(self, script: list):
         """Load a test script of server responses."""
         self.script = script
         self.script_idx = 0
         logger.info(f"Loaded {len(script)} responses")
-        
-    async def handle_client(self, websocket: WebSocketServerProtocol, path: str):
+
+    async def handle_client(self, websocket):
         """Handle incoming WebSocket connection."""
         self.clients.add(websocket)
         logger.info(f"Client connected: {websocket.remote_address}")
-        
+
         try:
             # Send connected message
             await self.send_to_client(websocket, {
@@ -50,7 +49,7 @@ class MockGUIService:
                 'data': {'version': '1.0'},
                 'context': {}
             })
-            
+
             # Process incoming messages
             async for message in websocket:
                 try:
@@ -58,7 +57,7 @@ class MockGUIService:
                     msg_type = msg.get('type', '')
                     data = msg.get('data', {})
                     logger.info(f"Received: {msg_type}")
-                    
+
                     # Handle common message types
                     if msg_type == 'recognizer_loop:utterance':
                         await self.handle_utterance(websocket, data)
@@ -69,16 +68,20 @@ class MockGUIService:
                         self.session_data.update(data)
                     else:
                         logger.debug(f"Unhandled message type: {msg_type}")
-                        
+
                 except json.JSONDecodeError:
                     logger.error(f"Invalid JSON: {message}")
-                    
+                except Exception as e:
+                    logger.error(f"Error processing message: {e}", exc_info=True)
+
         except websockets.exceptions.ConnectionClosed:
             logger.info(f"Client disconnected: {websocket.remote_address}")
+        except Exception as e:
+            logger.error(f"Error in handle_client: {e}", exc_info=True)
         finally:
-            self.clients.remove(websocket)
+            self.clients.discard(websocket)
             
-    async def send_to_client(self, websocket: WebSocketServerProtocol, msg: dict):
+    async def send_to_client(self, websocket, msg: dict):
         """Send message to specific client."""
         try:
             await websocket.send(json.dumps(msg))
@@ -91,7 +94,7 @@ class MockGUIService:
         for client in self.clients:
             await self.send_to_client(client, msg)
             
-    async def handle_utterance(self, websocket: WebSocketServerProtocol, data: dict):
+    async def handle_utterance(self, websocket, data: dict):
         """Handle voice utterance - send back scripted or default response."""
         utterance = data.get('utterance', '')
         logger.info(f"Processing utterance: {utterance}")

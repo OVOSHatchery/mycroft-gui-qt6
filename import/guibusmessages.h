@@ -103,6 +103,34 @@ enum class GUIBusMessageType {
     // Events sent FROM GUI client TO core (via legacy-plugin)
     EVENTS_TRIGGERED,   // "mycroft.events.triggered" (button clicks, etc.)
     RECOGNIZER_UTTERANCE,  // "recognizer_loop:utterance" (text input)
+
+    // ==================== SHELL FEATURES (PROTOCOL EXTENSIONS) ====================
+    // NEW: Brightness and display control
+    GUI_BRIGHTNESS_SET,        // "gui.brightness.set" (CLIENT → CORE)
+    GUI_BRIGHTNESS_GET,        // "gui.brightness.get" (CLIENT → CORE)
+    GUI_BRIGHTNESS_GET_RESPONSE,  // "gui.brightness.get.response" (CORE → CLIENT)
+    GUI_BRIGHTNESS_AUTO_DIM_SET,  // "gui.brightness.auto_dim.set" (CLIENT → CORE)
+    GUI_BRIGHTNESS_NIGHT_MODE_SET,  // "gui.brightness.night_mode.set" (CLIENT → CORE)
+
+    // NEW: Color scheme management
+    GUI_COLOR_SCHEME_SET,      // "gui.color_scheme.set" (CLIENT ↔ CORE)
+    GUI_COLOR_SCHEME_GET,      // "gui.color_scheme.get" (CLIENT → CORE)
+    GUI_COLOR_SCHEME_GET_RESPONSE,  // "gui.color_scheme.get.response" (CORE → CLIENT)
+
+    // NEW: Notifications
+    GUI_NOTIFICATION_SET,      // "gui.notification.set" (CORE → CLIENT)
+    GUI_NOTIFICATION_CLEAR,    // "gui.notification.clear" (CLIENT → CORE)
+
+    // NEW: Custom widgets
+    GUI_WIDGET_DISPLAY,        // "gui.widget.display" (CORE → CLIENT)
+    GUI_WIDGET_REMOVE,         // "gui.widget.remove" (CLIENT ↔ CORE)
+
+    // NEW: Configuration UI
+    GUI_CONFIG_LIST_GET,       // "gui.config.list.get" (CLIENT → CORE)
+    GUI_CONFIG_LIST_GET_RESPONSE,  // "gui.config.list.get.response" (CORE → CLIENT)
+    GUI_CONFIG_GET,            // "gui.config.get" (CLIENT → CORE)
+    GUI_CONFIG_GET_RESPONSE,   // "gui.config.get.response" (CORE → CLIENT)
+    GUI_CONFIG_SET,            // "gui.config.set" (CLIENT → CORE)
 };
 
 /**
@@ -179,6 +207,51 @@ inline GUIBusMessageType fromString(const QString &typeStr) {
     if (typeStr == QLatin1String("recognizer_loop:utterance"))
         return GUIBusMessageType::RECOGNIZER_UTTERANCE;
 
+    // Shell feature protocol extensions
+    // Brightness control
+    if (typeStr == QLatin1String("gui.brightness.set"))
+        return GUIBusMessageType::GUI_BRIGHTNESS_SET;
+    if (typeStr == QLatin1String("gui.brightness.get"))
+        return GUIBusMessageType::GUI_BRIGHTNESS_GET;
+    if (typeStr == QLatin1String("gui.brightness.get.response"))
+        return GUIBusMessageType::GUI_BRIGHTNESS_GET_RESPONSE;
+    if (typeStr == QLatin1String("gui.brightness.auto_dim.set"))
+        return GUIBusMessageType::GUI_BRIGHTNESS_AUTO_DIM_SET;
+    if (typeStr == QLatin1String("gui.brightness.night_mode.set"))
+        return GUIBusMessageType::GUI_BRIGHTNESS_NIGHT_MODE_SET;
+
+    // Color scheme management
+    if (typeStr == QLatin1String("gui.color_scheme.set"))
+        return GUIBusMessageType::GUI_COLOR_SCHEME_SET;
+    if (typeStr == QLatin1String("gui.color_scheme.get"))
+        return GUIBusMessageType::GUI_COLOR_SCHEME_GET;
+    if (typeStr == QLatin1String("gui.color_scheme.get.response"))
+        return GUIBusMessageType::GUI_COLOR_SCHEME_GET_RESPONSE;
+
+    // Notifications
+    if (typeStr == QLatin1String("gui.notification.set"))
+        return GUIBusMessageType::GUI_NOTIFICATION_SET;
+    if (typeStr == QLatin1String("gui.notification.clear"))
+        return GUIBusMessageType::GUI_NOTIFICATION_CLEAR;
+
+    // Widgets
+    if (typeStr == QLatin1String("gui.widget.display"))
+        return GUIBusMessageType::GUI_WIDGET_DISPLAY;
+    if (typeStr == QLatin1String("gui.widget.remove"))
+        return GUIBusMessageType::GUI_WIDGET_REMOVE;
+
+    // Configuration UI
+    if (typeStr == QLatin1String("gui.config.list.get"))
+        return GUIBusMessageType::GUI_CONFIG_LIST_GET;
+    if (typeStr == QLatin1String("gui.config.list.get.response"))
+        return GUIBusMessageType::GUI_CONFIG_LIST_GET_RESPONSE;
+    if (typeStr == QLatin1String("gui.config.get"))
+        return GUIBusMessageType::GUI_CONFIG_GET;
+    if (typeStr == QLatin1String("gui.config.get.response"))
+        return GUIBusMessageType::GUI_CONFIG_GET_RESPONSE;
+    if (typeStr == QLatin1String("gui.config.set"))
+        return GUIBusMessageType::GUI_CONFIG_SET;
+
     // Unknown message type (not in whitelist)
     // This is not an error - allows protocol extensions
     qDebug() << "Unknown GUI message type:" << typeStr << "(not in whitelist, ignored)";
@@ -239,6 +312,41 @@ inline const char* toString(GUIBusMessageType type) {
             return "mycroft.events.triggered";
         case GUIBusMessageType::RECOGNIZER_UTTERANCE:
             return "recognizer_loop:utterance";
+        // Shell feature extensions
+        case GUIBusMessageType::GUI_BRIGHTNESS_SET:
+            return "gui.brightness.set";
+        case GUIBusMessageType::GUI_BRIGHTNESS_GET:
+            return "gui.brightness.get";
+        case GUIBusMessageType::GUI_BRIGHTNESS_GET_RESPONSE:
+            return "gui.brightness.get.response";
+        case GUIBusMessageType::GUI_BRIGHTNESS_AUTO_DIM_SET:
+            return "gui.brightness.auto_dim.set";
+        case GUIBusMessageType::GUI_BRIGHTNESS_NIGHT_MODE_SET:
+            return "gui.brightness.night_mode.set";
+        case GUIBusMessageType::GUI_COLOR_SCHEME_SET:
+            return "gui.color_scheme.set";
+        case GUIBusMessageType::GUI_COLOR_SCHEME_GET:
+            return "gui.color_scheme.get";
+        case GUIBusMessageType::GUI_COLOR_SCHEME_GET_RESPONSE:
+            return "gui.color_scheme.get.response";
+        case GUIBusMessageType::GUI_NOTIFICATION_SET:
+            return "gui.notification.set";
+        case GUIBusMessageType::GUI_NOTIFICATION_CLEAR:
+            return "gui.notification.clear";
+        case GUIBusMessageType::GUI_WIDGET_DISPLAY:
+            return "gui.widget.display";
+        case GUIBusMessageType::GUI_WIDGET_REMOVE:
+            return "gui.widget.remove";
+        case GUIBusMessageType::GUI_CONFIG_LIST_GET:
+            return "gui.config.list.get";
+        case GUIBusMessageType::GUI_CONFIG_LIST_GET_RESPONSE:
+            return "gui.config.list.get.response";
+        case GUIBusMessageType::GUI_CONFIG_GET:
+            return "gui.config.get";
+        case GUIBusMessageType::GUI_CONFIG_GET_RESPONSE:
+            return "gui.config.get.response";
+        case GUIBusMessageType::GUI_CONFIG_SET:
+            return "gui.config.set";
         default:
             return "UNKNOWN";
     }
@@ -286,6 +394,39 @@ inline GUIBusMessageCategory getCategory(GUIBusMessageType type) {
         case GUIBusMessageType::EVENTS_TRIGGERED:
         case GUIBusMessageType::RECOGNIZER_UTTERANCE:
             return GUIBusMessageCategory::USER_INTERACTION;
+        // Shell feature extensions (protocol extensions)
+        // Brightness - bidirectional (client sets, core can push updates)
+        case GUIBusMessageType::GUI_BRIGHTNESS_SET:
+        case GUIBusMessageType::GUI_BRIGHTNESS_GET:
+        case GUIBusMessageType::GUI_BRIGHTNESS_AUTO_DIM_SET:
+        case GUIBusMessageType::GUI_BRIGHTNESS_NIGHT_MODE_SET:
+            return GUIBusMessageCategory::USER_INTERACTION;  // Client initiates
+        case GUIBusMessageType::GUI_BRIGHTNESS_GET_RESPONSE:
+            return GUIBusMessageCategory::SESSION_DATA;  // Server responds
+        // Color scheme - bidirectional
+        case GUIBusMessageType::GUI_COLOR_SCHEME_SET:
+        case GUIBusMessageType::GUI_COLOR_SCHEME_GET:
+            return GUIBusMessageCategory::USER_INTERACTION;  // Client initiates
+        case GUIBusMessageType::GUI_COLOR_SCHEME_GET_RESPONSE:
+            return GUIBusMessageCategory::SESSION_DATA;  // Server responds
+        // Notifications - core to client
+        case GUIBusMessageType::GUI_NOTIFICATION_SET:
+            return GUIBusMessageCategory::SESSION_DATA;  // Server pushes
+        case GUIBusMessageType::GUI_NOTIFICATION_CLEAR:
+            return GUIBusMessageCategory::USER_INTERACTION;  // Client requests
+        // Widgets - bidirectional
+        case GUIBusMessageType::GUI_WIDGET_DISPLAY:
+            return GUIBusMessageCategory::SESSION_DATA;  // Server pushes
+        case GUIBusMessageType::GUI_WIDGET_REMOVE:
+            return GUIBusMessageCategory::USER_INTERACTION;  // Client requests
+        // Configuration - bidirectional
+        case GUIBusMessageType::GUI_CONFIG_LIST_GET:
+        case GUIBusMessageType::GUI_CONFIG_GET:
+        case GUIBusMessageType::GUI_CONFIG_SET:
+            return GUIBusMessageCategory::USER_INTERACTION;  // Client initiates
+        case GUIBusMessageType::GUI_CONFIG_LIST_GET_RESPONSE:
+        case GUIBusMessageType::GUI_CONFIG_GET_RESPONSE:
+            return GUIBusMessageCategory::SESSION_DATA;  // Server responds
         default:
             return GUIBusMessageCategory::STATE_CHANGE;
     }

@@ -35,6 +35,7 @@ class GlobalSettings;
 class QQmlPropertyMap;
 class ActiveSkillsModel;
 class AbstractSkillView;
+class ShellFeatureController;
 
 class MycroftController : public QObject
 {

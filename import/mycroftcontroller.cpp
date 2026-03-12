@@ -22,6 +22,7 @@
 #include "activeskillsmodel.h"
 #include "abstractskillview.h"
 #include "controllerconfig.h"
+#include "shellfeaturecontroller.h"
 
 #include <QtGlobal>
 #include <QFile>
@@ -316,6 +317,19 @@ void MycroftController::onMainSocketMessageReceived(const QString &message)
     if (type == QLatin1String("screen.close.idle.event")) {
         QString skill_idle_event_id = doc[QStringLiteral("data")][QStringLiteral("skill_idle_event_id")].toString();
         emit skillTimeoutReceived(skill_idle_event_id);
+    }
+
+    // ==================== SHELL FEATURE PROTOCOL EXTENSIONS ====================
+    // Route messages to ShellFeatureController for brightness, colors, notifications, widgets, config
+    // This handles:
+    // - gui.brightness.* (brightness control, auto-dim, night mode)
+    // - gui.color_scheme.* (color theme management)
+    // - gui.notification.* (notifications)
+    // - gui.widget.* (custom widgets)
+    // - gui.config.* (configuration UI)
+    if (type.startsWith(QLatin1String("gui."))) {
+        ShellFeatureController::instance()->handleProtocolMessage(type, doc[QStringLiteral("data")].toVariant().toMap());
+        return;
     }
 
     // Check if it's an utterance recognized as an intent
