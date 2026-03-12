@@ -1,7 +1,13 @@
 include(ECMAddTests)
 
-find_package(Qt6 ${REQUIRED_QT_VERSION} NO_MODULE REQUIRED Test)
+find_package(Qt6 6.5 NO_MODULE REQUIRED Test)
 set_package_properties(Qt6Test PROPERTIES PURPOSE "Required for autotests")
+
+# Generate configuration header (same as main build)
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/../import/controllerconfig.h.in
+    ${CMAKE_CURRENT_BINARY_DIR}/controllerconfig.h
+)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/../import)
 
@@ -65,4 +71,23 @@ ecm_add_test(
     Qt6::Network
     Qt6::WebSockets
     Qt6::Multimedia
+)
+
+ecm_add_test(
+  message_routing_test.cpp
+
+  TEST_NAME message_routing_test
+
+  LINK_LIBRARIES
+    Qt6::Test
+)
+
+ecm_add_test(
+  qml_framework_components_test.cpp
+
+  TEST_NAME qml_framework_components_test
+
+  LINK_LIBRARIES
+    Qt6::Test
+    Qt6::Qml
 )

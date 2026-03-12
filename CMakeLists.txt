@@ -126,11 +126,9 @@ set_target_properties(mycroft-gui-qt6 PROPERTIES
 #     target_compile_definitions(mycroft-gui-app PRIVATE HAVE_KDBUS_SERVICE)
 # endif()
 
-# Optional: Tests
-if(BUILD_TESTING)
-    enable_testing()
-    add_subdirectory(autotests)
-endif()
+# Tests
+enable_testing()
+add_subdirectory(autotests)
 
 # Installation
 # Application deferred to Phase 5
