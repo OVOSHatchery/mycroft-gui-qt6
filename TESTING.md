@@ -12,41 +12,34 @@ uv run pytest test/e2e/ -v
 
 ### GUI Integration Testing (Interactive)
 ```bash
-# Terminal 1: Start mock messagebus (8181) + GUI service (18181/gui)
+# Terminal 1: Start mock GUI service on 18181/gui
 python tools/run_gui_test.py
 
 # Terminal 2: Run Qt application
 ./build/bin/mycroft-gui-app
 ```
 
-The mock services will:
-- Listen on port 8181/core (messagebus) and 18181/gui (GUI protocol)
-- Respond to gui.connected with the GUI port information
-- Send skill data (weather, alarms, etc.) to the Qt app
+The mock service will:
+- Listen on `ws://localhost:18181/gui` for Qt app connections
+- Send GUI handshake message on connect
+- Serve skill data (weather, alarms, etc.) to the Qt app
 
 ## Architecture
 
-### Service Endpoints
-
-**MessageBus** (`ws://localhost:8181/core`):
-- Handles skill loading, intent routing, event system
-- Qt app connects here first on startup
-- Responds to `mycroft.gui.connected` messages
+### Service Endpoint
 
 **GUI Protocol** (`ws://localhost:18181/gui`):
-- Handles skill display and user interface
-- Qt app receives GUI port from messagebus, then connects here
+- Direct WebSocket connection for skill display and user interface
+- Qt app connects directly on startup
 - Exchanges skill views, session data, and UI updates
+- No messagebus dependency (simpler, more direct)
 
 ### Connection Flow
 ```
-1. Qt app connects to 8181/core (messagebus)
-2. Qt app sends: mycroft.gui.connected
-3. Messagebus responds: mycroft.gui.port = 18181
-4. Qt app connects to 18181/gui (GUI service)
-5. GUI service sends: mycroft.gui.connected (handshake)
-6. GUI service sends: skill data (gui.list.insert, session.set)
-7. Qt app renders skill UI
+1. Qt app connects to ws://localhost:18181/gui
+2. GUI service sends: mycroft.gui.connected (handshake)
+3. GUI service sends: skill data (gui.list.insert, session.set)
+4. Qt app renders skill UI and responds to user input
 ```
 
 ## Test Suites
