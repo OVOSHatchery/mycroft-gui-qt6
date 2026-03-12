@@ -77,40 +77,11 @@ static QObject *mediaServiceSingletonProvider(QQmlEngine *engine, QJSEngine *scr
 
 void MycroftPlugin::registerTypes(const char *uri)
 {
-    // Qt6: Compare with std::string_view or QString for better compatibility
-    Q_ASSERT(QLatin1String(uri) == QLatin1String("Mycroft"));
-
-    // Singleton types must be registered explicitly even with QML_ELEMENT
-    qmlRegisterSingletonType<MycroftController>(uri, 1, 0, "MycroftController", mycroftControllerSingletonProvider);
-    qmlRegisterSingletonType<GlobalSettings>(uri, 1, 0, "GlobalSettings", globalSettingsSingletonProvider);
-    qmlRegisterSingletonType<FileReader>(uri, 1, 0, "FileReader", fileReaderSingletonProvider);
-    qmlRegisterSingletonType<AudioRec>(uri, 1, 0, "AudioRec", audioRecSingletonProvider);
-    qmlRegisterSingletonType<MediaService>(uri, 1, 0, "MediaService", mediaServiceSingletonProvider);
-    qmlRegisterSingletonType(QUrl(QStringLiteral("qrc:/qml/Units.qml")), uri, 1, 0, "Units");
-    qmlRegisterSingletonType(QUrl(QStringLiteral("qrc:/qml/SoundEffects.qml")), uri, 1, 0, "SoundEffects");
-    // AbstractSkillView and AbstractDelegate are now registered via QML_ELEMENT macro
-    qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/AudioPlayer.qml")), uri, 1, 0, "AudioPlayer");
-    qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/AutoFitLabel.qml")), uri, 1, 0, "AutoFitLabel");
-    qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/Delegate.qml")), uri, 1, 0, "Delegate");
-    qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/PaginatedText.qml")), uri, 1, 0, "PaginatedText");
-    qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/ProportionalDelegate.qml")), uri, 1, 0, "ProportionalDelegate");
-    qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/ScrollableDelegate.qml")), uri, 1, 0, "ScrollableDelegate");
-    qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/SkillView.qml")), uri, 1, 0, "SkillView");
-    qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/SlideShow.qml")), uri, 1, 0, "SlideShow");
-    qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/SlidingImage.qml")), uri, 1, 0, "SlidingImage");
-    qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/StatusIndicator.qml")), uri, 1, 0, "StatusIndicator");
-    qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/VideoPlayer.qml")), uri, 1, 0, "VideoPlayer");
-    qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/BoxLayout.qml")), uri, 1, 0, "BoxLayout");
-    qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/CardDelegate.qml")), uri, 1, 0, "CardDelegate");
-    qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/BusyIndicator.qml")), uri, 1, 0, "BusyIndicator");
-    qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/MarqueeText.qml")), uri, 1, 0, "MarqueeText");
-
-    qmlRegisterUncreatableType<ActiveSkillsModel>(uri, 1, 0, "ActiveSkillsModel", QStringLiteral("You cannot instantiate items of type ActiveSkillsModel"));
-    qmlRegisterUncreatableType<DelegatesModel>(uri, 1, 0, "DelegatesModel", QStringLiteral("You cannot instantiate items of type DelegatesModel"));
-    qmlRegisterUncreatableType<SessionDataMap>(uri, 1, 0, "SessionDataMap", QStringLiteral("You cannot instantiate items of type SessionDataMap"));
-
-    //use this only when all qml files are registered by the plugin
-   // qmlProtectModule(uri, 1);
+    // DEPRECATED: QML module system is no longer used.
+    // Singletons and types are now instantiated directly in main.cpp
+    // and registered via context properties instead of QML module imports.
+    // This method is kept for compatibility but does nothing.
+    Q_UNUSED(uri);
 }
 
 #include "moc_mycroftplugin.cpp"

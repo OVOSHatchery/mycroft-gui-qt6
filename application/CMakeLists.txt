@@ -11,7 +11,11 @@ SET(mycroft_gui_app_SRC
 
 set(mycroft_gui_app_EXTRA_LIBS
     Qt${QT_MAJOR_VERSION}::Widgets
+    Qt${QT_MAJOR_VERSION}::Multimedia
+    Qt${QT_MAJOR_VERSION}::Network
+    Qt${QT_MAJOR_VERSION}::WebSockets
     KF6::DBusAddons
+    mycroftplugin
 )
 
 # WebView is optional
@@ -26,6 +30,9 @@ qt_add_resources(mycroft_gui_app_SRC
 
 add_executable(mycroft-gui-app ${mycroft_gui_app_SRC})
 target_link_libraries(mycroft-gui-app Qt${QT_MAJOR_VERSION}::Core Qt${QT_MAJOR_VERSION}::Quick ${mycroft_gui_app_EXTRA_LIBS})
+
+# Link to the import plugin library and include paths
+target_include_directories(mycroft-gui-app PRIVATE ../import ${CMAKE_CURRENT_BINARY_DIR}/../)
 
 
 install(TARGETS mycroft-gui-app ${INSTALL_TARGETS_DEFAULT_ARGS})

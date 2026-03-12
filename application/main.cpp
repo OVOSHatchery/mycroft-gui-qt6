@@ -38,6 +38,13 @@
 #include "shell/plugins/EnvironmentSummary.h"
 #include "shell/plugins/ResetOperations.h"
 
+// GUI components (from import plugin)
+#include "../import/mycroftcontroller.h"
+#include "../import/globalsettings.h"
+#include "../import/filereader.h"
+#include "../import/audiorec.h"
+#include "../import/mediaservice.h"
+
 int main(int argc, char *argv[])
 {
     //QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
@@ -128,6 +135,13 @@ int main(int argc, char *argv[])
 
     AppSettings *appSettings = new AppSettings(&view);
     engine.rootContext()->setContextProperty(QStringLiteral("applicationSettings"), appSettings);
+
+    // Register GUI component singletons in QML context (replacing Mycroft module imports)
+    engine.rootContext()->setContextProperty(QStringLiteral("MycroftController"), MycroftController::instance());
+    engine.rootContext()->setContextProperty(QStringLiteral("GlobalSettings"), new GlobalSettings(&engine));
+    engine.rootContext()->setContextProperty(QStringLiteral("FileReader"), new FileReader(&engine));
+    engine.rootContext()->setContextProperty(QStringLiteral("AudioRec"), new AudioRec(&engine));
+    engine.rootContext()->setContextProperty(QStringLiteral("MediaService"), new MediaService(&engine));
 
     if (shellMode) {
         // Shell mode: register additional context properties and load shell QML

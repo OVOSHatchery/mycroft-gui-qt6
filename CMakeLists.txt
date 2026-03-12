@@ -112,6 +112,9 @@ set_target_properties(mycroft-gui-qt6 PROPERTIES
     CXX_STANDARD_REQUIRED ON
 )
 
+# Build the GUI component library (replaces QML plugin system)
+add_subdirectory(import)
+
 # Application, shell plugin, theme, and color schemes
 include(KDEInstallDirs)
 include(KDECMakeSettings)

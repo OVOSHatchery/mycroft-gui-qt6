@@ -339,15 +339,17 @@ void MycroftController::onMainSocketMessageReceived(const QString &message)
     }
 
     // ==================== SHELL FEATURE PROTOCOL EXTENSIONS ====================
-    // Route messages to ShellFeatureController for brightness, colors, notifications, widgets, config
-    // This handles:
+    // NOTE: Shell feature controller is not available in template-only architecture
+    // GUI extension messages would be routed here for brightness, colors, notifications, widgets, config
+    // This would handle:
     // - gui.brightness.* (brightness control, auto-dim, night mode)
     // - gui.color_scheme.* (color theme management)
     // - gui.notification.* (notifications)
     // - gui.widget.* (custom widgets)
     // - gui.config.* (configuration UI)
+    // For now, these messages are logged but not processed
     if (type.startsWith(QLatin1String("gui."))) {
-        ShellFeatureController::instance()->handleProtocolMessage(type, doc[QStringLiteral("data")].toVariant().toMap());
+        qDebug() << "GUI extension message received (not processed in template-only mode):" << type;
         return;
     }
 

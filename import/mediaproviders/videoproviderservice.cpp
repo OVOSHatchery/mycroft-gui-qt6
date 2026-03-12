@@ -16,6 +16,7 @@
  */
 
 #include "videoproviderservice.h"
+#include <QDebug>
 
 VideoProviderService::VideoProviderService(QObject *parent)
     : QObject(parent)
