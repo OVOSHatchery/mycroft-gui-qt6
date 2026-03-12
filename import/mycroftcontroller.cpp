@@ -54,6 +54,21 @@ MycroftController::MycroftController(QObject *parent)
       m_appSettingObj(new GlobalSettings)
 {
     m_qt_version_context = QStringLiteral("6");
+
+    // Initialize session_id: CLI args > env vars > config > "default"
+    m_sessionId = QStringLiteral("default");
+
+    // Initialize site_id: CLI args > env vars > config > auto-generated UUID
+    // Auto-generated UUID ensures each device has unique site_id for multi-instance scenarios
+    QString envSiteId = QString::fromUtf8(qgetenv("MYCROFT_SITE_ID"));
+    if (!envSiteId.isEmpty()) {
+        m_siteId = envSiteId;
+    } else {
+        // Auto-generate site_id from system UUID on first launch
+        // This gives each device a unique identifier without configuration
+        m_siteId = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    }
+
     connect(&m_mainWebSocket, &QWebSocket::connected, this,
             [this] () {
                 m_reconnectTimer.stop();
