@@ -39,17 +39,17 @@
 #include <QWebSocket>
 #include <QMediaPlayer>
 
-MycroftController *MycroftController::instance()
+OVOSController *OVOSController::instance()
 {
-    static MycroftController* s_self = nullptr;
+    static OVOSController* s_self = nullptr;
     if (!s_self) {
-        s_self = new MycroftController;
+        s_self = new OVOSController;
     }
     return s_self;
 }
 
 
-MycroftController::MycroftController(QObject *parent)
+OVOSController::OVOSController(QObject *parent)
     : QObject(parent),
       m_appSettingObj(new GlobalSettings)
 {
@@ -74,7 +74,7 @@ MycroftController::MycroftController(QObject *parent)
                 m_reconnectTimer.stop();
                 emit socketStatusChanged();
             });
-    connect(&m_mainWebSocket, &QWebSocket::disconnected, this, &MycroftController::closed);
+    connect(&m_mainWebSocket, &QWebSocket::disconnected, this, &OVOSController::closed);
     connect(&m_mainWebSocket, &QWebSocket::stateChanged, this,
             [this] (QAbstractSocket::SocketState state) {
                 emit socketStatusChanged();
@@ -103,7 +103,7 @@ MycroftController::MycroftController(QObject *parent)
                 }
             });
 
-    connect(&m_mainWebSocket, &QWebSocket::textMessageReceived, this, &MycroftController::onMainSocketMessageReceived);
+    connect(&m_mainWebSocket, &QWebSocket::textMessageReceived, this, &OVOSController::onMainSocketMessageReceived);
 
     m_reconnectTimer.setInterval(1000);
     connect(&m_reconnectTimer, &QTimer::timeout, this, [this]() {
@@ -145,7 +145,7 @@ MycroftController::MycroftController(QObject *parent)
 }
 
 
-void MycroftController::start()
+void OVOSController::start()
 {
     //auto appSettingObj = new GlobalSettings;
     QString socket = m_appSettingObj->webSocketAddress() + QStringLiteral(":18181/gui");
@@ -167,7 +167,7 @@ void MycroftController::start()
     emit socketStatusChanged();
 }
 
-void MycroftController::disconnectSocket()
+void OVOSController::disconnectSocket()
 {
     qDebug() << "in reconnect";
     m_mainWebSocket.close();
@@ -175,7 +175,7 @@ void MycroftController::disconnectSocket()
     emit socketStatusChanged();
 }
 
-void MycroftController::reconnect()
+void OVOSController::reconnect()
 {
     qDebug() << "in reconnect";
     m_mainWebSocket.close();
@@ -183,12 +183,12 @@ void MycroftController::reconnect()
     emit socketStatusChanged();
 }
 
-void MycroftController::startPTTClient()
+void OVOSController::startPTTClient()
 {
     QProcess::startDetached(QStringLiteral("mycroft-gui-ptt-loader"), QStringList());
 }
 
-void MycroftController::onMainSocketMessageReceived(const QString &message)
+void OVOSController::onMainSocketMessageReceived(const QString &message)
 {
     auto doc = QJsonDocument::fromJson(message.toUtf8());
 
@@ -365,7 +365,7 @@ void MycroftController::onMainSocketMessageReceived(const QString &message)
     }
 }
 
-void MycroftController::sendRequest(const QString &type, const QVariantMap &data, const QVariantMap &context)
+void OVOSController::sendRequest(const QString &type, const QVariantMap &data, const QVariantMap &context)
 {
     if (m_mainWebSocket.state() != QAbstractSocket::ConnectedState) {
         qWarning() << "mycroft connection not open!";
@@ -381,7 +381,7 @@ void MycroftController::sendRequest(const QString &type, const QVariantMap &data
     m_mainWebSocket.sendTextMessage(QString::fromUtf8(doc.toJson()));
 }
 
-void MycroftController::sendBinary(const QString &type, const QJsonObject &data, const QVariantMap &context)
+void OVOSController::sendBinary(const QString &type, const QJsonObject &data, const QVariantMap &context)
 {
     if (m_mainWebSocket.state() != QAbstractSocket::ConnectedState) {
         qWarning() << "mycroft connection not open!";
@@ -401,7 +401,7 @@ void MycroftController::sendBinary(const QString &type, const QJsonObject &data,
     m_mainWebSocket.sendBinaryMessage(docbin);
 }
 
-void MycroftController::sendText(const QString &message)
+void OVOSController::sendText(const QString &message)
 {
     if(!m_appSettingObj->useHivemindProtocol()){
         sendRequest(QStringLiteral("recognizer_loop:utterance"), QVariantMap({{QStringLiteral("utterances"), QStringList({message})}}), QVariantMap({{QStringLiteral("source"), QStringLiteral("debug_cli")}, {QStringLiteral("destination"), QStringLiteral("skills")}, {QStringLiteral("qt_version"), m_qt_version_context}}));
@@ -410,7 +410,7 @@ void MycroftController::sendText(const QString &message)
     }
 }
 
-void MycroftController::registerView(AbstractSkillView *view)
+void OVOSController::registerView(AbstractSkillView *view)
 {
     Q_ASSERT(!view->id().isEmpty());
     Q_ASSERT(!m_views.contains(view->id()));
@@ -425,7 +425,7 @@ void MycroftController::registerView(AbstractSkillView *view)
     }
 }
 
-MycroftController::Status MycroftController::status() const
+OVOSController::Status OVOSController::status() const
 {
     if (m_reconnectTimer.isActive()) {
         return Connecting;
@@ -449,27 +449,27 @@ MycroftController::Status MycroftController::status() const
 }
 
 //FIXME: remove
-QString MycroftController::currentSkill() const
+QString OVOSController::currentSkill() const
 {
     return m_currentSkill;
 }
 
-QString MycroftController::currentIntent() const
+QString OVOSController::currentIntent() const
 {
     return m_currentIntent;
 }
 
-QString MycroftController::sessionId() const
+QString OVOSController::sessionId() const
 {
     return m_sessionId;
 }
 
-QString MycroftController::siteId() const
+QString OVOSController::siteId() const
 {
     return m_siteId;
 }
 
-void MycroftController::setSessionId(const QString &sessionId)
+void OVOSController::setSessionId(const QString &sessionId)
 {
     if (m_sessionId != sessionId) {
         m_sessionId = sessionId;
@@ -477,7 +477,7 @@ void MycroftController::setSessionId(const QString &sessionId)
     }
 }
 
-void MycroftController::setSiteId(const QString &siteId)
+void OVOSController::setSiteId(const QString &siteId)
 {
     if (m_siteId != siteId) {
         m_siteId = siteId;
@@ -485,17 +485,17 @@ void MycroftController::setSiteId(const QString &siteId)
     }
 }
 
-bool MycroftController::isSpeaking() const
+bool OVOSController::isSpeaking() const
 {
     return m_isSpeaking;
 }
 
-bool MycroftController::isListening() const
+bool OVOSController::isListening() const
 {
     return m_isListening;
 }
 
-bool MycroftController::serverReady() const
+bool OVOSController::serverReady() const
 {
     return m_serverReady;
 }

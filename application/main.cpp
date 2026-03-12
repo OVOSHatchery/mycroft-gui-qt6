@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty(QStringLiteral("applicationSettings"), appSettings);
 
     // Register GUI component singletons in QML context (replacing Mycroft module imports)
-    engine.rootContext()->setContextProperty(QStringLiteral("MycroftController"), MycroftController::instance());
+    engine.rootContext()->setContextProperty(QStringLiteral("OVOSController"), OVOSController::instance());
     engine.rootContext()->setContextProperty(QStringLiteral("GlobalSettings"), new GlobalSettings(&engine));
     engine.rootContext()->setContextProperty(QStringLiteral("FileReader"), new FileReader(&engine));
     engine.rootContext()->setContextProperty(QStringLiteral("AudioRec"), new AudioRec(&engine));

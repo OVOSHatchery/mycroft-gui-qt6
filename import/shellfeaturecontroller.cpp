@@ -239,6 +239,6 @@ void ShellFeatureController::handleProtocolMessage(const QString &msgType, const
 
 void ShellFeatureController::sendProtocolMessage(const QString &msgType, const QVariantMap &data)
 {
-    // Send message to MycroftController to forward to adapter via WebSocket
-    MycroftController::instance()->sendRequest(msgType, data);
+    // Send message to OVOSController to forward to adapter via WebSocket
+    OVOSController::instance()->sendRequest(msgType, data);
 }

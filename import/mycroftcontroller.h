@@ -37,7 +37,7 @@ class ActiveSkillsModel;
 class AbstractSkillView;
 class ShellFeatureController;
 
-class MycroftController : public QObject
+class OVOSController : public QObject
 {
     Q_OBJECT
     QML_ELEMENT
@@ -63,7 +63,7 @@ public:
         Error
     };
     Q_ENUM(Status)
-    static MycroftController* instance();
+    static OVOSController* instance();
 
     bool isSpeaking() const;
     bool isListening() const;
@@ -118,7 +118,7 @@ public Q_SLOTS:
     void startPTTClient();
 
 private:
-    explicit MycroftController(QObject *parent = nullptr);
+    explicit OVOSController(QObject *parent = nullptr);
     void onMainSocketMessageReceived(const QString &message);
 
     QWebSocket m_mainWebSocket;

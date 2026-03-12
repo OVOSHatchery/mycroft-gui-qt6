@@ -17,15 +17,15 @@
  *
  */
 
-#ifndef MYCROFTPLUGIN_H
-#define MYCROFTPLUGIN_H
+#ifndef OVOSPLUGIN_H
+#define OVOSPLUGIN_H
 
 #include <QUrl>
 
 #include <QQmlEngine>
 #include <QQmlExtensionPlugin>
 
-class MycroftPlugin : public QQmlExtensionPlugin
+class OVOSPlugin : public QQmlExtensionPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QQmlExtensionInterface/1.0")

@@ -36,7 +36,7 @@ Kirigami.AbstractApplicationWindow {
     visible: true
     visibility: "Maximized"
     flags: Qt.FramelessWindowHint
-    property var controllerStatus: MycroftController.status
+    property var controllerStatus: OVOSController.status
     property bool platformEGLFS: true
     property bool slidingPanelShouldOpen: false
 
@@ -79,7 +79,7 @@ Kirigami.AbstractApplicationWindow {
     }
 
     Connections {
-        target: MycroftController
+        target: OVOSController
         onIntentRecevied: {
             if (type == "ovos.shell.exec.factory.reset") {
                 var script_to_run_path = data.script
@@ -104,14 +104,14 @@ Kirigami.AbstractApplicationWindow {
                 mainView.grabToImage(function(result) {
                     result.saveToFile(filepath);
                 });
-                MycroftController.sendRequest("ovos.display.screenshot.get.response", {"result": filepath});
+                OVOSController.sendRequest("ovos.display.screenshot.get.response", {"result": filepath});
             }
             if (type == "ovos.shell.get.menuLabels.status") {
-                MycroftController.sendRequest("ovos.shell.get.menuLabels.status.response", {"enabled": applicationSettings.menuLabels});
+                OVOSController.sendRequest("ovos.shell.get.menuLabels.status.response", {"enabled": applicationSettings.menuLabels});
             }
             if (type == "ovos.shell.set.menuLabels") {
                 applicationSettings.menuLabels = data.enabled
-                MycroftController.sendRequest("ovos.shell.get.menuLabels.status.response", {"enabled": applicationSettings.menuLabels});
+                OVOSController.sendRequest("ovos.shell.get.menuLabels.status.response", {"enabled": applicationSettings.menuLabels});
             }
         }
     }
@@ -134,11 +134,11 @@ Kirigami.AbstractApplicationWindow {
 
     Timer {
         interval: 20000
-        running: GlobalSettings.autoConnect && MycroftController.status != MycroftController.Open
+        running: GlobalSettings.autoConnect && OVOSController.status != OVOSController.Open
         triggeredOnStart: true
         onTriggered: {
             console.log("Trying to connect to Mycroft");
-            MycroftController.start();
+            OVOSController.start();
             slidingPanel.close();
             // updateSchemeList would be called on OVOSPlugin.Configuration if available
         }

@@ -17,7 +17,7 @@
  *
  */
 
-#include "mycroftplugin.h"
+#include "ovosplugin.h"
 
 #include "mycroftcontroller.h"
 #include "globalsettings.h"
@@ -55,8 +55,8 @@ static QObject *mycroftControllerSingletonProvider(QQmlEngine *engine, QJSEngine
     Q_UNUSED(scriptEngine);
 
     //singleton managed internally, qml should never delete it
-    engine->setObjectOwnership(MycroftController::instance(), QQmlEngine::CppOwnership);
-    return MycroftController::instance();
+    engine->setObjectOwnership(OVOSController::instance(), QQmlEngine::CppOwnership);
+    return OVOSController::instance();
 }
 
 static QObject *audioRecSingletonProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
@@ -75,7 +75,7 @@ static QObject *mediaServiceSingletonProvider(QQmlEngine *engine, QJSEngine *scr
     return new MediaService;
 }
 
-void MycroftPlugin::registerTypes(const char *uri)
+void OVOSPlugin::registerTypes(const char *uri)
 {
     // DEPRECATED: QML module system is no longer used.
     // Singletons and types are now instantiated directly in main.cpp
@@ -84,5 +84,5 @@ void MycroftPlugin::registerTypes(const char *uri)
     Q_UNUSED(uri);
 }
 
-#include "moc_mycroftplugin.cpp"
+#include "moc_ovosplugin.cpp"
 

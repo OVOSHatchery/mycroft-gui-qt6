@@ -1,7 +1,7 @@
 project(mycroftimport)
 
 set(mycroftimport_SRCS
-    mycroftplugin.cpp
+    ovosplugin.cpp
     mycroftcontroller.cpp
     activeskillsmodel.cpp
     delegatesmodel.cpp
@@ -25,19 +25,19 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 qt6_add_resources(mycroftimport_SRCS mycroft.qrc)
 
-add_library(mycroftplugin SHARED ${mycroftimport_SRCS} ${RESOURCES})
+add_library(ovosplugin SHARED ${mycroftimport_SRCS} ${RESOURCES})
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Android")
-    set(mycroftplugin_EXTRA_LIBS
+    set(ovosplugin_EXTRA_LIBS
         Qt6::TextToSpeech
     )
 endif()
 
-target_link_libraries(mycroftplugin
+target_link_libraries(ovosplugin
         PUBLIC
             Qt6::Core
             Qt6::Multimedia
-            ${mycroftplugin_EXTRA_LIBS}
+            ${ovosplugin_EXTRA_LIBS}
         PRIVATE
             Qt6::Qml
             Qt6::Quick
@@ -45,7 +45,7 @@ target_link_libraries(mycroftplugin
             Qt6::WebSockets
     )
 
-install(TARGETS mycroftplugin DESTINATION ${KDE_INSTALL_QMLDIR}/Mycroft)
+install(TARGETS ovosplugin DESTINATION ${KDE_INSTALL_QMLDIR}/Mycroft)
 
 install(FILES qmldir DESTINATION ${KDE_INSTALL_QMLDIR}/Mycroft)
 install(DIRECTORY qml/ DESTINATION ${KDE_INSTALL_QMLDIR}/Mycroft)

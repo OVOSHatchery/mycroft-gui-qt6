@@ -27,7 +27,7 @@ Q_SIGNALS:
     void micAudioLevelChanged(const qreal &micLevel);
 
 private:
-    MycroftController *m_controller;
+    OVOSController *m_controller;
     QFile destinationFile;
     QByteArray m_audStream;
     qint16 m_audStream_size;

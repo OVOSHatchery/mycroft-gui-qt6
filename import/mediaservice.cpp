@@ -19,14 +19,14 @@
 
 MediaService::MediaService(QObject *parent)
     : QObject(parent),
-    m_controller(MycroftController::instance())
+    m_controller(OVOSController::instance())
 {
     m_currentPlaybackState = MediaService::StoppedState;
     m_currentMediaState = MediaService::NoMedia;
     m_selectedProviderService = MediaService::NoProvider;
 
-    if (m_controller->status() == MycroftController::Open){
-        connect(m_controller, &MycroftController::intentRecevied, this,
+    if (m_controller->status() == OVOSController::Open){
+        connect(m_controller, &OVOSController::intentRecevied, this,
                 &MediaService::onMainSocketIntentReceived);
     }
 }

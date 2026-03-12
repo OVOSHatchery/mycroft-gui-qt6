@@ -13,7 +13,7 @@
 
 AudioRec::AudioRec(QObject *parent) :
     QObject(parent),
-    m_controller(MycroftController::instance())
+    m_controller(OVOSController::instance())
 {
 
 }

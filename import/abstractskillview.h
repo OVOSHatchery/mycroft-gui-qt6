@@ -34,7 +34,7 @@ class AbstractSkillView: public QQuickItem
 {
     Q_OBJECT
     QML_ELEMENT
-    Q_PROPERTY(MycroftController::Status status READ status NOTIFY statusChanged)
+    Q_PROPERTY(OVOSController::Status status READ status NOTIFY statusChanged)
 
     Q_PROPERTY(ActiveSkillsModel *activeSkills READ activeSkills CONSTANT)
 
@@ -46,12 +46,12 @@ public:
     AbstractSkillView(QQuickItem *parent = nullptr);
     ~AbstractSkillView();
 
-    MycroftController::Status status() const;
+    OVOSController::Status status() const;
 
     ActiveSkillsModel *activeSkills() const;
 
 
-    //API for MycroftController, NOT QML
+    //API for OVOSController, NOT QML
     /**
      * Url of the Web socket
      */
@@ -101,7 +101,7 @@ private:
     QHash<QString, SessionDataMap *> m_skillData;
     QHash<QString, QTranslator *> m_translatorsForSkill;
 
-    MycroftController *m_controller;
+    OVOSController *m_controller;
     QWebSocket *m_guiWebSocket;
     ActiveSkillsModel *m_activeSkillsModel;
 };

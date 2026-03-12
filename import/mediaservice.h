@@ -163,7 +163,7 @@ private:
     QPointer<QVideoSink> m_videoSink;
     QPointer<QObject> m_videoOutput;
 
-    MycroftController *m_controller;
+    OVOSController *m_controller;
     void onMainSocketIntentReceived(const QString &type, const QVariantMap &data);
 
     QString m_loadedUrl;

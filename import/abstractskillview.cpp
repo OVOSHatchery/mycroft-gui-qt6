@@ -35,7 +35,7 @@
 AbstractSkillView::AbstractSkillView(QQuickItem *parent)
     : QQuickItem(parent),
       m_id(QUuid::createUuid().toString()),
-      m_controller(MycroftController::instance())
+      m_controller(OVOSController::instance())
 {
     m_activeSkillsModel = new ActiveSkillsModel(this);
 
@@ -66,7 +66,7 @@ AbstractSkillView::AbstractSkillView(QQuickItem *parent)
                 //TODO: when the connection closes, all session data and guis should be destroyed
                 //qWarning()<<"GUI SOCKET STATE:"<<socketState;
                 //Try to reconnect if our connection died but the main server connection is still alive
-                if (socketState == QAbstractSocket::UnconnectedState && m_url.isValid() && m_controller->status() == MycroftController::Open) {
+                if (socketState == QAbstractSocket::UnconnectedState && m_url.isValid() && m_controller->status() == OVOSController::Open) {
                     m_reconnectTimer.start();
                 }
             });
@@ -78,9 +78,9 @@ AbstractSkillView::AbstractSkillView(QQuickItem *parent)
             });
 
 
-    connect(m_controller, &MycroftController::socketStatusChanged, this,
+    connect(m_controller, &OVOSController::socketStatusChanged, this,
             [this]() {
-                if (m_controller->status() != MycroftController::Open) {
+                if (m_controller->status() != OVOSController::Open) {
                     m_guiWebSocket->close();
                     //don't assume the url will be still valid
                     m_url = QUrl();
@@ -104,7 +104,7 @@ AbstractSkillView::AbstractSkillView(QQuickItem *parent)
         }
     });
 
-    connect(m_controller, &MycroftController::utteranceManagedBySkill, this,
+    connect(m_controller, &OVOSController::utteranceManagedBySkill, this,
         [this](const QString &skillId) {
             m_activeSkillsModel->checkGuiActivation(skillId);
         });
@@ -129,7 +129,7 @@ void AbstractSkillView::setUrl(const QUrl &url)
     m_url = url;
 
     //don't connect if the controller is offline
-    if (m_controller->status() == MycroftController::Open) {
+    if (m_controller->status() == OVOSController::Open) {
         m_guiWebSocket->close();
         m_guiWebSocket->open(url);
     }
@@ -189,10 +189,10 @@ void AbstractSkillView::deleteProperty(const QString &skillId, const QString &pr
     m_guiWebSocket->sendTextMessage(QString::fromUtf8(doc.toJson()));
 }
 
-MycroftController::Status AbstractSkillView::status() const
+OVOSController::Status AbstractSkillView::status() const
 {
     if (m_reconnectTimer.isActive()) {
-        return MycroftController::Connecting;
+        return OVOSController::Connecting;
     }
 
     switch(m_guiWebSocket->state())
@@ -200,15 +200,15 @@ MycroftController::Status AbstractSkillView::status() const
     case QAbstractSocket::ConnectingState:
     case QAbstractSocket::BoundState:
     case QAbstractSocket::HostLookupState:
-        return MycroftController::Connecting;
+        return OVOSController::Connecting;
     case QAbstractSocket::UnconnectedState:
-        return MycroftController::Closed;
+        return OVOSController::Closed;
     case QAbstractSocket::ConnectedState:
-        return MycroftController::Open;
+        return OVOSController::Open;
     case QAbstractSocket::ClosingState:
-        return MycroftController::Closing;
+        return OVOSController::Closing;
     default:
-        return MycroftController::Connecting;
+        return OVOSController::Connecting;
     }
 }
 

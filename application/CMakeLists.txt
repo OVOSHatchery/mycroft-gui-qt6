@@ -15,7 +15,7 @@ set(mycroft_gui_app_EXTRA_LIBS
     Qt${QT_MAJOR_VERSION}::Network
     Qt${QT_MAJOR_VERSION}::WebSockets
     KF6::DBusAddons
-    mycroftplugin
+    ovosplugin
 )
 
 # WebView is optional

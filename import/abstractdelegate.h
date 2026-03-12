@@ -26,7 +26,7 @@
 #include "sessiondatamap.h"
 #include "abstractskillview.h"
 
-class MycroftController;
+class OVOSController;
 
 class DelegateLoader : public QObject {
     Q_OBJECT
