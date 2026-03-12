@@ -78,25 +78,6 @@ Kirigami.ApplicationWindow {
         }
     }
     
-    Connections {
-        target: keyFilter
-        function onGlobalBackReceived() {
-            mainView.currentItem.backRequested()
-        }
-    }
-    
-    // Uses Android's voice popup for speech recognition
-    MycroftGui.SpeechIntent {
-        id: speechIntent
-        title: "Say something to Mycroft" // TODO i18n
-        onSpeechRecognized: (text)=> {
-            Mycroft.MycroftController.sendText(text)
-        }
-        //onRecognitionFailed: console.log("SPEECH FAILED")
-        //onRecognitionCanceled: console.log("SPEECH CANCELED")
-        //onNothingRecognized: console.log("SPEECH NOTHING")
-    }
-
     //HACK
     Connections {
         target: root.pageStack.layers
@@ -111,7 +92,6 @@ Kirigami.ApplicationWindow {
 
     globalDrawer: Kirigami.GlobalDrawer {
         bannerImageSource: "banner.png"
-        handleVisible: !hideTextInput
         Kirigami.Theme.inherit: false
         Kirigami.Theme.colorSet: applicationSettings.darkMode ? Kirigami.Theme.Complementary : Kirigami.Theme.View
 
@@ -310,8 +290,6 @@ Kirigami.ApplicationWindow {
         //Note: a custom control as ToolBar on Android has a funny color
         footer: Control {
             Kirigami.Theme.colorSet: nightSwitch.checked ? Kirigami.Theme.Complementary : Kirigami.Theme.Window
-            visible: !hideTextInput
-            height: hideTextInput ? 0 : implicitHeight
             implicitHeight: contentItem.implicitHeight + topPadding + bottomPadding
             contentItem: RowLayout {
                 Item {

@@ -23,7 +23,6 @@ else()
     SET(mycroft_gui_app_SRC
         main.cpp
         appsettings.cpp
-        speechintent.cpp
         shell/plugins/EnvironmentSummary.cpp
         shell/plugins/ResetOperations.cpp
     )
