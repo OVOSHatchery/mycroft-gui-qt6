@@ -51,6 +51,9 @@ class MycroftController : public QObject
 
     Q_PROPERTY(bool serverReady READ serverReady NOTIFY serverReadyChanged)
 
+    Q_PROPERTY(QString sessionId READ sessionId NOTIFY sessionIdChanged)
+    Q_PROPERTY(QString siteId READ siteId NOTIFY siteIdChanged)
+
 public:
     enum Status {
         Connecting,
@@ -68,9 +71,13 @@ public:
     Status status() const;
     QString currentSkill() const;
     QString currentIntent() const;
+    QString sessionId() const;
+    QString siteId() const;
 
     //Public API NOT to be used with QML
     void registerView(AbstractSkillView *view);
+    void setSessionId(const QString &sessionId);
+    void setSiteId(const QString &siteId);
 
 Q_SIGNALS:
     //socket stuff
@@ -97,6 +104,9 @@ Q_SIGNALS:
 
     void utteranceManagedBySkill(const QString &skill);
     void skillTimeoutReceived(const QString &skillidleid);
+
+    void sessionIdChanged();
+    void siteIdChanged();
 
 public Q_SLOTS:
     void start();
@@ -137,5 +147,9 @@ private:
     bool m_isListening = false;
     bool m_mycroftLaunched = false;
     bool m_serverReady = false;
+
+    // Session and site identifiers for multi-screen deployments
+    QString m_sessionId = QStringLiteral("default");
+    QString m_siteId = QStringLiteral("default");
 };
 

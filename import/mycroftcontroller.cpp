@@ -72,7 +72,9 @@ MycroftController::MycroftController(QObject *parent)
                     #endif
                     for (const auto &guiId : m_views.keys()) {
                         sendRequest(QStringLiteral("mycroft.gui.connected"),
-                                    QVariantMap({{QStringLiteral("gui_id"), guiId}}),
+                                    QVariantMap({{QStringLiteral("gui_id"), guiId},
+                                                 {QStringLiteral("session_id"), m_sessionId},
+                                                 {QStringLiteral("site_id"), m_siteId}}),
                                     QVariantMap({{QStringLiteral("qt_version"), m_qt_version_context}}));
                     }
                     m_reannounceGuiTimer.start();
@@ -90,7 +92,7 @@ MycroftController::MycroftController(QObject *parent)
 
     m_reconnectTimer.setInterval(1000);
     connect(&m_reconnectTimer, &QTimer::timeout, this, [this]() {
-        QString socket = m_appSettingObj->webSocketAddress() + QStringLiteral(":8181/core");
+        QString socket = m_appSettingObj->webSocketAddress() + QStringLiteral(":18181/gui");
         m_mainWebSocket.open(QUrl(socket));
     });
 
@@ -103,7 +105,9 @@ MycroftController::MycroftController(QObject *parent)
             if (m_views[guiId]->status() != Open) {
                 qWarning()<<"Retrying to announce gui";
                 sendRequest(QStringLiteral("mycroft.gui.connected"),
-                            QVariantMap({{QStringLiteral("gui_id"), guiId}}), 
+                            QVariantMap({{QStringLiteral("gui_id"), guiId},
+                                         {QStringLiteral("session_id"), m_sessionId},
+                                         {QStringLiteral("site_id"), m_siteId}}),
                             QVariantMap({{QStringLiteral("qt_version"), m_qt_version_context}}));
             }
         }
@@ -129,7 +133,7 @@ MycroftController::MycroftController(QObject *parent)
 void MycroftController::start()
 {
     //auto appSettingObj = new GlobalSettings;
-    QString socket = m_appSettingObj->webSocketAddress() + QStringLiteral(":8181/core");
+    QString socket = m_appSettingObj->webSocketAddress() + QStringLiteral(":18181/gui");
     m_mainWebSocket.open(QUrl(socket));
     connect(&m_mainWebSocket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error),
             this, [this] (const QAbstractSocket::SocketError &error) {
@@ -397,7 +401,9 @@ void MycroftController::registerView(AbstractSkillView *view)
 //TODO: manage view destruction
     if (m_mainWebSocket.state() == QAbstractSocket::ConnectedState) {
         sendRequest(QStringLiteral("mycroft.gui.connected"),
-                    QVariantMap({{QStringLiteral("gui_id"), view->id()}}), 
+                    QVariantMap({{QStringLiteral("gui_id"), view->id()},
+                                 {QStringLiteral("session_id"), m_sessionId},
+                                 {QStringLiteral("site_id"), m_siteId}}),
                     QVariantMap({{QStringLiteral("qt_version"), m_qt_version_context}}));
     }
 }
@@ -434,6 +440,32 @@ QString MycroftController::currentSkill() const
 QString MycroftController::currentIntent() const
 {
     return m_currentIntent;
+}
+
+QString MycroftController::sessionId() const
+{
+    return m_sessionId;
+}
+
+QString MycroftController::siteId() const
+{
+    return m_siteId;
+}
+
+void MycroftController::setSessionId(const QString &sessionId)
+{
+    if (m_sessionId != sessionId) {
+        m_sessionId = sessionId;
+        emit sessionIdChanged();
+    }
+}
+
+void MycroftController::setSiteId(const QString &siteId)
+{
+    if (m_siteId != siteId) {
+        m_siteId = siteId;
+        emit siteIdChanged();
+    }
 }
 
 bool MycroftController::isSpeaking() const
