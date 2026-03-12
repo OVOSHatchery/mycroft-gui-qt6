@@ -19,6 +19,8 @@ find_package(Qt6 6.5 REQUIRED COMPONENTS
     Multimedia
     Gui
     Widgets
+    DBus
+    WebView
 )
 
 find_package(ECM 6.0 REQUIRED NO_MODULE)
@@ -28,6 +30,11 @@ set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
 find_package(KF6 6.0 REQUIRED COMPONENTS
     Kirigami
     CoreAddons
+    GuiAddons
+    Config
+    ConfigWidgets
+    IconThemes
+    DBusAddons
 )
 
 # Minimum versions
@@ -103,38 +110,22 @@ set_target_properties(mycroft-gui-qt6 PROPERTIES
     CXX_STANDARD_REQUIRED ON
 )
 
-# Standalone application (deferred to Phase 5 - Integration Testing)
-# The application requires platform-specific headers and resources that are not yet ported.
-# Focus on library build first (libmycroft-gui-qt6.so).
-#
-# add_executable(mycroft-gui-app
-#     application/main.cpp
-# )
-#
-# target_link_libraries(mycroft-gui-app
-#     PRIVATE
-#         mycroft-gui-qt6
-#         Qt6::Core
-#         Qt6::Gui
-#         Qt6::Qml
-#         Qt6::Quick
-#         Qt6::Widgets
-# )
-#
-# if(KF6DBusAddons_FOUND)
-#     target_link_libraries(mycroft-gui-app PRIVATE KF6::DBusAddons)
-#     target_compile_definitions(mycroft-gui-app PRIVATE HAVE_KDBUS_SERVICE)
-# endif()
+# Application, shell plugin, theme, and color schemes
+include(KDEInstallDirs)
+include(KDECMakeSettings)
+add_subdirectory(application)
+add_subdirectory(application/shell)
+add_subdirectory(theme)
+add_subdirectory(schemes)
 
 # Tests
 enable_testing()
 add_subdirectory(autotests)
 
 # Installation
-# Application deferred to Phase 5
-# install(TARGETS mycroft-gui-app
-#     RUNTIME DESTINATION bin
-# )
+install(TARGETS mycroft-gui-app
+    RUNTIME DESTINATION bin
+)
 
 install(TARGETS mycroft-gui-qt6
     LIBRARY DESTINATION lib

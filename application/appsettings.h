@@ -29,20 +29,36 @@ class AppSettings : public QObject
     Q_OBJECT
     Q_PROPERTY(bool darkMode READ darkMode WRITE setDarkMode NOTIFY darkModeChanged)
     Q_PROPERTY(bool usesRemoteSTT READ usesRemoteSTT WRITE setUsesRemoteSTT NOTIFY usesRemoteSTTChanged)
-    
+    // Shell mode properties (rotation, brightness, menu labels)
+    Q_PROPERTY(QString rotation READ rotation WRITE setRotation NOTIFY rotationChanged)
+    Q_PROPERTY(qreal fakeBrightness READ fakeBrightness WRITE setFakeBrightness NOTIFY fakeBrightnessChanged)
+    Q_PROPERTY(bool menuLabels READ menuLabels WRITE setMenuLabels NOTIFY menuLabelsChanged)
+
 public:
-    explicit AppSettings(QObject *parent=0);
+    explicit AppSettings(QObject *parent = nullptr);
 
     bool darkMode() const;
     void setDarkMode(bool dark);
     bool usesRemoteSTT() const;
     void setUsesRemoteSTT(bool remote);
 
+    // Shell mode settings
+    void setRotation(const QString &rotation);
+    QString rotation() const;
+
+    void setFakeBrightness(qreal brightness);
+    qreal fakeBrightness() const;
+
+    void setMenuLabels(bool menuLabels);
+    bool menuLabels() const;
+
 Q_SIGNALS:
     void darkModeChanged();
     void usesRemoteSTTChanged();
+    void rotationChanged();
+    void fakeBrightnessChanged();
+    void menuLabelsChanged();
 
 private:
     QSettings m_settings;
 };
-

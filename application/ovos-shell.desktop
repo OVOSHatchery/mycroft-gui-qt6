@@ -1,0 +1,8 @@
+[Desktop Entry]
+Exec=ovos-gui-app --shell
+Icon=mycroft
+Type=Application
+StartupNotify=true
+
+Name=OVOS Shell
+Comment=OpenVoiceOS shell with homescreen, notifications, and OSD overlays

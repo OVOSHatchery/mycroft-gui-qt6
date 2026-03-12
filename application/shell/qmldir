@@ -1,0 +1,5 @@
+module OVOSPlugin
+plugin openvoiceshellplugin
+classname OpenVoiceShellPlugin
+
+typeinfo plugins.qmltypes

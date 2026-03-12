@@ -54,3 +54,50 @@ void AppSettings::setUsesRemoteSTT(bool remote)
     m_settings.setValue(QStringLiteral("usesRemoteSTT"), remote);
     emit usesRemoteSTTChanged();
 }
+
+// Shell mode settings
+
+QString AppSettings::rotation() const
+{
+    return m_settings.value(QStringLiteral("rotation"), QStringLiteral("NORMAL")).toString();
+}
+
+void AppSettings::setRotation(const QString &rotation)
+{
+    if (AppSettings::rotation() == rotation) {
+        return;
+    }
+
+    m_settings.setValue(QStringLiteral("rotation"), rotation);
+    emit rotationChanged();
+}
+
+qreal AppSettings::fakeBrightness() const
+{
+    return m_settings.value(QStringLiteral("fakeBrightness"), 1.0).toDouble();
+}
+
+void AppSettings::setFakeBrightness(qreal brightness)
+{
+    if (AppSettings::fakeBrightness() == brightness) {
+        return;
+    }
+
+    m_settings.setValue(QStringLiteral("fakeBrightness"), brightness);
+    emit fakeBrightnessChanged();
+}
+
+bool AppSettings::menuLabels() const
+{
+    return m_settings.value(QStringLiteral("menuLabels"), false).toBool();
+}
+
+void AppSettings::setMenuLabels(bool menuLabels)
+{
+    if (AppSettings::menuLabels() == menuLabels) {
+        return;
+    }
+
+    m_settings.setValue(QStringLiteral("menuLabels"), menuLabels);
+    emit menuLabelsChanged();
+}
