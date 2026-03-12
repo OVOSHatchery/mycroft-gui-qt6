@@ -37,6 +37,13 @@ set(Qt6_MIN_VERSION "6.5.0")
 # Optional KDE/Plasma components
 find_package(KF6Plasma QUIET)
 find_package(KF6KIO QUIET)
+find_package(KF6DBusAddons QUIET)
+
+# Generate configuration header
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/import/controllerconfig.h.in
+    ${CMAKE_CURRENT_BINARY_DIR}/controllerconfig.h
+)
 
 # Source files
 set(mycroft_gui_SRCS
@@ -56,6 +63,9 @@ qt6_add_resources(mycroft_gui_SRCS import/mycroft.qrc)
 
 # Main library
 add_library(mycroft-gui-qt6 SHARED ${mycroft_gui_SRCS})
+
+# Include directory for generated headers
+target_include_directories(mycroft-gui-qt6 PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(mycroft-gui-qt6
     PUBLIC
@@ -93,19 +103,28 @@ set_target_properties(mycroft-gui-qt6 PROPERTIES
     CXX_STANDARD_REQUIRED ON
 )
 
-# Standalone application
-add_executable(mycroft-gui-app
-    application/main.cpp
-)
-
-target_link_libraries(mycroft-gui-app
-    PRIVATE
-        mycroft-gui-qt6
-        Qt6::Core
-        Qt6::Gui
-        Qt6::Qml
-        Qt6::Quick
-)
+# Standalone application (deferred to Phase 5 - Integration Testing)
+# The application requires platform-specific headers and resources that are not yet ported.
+# Focus on library build first (libmycroft-gui-qt6.so).
+#
+# add_executable(mycroft-gui-app
+#     application/main.cpp
+# )
+#
+# target_link_libraries(mycroft-gui-app
+#     PRIVATE
+#         mycroft-gui-qt6
+#         Qt6::Core
+#         Qt6::Gui
+#         Qt6::Qml
+#         Qt6::Quick
+#         Qt6::Widgets
+# )
+#
+# if(KF6DBusAddons_FOUND)
+#     target_link_libraries(mycroft-gui-app PRIVATE KF6::DBusAddons)
+#     target_compile_definitions(mycroft-gui-app PRIVATE HAVE_KDBUS_SERVICE)
+# endif()
 
 # Optional: Tests
 if(BUILD_TESTING)
@@ -114,9 +133,10 @@ if(BUILD_TESTING)
 endif()
 
 # Installation
-install(TARGETS mycroft-gui-app
-    RUNTIME DESTINATION bin
-)
+# Application deferred to Phase 5
+# install(TARGETS mycroft-gui-app
+#     RUNTIME DESTINATION bin
+# )
 
 install(TARGETS mycroft-gui-qt6
     LIBRARY DESTINATION lib

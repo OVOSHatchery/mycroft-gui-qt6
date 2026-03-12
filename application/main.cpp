@@ -23,7 +23,8 @@
 #include <QtQml>
 #include <QDebug>
 #include <QCursor>
-#include <QtWebView/QtWebView>
+// QtWebView is optional in Qt6
+// #include <QtWebView/QtWebView>
 
 #ifdef Q_OS_ANDROID
 #include <QGuiApplication>
@@ -33,7 +34,9 @@
 #include "keyfilter.h"
 #else
 #include <QApplication>
+#ifdef HAVE_KDBUS_SERVICE
 #include <KDBusService>
+#endif
 #endif
 
 #include "speechintent.h"
@@ -92,7 +95,8 @@ int main(int argc, char *argv[])
         parser.showHelp();
         return 0;
     }
-    QtWebView::initialize();
+    // Qt6: QtWebView initialization is optional
+    // QtWebView::initialize();
 
     QQuickView view;
     view.setResizeMode(QQuickView::SizeRootObjectToView);
@@ -130,7 +134,9 @@ int main(int argc, char *argv[])
 #ifndef Q_OS_ANDROID
     if (parser.isSet(skillOption)) {
         app.setApplicationName(QStringLiteral("mycroft.gui.") + singleSkill);
+#ifdef HAVE_KDBUS_SERVICE
         KDBusService service(KDBusService::Unique);
+#endif
     }
 #endif
 

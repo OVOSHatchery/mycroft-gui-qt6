@@ -21,6 +21,7 @@
 #include <QQmlParserStatus>
 #include <QQmlPropertyMap>
 #include <QPointer>
+#include <QQmlEngine>
 
 #include "sessiondatamap.h"
 #include "abstractskillview.h"
@@ -57,6 +58,7 @@ private:
 class AbstractDelegate: public QQuickItem
 {
     Q_OBJECT
+    QML_ELEMENT
     Q_INTERFACES(QQmlParserStatus)
 
     /**

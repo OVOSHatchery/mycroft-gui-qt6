@@ -21,3 +21,4 @@ build/qml.qrc.depends
 build/qrc_qml.cpp
 build/regenerateindex.sh
 
+build/

@@ -22,6 +22,7 @@
 #include <QWebSocket>
 #include <QPointer>
 #include <QQuickItem>
+#include <QQmlEngine>
 
 #ifdef Q_OS_ANDROID
 #include <QTextToSpeech>
@@ -38,6 +39,7 @@ class AbstractSkillView;
 class MycroftController : public QObject
 {
     Q_OBJECT
+    QML_ELEMENT
     Q_PROPERTY(Status status READ status NOTIFY socketStatusChanged)
     //FIXME: make those two enums?
     Q_PROPERTY(bool speaking READ isSpeaking NOTIFY isSpeakingChanged)
@@ -48,7 +50,6 @@ class MycroftController : public QObject
 
     Q_PROPERTY(bool serverReady READ serverReady NOTIFY serverReadyChanged)
 
-    Q_ENUMS(Status)
 public:
     enum Status {
         Connecting,
@@ -57,6 +58,7 @@ public:
         Closed,
         Error
     };
+    Q_ENUM(Status)
     static MycroftController* instance();
 
     bool isSpeaking() const;

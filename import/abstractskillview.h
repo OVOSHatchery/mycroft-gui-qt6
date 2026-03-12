@@ -22,6 +22,7 @@
 
 #include <QQuickItem>
 #include <QPointer>
+#include <QQmlEngine>
 
 class ActiveSkillsModel;
 class AbstractSkillView;
@@ -32,6 +33,7 @@ class QTranslator;
 class AbstractSkillView: public QQuickItem
 {
     Q_OBJECT
+    QML_ELEMENT
     Q_PROPERTY(MycroftController::Status status READ status NOTIFY statusChanged)
 
     Q_PROPERTY(ActiveSkillsModel *activeSkills READ activeSkills CONSTANT)

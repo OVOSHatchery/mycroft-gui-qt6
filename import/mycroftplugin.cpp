@@ -77,9 +77,10 @@ static QObject *mediaServiceSingletonProvider(QQmlEngine *engine, QJSEngine *scr
 
 void MycroftPlugin::registerTypes(const char *uri)
 {
-    // QLatin1String is deprecated in Qt 6, so fix this 
+    // Qt6: Compare with std::string_view or QString for better compatibility
     Q_ASSERT(QLatin1String(uri) == QLatin1String("Mycroft"));
 
+    // Singleton types must be registered explicitly even with QML_ELEMENT
     qmlRegisterSingletonType<MycroftController>(uri, 1, 0, "MycroftController", mycroftControllerSingletonProvider);
     qmlRegisterSingletonType<GlobalSettings>(uri, 1, 0, "GlobalSettings", globalSettingsSingletonProvider);
     qmlRegisterSingletonType<FileReader>(uri, 1, 0, "FileReader", fileReaderSingletonProvider);
@@ -87,8 +88,7 @@ void MycroftPlugin::registerTypes(const char *uri)
     qmlRegisterSingletonType<MediaService>(uri, 1, 0, "MediaService", mediaServiceSingletonProvider);
     qmlRegisterSingletonType(QUrl(QStringLiteral("qrc:/qml/Units.qml")), uri, 1, 0, "Units");
     qmlRegisterSingletonType(QUrl(QStringLiteral("qrc:/qml/SoundEffects.qml")), uri, 1, 0, "SoundEffects");
-    qmlRegisterType<AbstractSkillView>(uri, 1, 0, "AbstractSkillView");
-    qmlRegisterType<AbstractDelegate>(uri, 1, 0, "AbstractDelegate");
+    // AbstractSkillView and AbstractDelegate are now registered via QML_ELEMENT macro
     qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/AudioPlayer.qml")), uri, 1, 0, "AudioPlayer");
     qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/AutoFitLabel.qml")), uri, 1, 0, "AutoFitLabel");
     qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/Delegate.qml")), uri, 1, 0, "Delegate");
