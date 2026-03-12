@@ -23,6 +23,7 @@
 #include "abstractskillview.h"
 #include "controllerconfig.h"
 #include "shellfeaturecontroller.h"
+#include "gui_message_types.h"
 
 #include <QtGlobal>
 #include <QFile>
