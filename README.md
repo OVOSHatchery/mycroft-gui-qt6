@@ -2,6 +2,23 @@
 
 **Qt6 Port of mycroft-gui-qt5 with Full Feature Parity**
 
+---
+
+## ⚠️ PROJECT STATUS: AI-GENERATED MODERNIZATION
+
+**This project was abandoned by its original developers.** The original codebase was archived as unmaintained, with original developers lacking Qt expertise, time, and capacity for maintenance.
+
+**Claude AI has completed a modern Qt6 port as a best-effort experiment** to explore AI usage in OpenVoiceOS modernization efforts. This is **experimental code** and should be treated as such:
+
+- ✅ **What you get**: A functional Qt6 GUI client that builds cleanly, passes tests, and implements all 25 OVOS templates
+- ⚠️ **What to expect**: Experimental code designed to validate the concept of AI-driven modernization on low-risk archived projects
+- 🔍 **Code transparency**: 100% AI-generated with detailed documentation (ARCHITECTURE.md, CODE_GUIDE.md, COMPONENTS.md) to enable human understanding and maintenance
+- 📋 **Before using**: Read the [ARCHITECTURE.md](docs/ARCHITECTURE.md), [CODE_GUIDE.md](docs/CODE_GUIDE.md), and [COMPONENTS.md](docs/COMPONENTS.md) to understand the design decisions and implementation details
+
+**Use in production at your own risk.** While the code is functional and well-documented, this is an experiment in AI-assisted open source maintenance. Community contribution and human review are essential before considering this production-ready.
+
+---
+
 ## Overview
 
 `mycroft-gui-qt6` is a modern Qt6-based GUI client for the OpenVoiceOS voice assistant. It maintains **100% feature parity** with the modernized Qt5 version while leveraging Qt6's performance, security, and modern APIs.
