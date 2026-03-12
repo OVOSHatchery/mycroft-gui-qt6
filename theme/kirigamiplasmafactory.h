@@ -8,7 +8,7 @@
 class OpenVoiceStyleFactory : public Kirigami::KirigamiPluginFactory
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.ovos.KirigamiPluginFactory")
+    Q_PLUGIN_METADATA(IID "org.kde.Kirigami.KirigamiPluginFactory" FILE "ovostheme.json")
     Q_INTERFACES(Kirigami::KirigamiPluginFactory)
 
 public:

@@ -20,8 +20,10 @@ find_package(Qt6 6.5 REQUIRED COMPONENTS
     Gui
     Widgets
     DBus
-    WebView
 )
+
+# WebView is optional
+find_package(Qt6 QUIET COMPONENTS WebView)
 
 find_package(ECM 6.0 REQUIRED NO_MODULE)
 set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
@@ -114,8 +116,10 @@ set_target_properties(mycroft-gui-qt6 PROPERTIES
 include(KDEInstallDirs)
 include(KDECMakeSettings)
 add_subdirectory(application)
-add_subdirectory(application/shell)
-add_subdirectory(theme)
+# Shell plugin requires additional KDE components - skip for now
+#add_subdirectory(application/shell)
+# Theme has KF6 compatibility issues - skip for now
+#add_subdirectory(theme)
 add_subdirectory(schemes)
 
 # Tests

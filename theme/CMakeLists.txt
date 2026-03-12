@@ -3,7 +3,11 @@ set(OpenVoiceStyle_SRCS
     kirigamiplasmafactory.cpp
 )
 
-kcoreaddons_add_plugin(OpenVoiceStyle SOURCES ${OpenVoiceStyle_SRCS} INSTALL_NAMESPACE "kf6/kirigami" JSON ovostheme.json)
+add_library(OpenVoiceStyle SHARED ${OpenVoiceStyle_SRCS})
+set_target_properties(OpenVoiceStyle PROPERTIES PREFIX "")
+
+install(TARGETS OpenVoiceStyle DESTINATION ${KDE_INSTALL_PLUGINDIR}/kf6/kirigami)
+install(FILES ovostheme.json DESTINATION ${KDE_INSTALL_PLUGINDIR}/kf6/kirigami)
 
 target_link_libraries(OpenVoiceStyle
     PUBLIC
