@@ -21,6 +21,38 @@ Qt 6.5+, KF6, CMake 3.22+, C++17 compiler. See QUICK_FACTS.md for full details.
 ## Is this production-ready?
 Experimental. Functional and well-documented, but needs broader user testing before production deployment.
 
+## Shell Mode
+
+### What is shell mode?
+
+Shell mode launches the GUI as a full-screen touch-optimized desktop environment (EGLFS) for embedded devices without a traditional desktop environment (window manager). It includes a homescreen, notifications, OSD, and quick settings — all features of the integrated shell absorbed from the separate ovos-shell package.
+
+### How do I launch shell mode?
+
+```bash
+ovos-gui-app --shell
+```
+
+### When should I use shell mode?
+
+Use shell mode for:
+- Embedded devices without a desktop environment (Mycroft Mark 2, Raspberry Pi, etc.)
+- Devices with integrated touchscreens
+- Systems where the OVOS interface should be the entire user experience
+
+Use regular `ovos-gui-app` for:
+- Desktop/laptop systems with an existing desktop environment
+- Development machines
+- Running OVOS alongside other applications
+
+### Does Qt6 shell mode have feature parity with Qt5?
+
+Yes. Qt6 shell mode includes all features of the Qt5 shell: homescreen, widgets, notifications, OSD, and device controls. Qt6 provides improved performance and modern graphics rendering.
+
+### What hardware works with shell mode?
+
+Minimum: 512 MB RAM, 1 GHz CPU, touchscreen or pointer device. Modern embedded systems like Mycroft Mark 2 and Raspberry Pi 3+ work well. Qt6 requires 64-bit architecture.
+
 ## See Also
 - [QUICK_FACTS.md](QUICK_FACTS.md) — Machine-readable reference
 - [AUDIT.md](AUDIT.md) — Known issues

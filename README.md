@@ -57,6 +57,43 @@ Same as Qt5 version with modernized APIs:
 - 23 OVOS bus message types (enum-based)
 - Type-safe message routing
 
+## Modes of Operation
+
+### GUI Mode (Desktop)
+
+Standard windowed GUI for desktop and laptop systems. Launches as a normal application window within your desktop environment:
+
+```bash
+ovos-gui-app
+```
+
+Perfect for:
+- Desktop/laptop development and testing
+- Systems with an existing desktop environment (KDE Plasma, GNOME, etc.)
+- Running OVOS GUI alongside other applications
+
+### Shell Mode (Embedded Devices)
+
+Full-screen touch-optimized shell for headless embedded devices. Integrates homescreen, notifications, and OSD into a complete EGLFS-based desktop environment:
+
+```bash
+ovos-gui-app --shell
+```
+
+**Features:**
+- Full-screen display (touch-optimized, no window manager needed)
+- Homescreen with widget area
+- System notifications and on-screen display (OSD)
+- Quick settings panel for device controls
+- Direct skill interaction without windowing
+
+**Best for:**
+- Embedded devices without a desktop environment (Mycroft Mark 2, Raspberry Pi, etc.)
+- Devices with integrated touchscreens
+- Systems where the OVOS interface IS the entire user experience
+
+**Note:** Qt6 shell mode has feature parity with Qt5 shell mode, with improved performance and modern graphics rendering.
+
 ## Qt5 → Qt6 Changes
 
 ### C++ API
