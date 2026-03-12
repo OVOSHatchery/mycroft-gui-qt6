@@ -44,9 +44,10 @@ def service_port():
 @pytest.fixture
 def mock_service_script(service_port):
     """Path to mock service script."""
-    script_path = Path(__file__).parent.parent.parent.parent / "mock_gui_service.py"
+    # Look in tools directory first (preferred location)
+    script_path = Path(__file__).parent.parent.parent.parent / "tools" / "mock_gui_service.py"
     if not script_path.exists():
-        # Fallback to /tmp location
+        # Fallback to /tmp location for development
         script_path = Path("/tmp/mock-gui-service/mock_gui_service.py")
     return script_path
 
