@@ -16,12 +16,16 @@
  *
  */
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15 as Controls
-import QtQuick.Layouts 1.15
-import org.kde.kirigami 2.19 as Kirigami
-import Mycroft 1.0 as Mycroft
+import QtQuick
+import QtQuick.Controls as Controls
+import QtQuick.Layouts
 import QtMultimedia
+import org.kde.kirigami as Kirigami
+import Mycroft 1.0 as Mycroft
+
+// DEPRECATED: This component duplicates system-templates/AudioPlayer.qml functionality.
+// Use the system template (SYSTEM_media_player or SYSTEM_audio_player) instead.
+// See docs/QML_AUDIT_AND_MIGRATION.md for details.
 
 Item {
     id: root

@@ -16,12 +16,12 @@
  *
  */
 
-import QtQuick 2.15
-import QtQuick.Layouts 1.15
-import QtQuick.Controls 2.15 as Controls
-import org.kde.kirigami 2.19 as Kirigami
-import Mycroft 1.0 as Mycroft 
-import Qt5Compat.GraphicalEffects
+import QtQuick
+import QtQuick.Layouts
+import QtGraphicalEffects
+import QtQuick.Controls as Controls
+import org.kde.kirigami as Kirigami
+import Mycroft 1.0 as Mycroft
 
 import "private" as Private
 
@@ -62,9 +62,7 @@ Mycroft.AbstractSkillView {
 
     Connections {
         target: root.activeSkills
-        function onSkillActivated() { 
-            root.open = true;
-        }
+        onSkillActivated: root.open = true;
     }
 
     SequentialAnimation {
@@ -227,7 +225,7 @@ Mycroft.AbstractSkillView {
 
                     Connections {
                         target: delegates
-                        function onCurrentIndexChanged() {
+                        onCurrentIndexChanged: {
                             delegatesView.currentIndex = delegates.currentIndex
                         }
                     }
@@ -260,7 +258,7 @@ Mycroft.AbstractSkillView {
                             
                             Connections {
                                 target: model.delegateUi
-                                function onFocusChanged() {
+                                onFocusChanged: {
                                     if (model.delegateUi.focus) {
                                         delegatesView.currentIndex = index;
                                         if (root.width >= root.switchWidth) {
@@ -289,6 +287,28 @@ Mycroft.AbstractSkillView {
                                     to: 1
                                     duration: Kirigami.Units.longDuration
                                     easing.type: Easing.InOutQuad
+                                }
+                            }
+                            RadialGradient {
+                                anchors {
+                                    left: parent.left
+                                    right: parent.right
+                                    bottom: parent.bottom
+                                }
+                                height: Kirigami.Units.gridUnit
+                                verticalOffset: height/2
+                                gradient: Gradient {
+                                    GradientStop { position: 0.0; color: Kirigami.Theme.highlightColor }
+                                    GradientStop { position: 0.5; color: "transparent" }
+                                }
+                                visible: root.width >= root.switchWidth && delegatesView.count > 1 && (model.delegateUi && !model.delegateUi.fillWidth)
+                                opacity: delegatesView.currentIndex == index
+                                Behavior on opacity {
+                                    NumberAnimation {
+                                        property: "scale"
+                                        duration: Kirigami.Units.longDuration
+                                        easing.type: Easing.InOutQuad
+                                    }
                                 }
                             }
                         }

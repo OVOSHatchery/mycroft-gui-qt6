@@ -15,9 +15,9 @@
  *
  */
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15 as Controls
-import org.kde.kirigami 2.19 as Kirigami
+import QtQuick
+import QtQuick.Controls as Controls
+import org.kde.kirigami as Kirigami
 
 /**
  * Takes a long text and breaks it down into pages that can be horizontally swiped

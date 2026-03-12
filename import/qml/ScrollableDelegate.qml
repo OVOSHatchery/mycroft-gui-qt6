@@ -16,12 +16,16 @@
  *
  */
 
-import QtQuick 2.15
-import QtQuick.Controls 2.15 as Controls
-import org.kde.kirigami 2.19 as Kirigami
+import QtQuick
+import QtQuick.Controls as Controls
+import org.kde.kirigami as Kirigami
 import Mycroft 1.0 as Mycroft
 
-//TODO: this muct become a Delegate subclass
+// ScrollableDelegate formally inherits from Delegate, providing a scrollable content area
+// while maintaining all Delegate theming and behavior (padding, background colors, etc.).
+//
+// DEPRECATED: Do not use for new skills. Use template-based system instead.
+// See docs/QML_AUDIT_AND_MIGRATION.md for migration guidance.
 Delegate {
     id: control
 

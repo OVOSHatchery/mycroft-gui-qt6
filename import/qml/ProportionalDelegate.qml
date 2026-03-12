@@ -15,12 +15,14 @@
  *
  */
 
-import QtQuick 2.15
-import QtQuick.Layouts 1.15
-import QtQuick.Controls 2.15 as Controls
-import org.kde.kirigami 2.19 as Kirigami
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls as Controls
+import org.kde.kirigami as Kirigami
 import Mycroft 1.0 as Mycroft
 
+// DEPRECATED: Do not use for new skills. Use template-based system instead.
+// See docs/QML_AUDIT_AND_MIGRATION.md for migration guidance.
 Delegate {
     id: root
 
@@ -38,7 +40,9 @@ Delegate {
     contentItem: Mycroft.BoxLayout {
         id: layout
 
-        //TODO: default to zero?
+        // Design Decision: Use proportional spacing (root.spacing) instead of zero
+        // Proportional spacing scales with screen size and ensures consistent visual
+        // relationships between UI elements across different device form factors.
         rowSpacing: root.spacing
         columnSpacing: root.spacing
     }

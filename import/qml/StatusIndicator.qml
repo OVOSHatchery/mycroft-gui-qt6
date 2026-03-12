@@ -16,10 +16,10 @@
  *
  */
 
-import QtQuick 2.15
-import org.kde.kirigami 2.19 as Kirigami
+import QtQuick
+import QtGraphicalEffects
+import org.kde.kirigami as Kirigami
 import Mycroft 1.0 as Mycroft
-import Qt5Compat.GraphicalEffects
 
 Item {
     id: root
@@ -164,28 +164,28 @@ Item {
 
     Connections {
         target: Mycroft.MycroftController
-        function onListeningChanged() {
+        onListeningChanged: {
             if (Mycroft.MycroftController.listening) {
                 root.state = "waiting";
             } else {
                 fadeTimer.restart();
             }
         }
-        function onNotUnderstood() {
+        onNotUnderstood: {
             root.state = "idle"
             root.state = "error";
         }
-        function onFallbackTextRecieved(skill, data){
+        onFallbackTextRecieved: {
             if (skill.length > 0) {
                 root.state = "ok";
             }
         }
-        function onServerReadyChanged() {
+        onServerReadyChanged: {
             if (Mycroft.MycroftController.serverReady) {
                 root.state = "ok";
             }
         }
-        function onStatusChanged(status) {
+        onStatusChanged: {
             switch (Mycroft.MycroftController.status) {
             case Mycroft.MycroftController.Open:
                 root.state = Mycroft.MycroftController.serverReady ? "ok" : "loading";
@@ -199,7 +199,7 @@ Item {
                 break;
             }
         }
-        function onCurrentIntentChanged() {
+        onCurrentIntentChanged: {
             if (Mycroft.MycroftController.currentIntent.length == 0) {
                 if (root.state == "loading") {
                     root.state = "idle";

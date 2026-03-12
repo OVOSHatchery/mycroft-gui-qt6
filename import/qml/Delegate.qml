@@ -16,13 +16,27 @@
  *
  */
 
-//DEPRECATED or inherit fom c++ Delegate?
-import QtQuick 2.15
-import QtQuick.Controls 2.15 as Controls
-import org.kde.kirigami 2.19 as Kirigami
+/*
+ * DEPRECATED: Do not use for new skills.
+ *
+ * Skills should use the template-based system (ovos-gui-api-client.PageTemplates)
+ * instead of shipping custom QML with Delegate.
+ *
+ * This component is maintained for backward compatibility with legacy skills only.
+ * See docs/QML_AUDIT_AND_MIGRATION.md for migration guidance.
+ */
+
+import QtQuick
+import QtQuick.Controls as Controls
+import org.kde.kirigami as Kirigami
 import Mycroft 1.0 as Mycroft
 
-//TODO: should all delegates be a Kirigami Page?
+// Design Decision: Keep AbstractDelegate pattern instead of Kirigami Page
+// AbstractDelegate provides a lightweight, composable base for skill UI without
+// Page-specific overhead (navigation stack, header/footer assumptions).
+// This allows simpler skill layouts while maintaining consistent theming.
+//
+// NOTE: New skills should use template-based system instead (SYSTEM_text, SYSTEM_weather, etc.)
 Mycroft.AbstractDelegate {
     id: control
 
