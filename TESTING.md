@@ -4,21 +4,49 @@ Complete guide to testing the Qt6 GUI client with mock protocol server.
 
 ## Quick Start
 
-### 1. Install Test Dependencies
+### Protocol Testing (Automated)
 ```bash
-pip install pytest pytest-asyncio websockets
+# Run all 33 protocol + integration tests
+uv run pytest test/e2e/ -v
 ```
 
-### 2. Start Mock GUI Service
+### GUI Integration Testing (Interactive)
 ```bash
-python /tmp/mock-gui-service/mock_gui_service.py --script hello
-# or
-python /tmp/mock-gui-service/mock_gui_service.py --script weather
+# Terminal 1: Start mock messagebus (8181) + GUI service (18181/gui)
+python tools/run_gui_test.py
+
+# Terminal 2: Run Qt application
+./build/bin/mycroft-gui-app
 ```
 
-### 3. Run Tests
-```bash
-pytest test/e2e/ -v
+The mock services will:
+- Listen on port 8181/core (messagebus) and 18181/gui (GUI protocol)
+- Respond to gui.connected with the GUI port information
+- Send skill data (weather, alarms, etc.) to the Qt app
+
+## Architecture
+
+### Service Endpoints
+
+**MessageBus** (`ws://localhost:8181/core`):
+- Handles skill loading, intent routing, event system
+- Qt app connects here first on startup
+- Responds to `mycroft.gui.connected` messages
+
+**GUI Protocol** (`ws://localhost:18181/gui`):
+- Handles skill display and user interface
+- Qt app receives GUI port from messagebus, then connects here
+- Exchanges skill views, session data, and UI updates
+
+### Connection Flow
+```
+1. Qt app connects to 8181/core (messagebus)
+2. Qt app sends: mycroft.gui.connected
+3. Messagebus responds: mycroft.gui.port = 18181
+4. Qt app connects to 18181/gui (GUI service)
+5. GUI service sends: mycroft.gui.connected (handshake)
+6. GUI service sends: skill data (gui.list.insert, session.set)
+7. Qt app renders skill UI
 ```
 
 ## Test Suites
