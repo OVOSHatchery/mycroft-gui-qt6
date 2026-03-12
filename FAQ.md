@@ -9,14 +9,11 @@ Through the `ovos-legacy-mycroft-gui-plugin` adapter (WebSocket port 18181). Thi
 ## What does "legacy" mean in the adapter name?
 It refers to the protocol's Mycroft AI origins, not its current status. The mycroft gui protocol is the CURRENT, ACTIVE standard for all Qt GUI clients.
 
-## Is Qt5 abandoned?
-No. mycroft-gui-qt5 was modernized in Q1 2026 (C++17, TLS/SSL, auth tokens, memory leak fixes). It is deprecated but fully functional.
+## Is Qt5 still maintained?
+mycroft-gui-qt5 received a one-time modernization in Q1 2026 (C++17, TLS/SSL, auth tokens, memory leak fixes) but is deprecated and will not receive further updates. It remains functional for systems where Qt6 is unavailable.
 
 ## Will old Mycroft AI GUI binaries work?
 No. Pre-OVOS `mycroft-gui` binaries are NOT compatible with modern OVOS. You must recompile from the current mycroft-gui-qt5 or mycroft-gui-qt6 source.
-
-## What about ovos-media QML files?
-`ovos-media` still ships legacy QML files in `ovos_media/qt5/` using the old `show_pages` pattern. The Qt clients already have bundled system templates (SYSTEM_ocp_now_playing, etc.) as the replacement.
 
 ## Build requirements?
 Qt 6.5+, KF6, CMake 3.22+, C++17 compiler. See QUICK_FACTS.md for full details.

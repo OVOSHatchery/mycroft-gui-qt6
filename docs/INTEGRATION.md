@@ -453,7 +453,7 @@ def handle_message(self, message):
 - **Status**: Deprecated but functional — modernized in Q1 2026 (C++17, TLS/SSL, auth tokens, memory fixes)
 - **Connection**: Through the SAME legacy adapter plugin as Qt6 (WebSocket port 18181)
 - **Modern Features**: Yes — C++17, Qt5.15+, TLS/SSL, bearer token auth
-- **Maintenance**: Actively maintained alongside Qt6; recommended for systems where Qt6 is unavailable
+- **Maintenance**: One-time modernization complete; deprecated, no further updates planned. Use for systems where Qt6 is unavailable.
 
 ### Qt6 Modern GUI (mycroft-gui-qt6) ← **You are here**
 - **Status**: AI-modernized, actively maintained
@@ -669,7 +669,3 @@ Understanding the GUI ecosystem requires knowing its history:
 - This protocol is the CURRENT, ACTIVE standard used by all Qt GUI clients
 - Both mycroft-gui-qt5 and mycroft-gui-qt6 connect through this same adapter
 
-### Legacy QML Still in the Wild
-- `ovos-media` still ships 15 QML files in `ovos_media/qt5/` using the old `Mycroft.Delegate` + `show_pages` pattern
-- The Qt clients already have bundled system templates (SYSTEM_ocp_now_playing, etc.) as the replacement
-- Migration: ovos-media should transition to using system template API calls instead of shipping raw QML

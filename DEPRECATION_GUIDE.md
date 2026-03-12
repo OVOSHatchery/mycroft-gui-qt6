@@ -64,10 +64,9 @@ Understanding the ecosystem requires knowing its history:
 - **The mycroft gui protocol** (WebSocket port 18181): Implemented by `ovos-legacy-mycroft-gui-plugin`. This is the CURRENT standard — both Qt5 and Qt6 connect through the SAME adapter.
 - **"Legacy" naming**: Refers to the protocol's Mycroft AI origins, NOT its current status.
 - **Incompatibility warning**: Pre-OVOS `mycroft-gui` binaries will NOT work. You must recompile from current source and use the latest ovos-gui service.
-- **Legacy QML example**: `ovos-media` still ships QML files using the old `show_pages` pattern in `ovos_media/qt5/`. The Qt clients already have bundled system templates as the replacement.
 
 ### Strategic Approach
-- **Qt5 NOT deprecated** — continues as option for legacy systems
+- **Qt5 deprecated** — one-time modernization (C++17, TLS, memory fixes) was performed but no further updates are planned
 - **Qt6 NOW available** — option for modern systems
 - **Dual maintenance** — both receive bug fixes, security updates
 - **Planned transition** — move to Qt6 default around 2027 Q2
