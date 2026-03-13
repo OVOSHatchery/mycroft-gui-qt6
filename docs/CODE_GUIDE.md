@@ -178,14 +178,14 @@ Text {
 
 ## Common Qt Patterns in This Project
 
-### 1. Singleton Pattern (MycroftController)
+### 1. Singleton Pattern (OVOSController)
 
 ```cpp
-class MycroftController : public QObject {
+class OVOSController : public QObject {
 public:
-    static MycroftController* instance() {
-        static MycroftController* s_instance = nullptr;
-        if (!s_instance) s_instance = new MycroftController();
+    static OVOSController* instance() {
+        static OVOSController* s_instance = nullptr;
+        if (!s_instance) s_instance = new OVOSController();
         return s_instance;
     }
 };
@@ -195,7 +195,7 @@ public:
 
 **Usage**: 
 ```cpp
-MycroftController::instance()->sendMessage("hello");
+OVOSController::instance()->sendMessage("hello");
 ```
 
 ### 2. Parent-Child Ownership
@@ -359,7 +359,7 @@ connect(button, &Button::clicked, someObject, [this]() {
 - Understand what gets created first
 
 ### Step 2: Trace Key Classes
-- `MycroftController` - handles server connection
+- `OVOSController` - handles server connection
 - `AbstractSkillView` - displays individual skill UIs
 - `SessionDataModel` - holds skill data
 

@@ -21,11 +21,11 @@ import QtQuick.Layouts
 import QtGraphicalEffects
 import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 import "private" as Private
 
-Mycroft.AbstractSkillView {
+OVOS.AbstractSkillView {
     id: root
 
     Kirigami.Theme.colorSet: Kirigami.Theme.Complementary
@@ -44,17 +44,17 @@ Mycroft.AbstractSkillView {
 
     onOpenChanged: {
         if (open) {
-            if(Mycroft.GlobalSettings.useExitNameSpaceAnimation) {
+            if(OVOS.GlobalSettings.useExitNameSpaceAnimation) {
                 closeAnimation.running = false;
             }
-            if(Mycroft.GlobalSettings.useEntryNameSpaceAnimation) {
+            if(OVOS.GlobalSettings.useEntryNameSpaceAnimation) {
                 openAnimation.restart();
             }
         } else {
-            if(Mycroft.GlobalSettings.useEntryNameSpaceAnimation) {
+            if(OVOS.GlobalSettings.useEntryNameSpaceAnimation) {
                 openAnimation.running = false;
             }
-            if(Mycroft.GlobalSettings.useExitNameSpaceAnimation) {
+            if(OVOS.GlobalSettings.useExitNameSpaceAnimation) {
                 closeAnimation.restart();
             }
         }
@@ -191,7 +191,7 @@ Mycroft.AbstractSkillView {
                             activeSkillsRepeater.currentDelegate = delegate;
                             if (root.open === false) {
                                 root.open = true;
-                                if(Mycroft.GlobalSettings.useDelegateAnimation) {
+                                if(OVOS.GlobalSettings.useDelegateAnimation) {
                                     enterAnim.restart();
                                 }
                             }
@@ -219,7 +219,7 @@ Mycroft.AbstractSkillView {
                             delegatesView.currentIndex--
                             delegatesView.currentItem.contentItem.forceActiveFocus()
                         } else {
-                            Mycroft.MycroftController.sendRequest("mycroft.gui.screen.close", {})
+                            OVOS.OVOSController.sendRequest("mycroft.gui.screen.close", {})
                         }
                     }
 
@@ -262,7 +262,7 @@ Mycroft.AbstractSkillView {
                                     if (model.delegateUi.focus) {
                                         delegatesView.currentIndex = index;
                                         if (root.width >= root.switchWidth) {
-                                            if(Mycroft.GlobalSettings.useFocusAnimation) {
+                                            if(OVOS.GlobalSettings.useFocusAnimation) {
                                                 focusAnim.restart();
                                             }
                                         }

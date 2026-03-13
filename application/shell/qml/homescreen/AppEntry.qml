@@ -4,7 +4,7 @@ import QtQuick.Window
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
 import QtQuick.Layouts
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 Control {
     id: appEntryDelegate
@@ -56,8 +56,8 @@ Control {
             delBackground.color = Qt.rgba(Kirigami.Theme.highlightColor.r, Kirigami.Theme.highlightColor.g, Kirigami.Theme.highlightColor.b, 0.8)
             delBackground.color = Qt.darker(Kirigami.Theme.backgroundColor, 2)
             appBarRoot.close()
-            Mycroft.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
-            Mycroft.MycroftController.sendRequest(model.action, {})
+            OVOS.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
+            OVOS.OVOSController.sendRequest(model.action, {})
         }
     }
 }

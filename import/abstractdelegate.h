@@ -72,7 +72,7 @@ class AbstractDelegate: public QQuickItem
     Q_PROPERTY(bool fillWidth MEMBER m_fillWidth NOTIFY fillWidthChanged)
 
     /**
-     * The idle time after Mycroft stopped talking  before the delegate wants to return to the resting face expressed in milliseconds.
+     * The idle time after OVOS stopped talking before the delegate wants to return to the resting face expressed in milliseconds.
      * The view may or may not follow this.
      * By default, it's 5 seconsa
      */
@@ -266,7 +266,7 @@ private:
     QList<QObject *> m_contentData;
 
 
-    //The main data from the Mycroft server
+    //The main data from the OVOS server
     QPointer<SessionDataMap> m_data;
     QPointer<AbstractSkillView> m_skillView;
 

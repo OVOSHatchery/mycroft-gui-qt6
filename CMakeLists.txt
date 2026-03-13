@@ -58,7 +58,7 @@ configure_file(
 set(mycroft_gui_SRCS
     import/abstractdelegate.cpp
     import/abstractskillview.cpp
-    import/mycroftcontroller.cpp
+    import/ovoscontroller.cpp
     import/activeskillsmodel.cpp
     import/delegatesmodel.cpp
     import/sessiondatamap.cpp
@@ -67,8 +67,14 @@ set(mycroft_gui_SRCS
     import/globalsettings.cpp
 )
 
+# System templates directory
+if(NOT OVOS_SYSTEM_TEMPLATES_DIR)
+    set(OVOS_SYSTEM_TEMPLATES_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/ovos-gui/system-templates")
+endif()
+add_definitions(-DOVOS_SYSTEM_TEMPLATES_DIR="${OVOS_SYSTEM_TEMPLATES_DIR}")
+
 # QML resources
-qt6_add_resources(mycroft_gui_SRCS import/mycroft.qrc)
+qt6_add_resources(mycroft_gui_SRCS import/ovos.qrc)
 
 # Main library
 add_library(mycroft-gui-qt6 SHARED ${mycroft_gui_SRCS})
@@ -130,7 +136,7 @@ enable_testing()
 add_subdirectory(autotests)
 
 # Installation
-install(TARGETS mycroft-gui-app
+install(TARGETS ovos-gui-app
     RUNTIME DESTINATION bin
 )
 

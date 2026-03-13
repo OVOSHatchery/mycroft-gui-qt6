@@ -25,10 +25,8 @@ MediaService::MediaService(QObject *parent)
     m_currentMediaState = MediaService::NoMedia;
     m_selectedProviderService = MediaService::NoProvider;
 
-    if (m_controller->status() == OVOSController::Open){
-        connect(m_controller, &OVOSController::intentRecevied, this,
-                &MediaService::onMainSocketIntentReceived);
-    }
+    // NOTE: intentRecevied signal was removed (dead code from legacy).
+    // MediaService intent handling is done via mycroft.events.triggered instead.
 }
 
 void MediaService::unloadAudioProvider(MediaService::UnloadStateReason reason)

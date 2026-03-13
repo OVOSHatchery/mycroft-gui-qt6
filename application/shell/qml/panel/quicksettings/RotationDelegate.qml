@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 Delegate {
     iconSource: "qrc://icons/screen-rotate"

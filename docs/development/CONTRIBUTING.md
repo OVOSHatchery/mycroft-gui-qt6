@@ -76,7 +76,7 @@ mycroft-gui-qt6/
 ├── CMakeLists.txt              # Build configuration
 ├── import/
 │   ├── *.h / *.cpp            # C++ sources (13 files)
-│   │   ├── mycroftcontroller.cpp         # WebSocket connection
+│   │   ├── ovoscontroller.cpp         # WebSocket connection
 │   │   ├── abstractskillview.cpp         # Skill UI container
 │   │   ├── abstractdelegate.cpp          # Base delegate
 │   │   ├── guibusmessages.h              # Message type enum
@@ -116,7 +116,7 @@ Found a bug? Report it on GitHub with:
 
 Example:
 ```
-Title: Bug: MycroftController fails to reconnect after network loss
+Title: Bug: OVOSController fails to reconnect after network loss
 
 Steps:
 1. Start mycroft-gui-app
@@ -150,8 +150,8 @@ Proposed Solution:
 - Restore on startup using QSettings
 
 Code outline:
-void MycroftController::saveWindowGeometry() { /* ... */ }
-void MycroftController::restoreWindowGeometry() { /* ... */ }
+void OVOSController::saveWindowGeometry() { /* ... */ }
+void OVOSController::restoreWindowGeometry() { /* ... */ }
 ```
 
 ### 3. Code Contributions
@@ -179,7 +179,7 @@ void MycroftController::restoreWindowGeometry() { /* ... */ }
 
 4. **Commit with clear message**
    ```bash
-   git commit -m "fix: MycroftController reconnects after network loss
+   git commit -m "fix: OVOSController reconnects after network loss
 
    - Track connection state with Timer
    - Auto-reconnect on disconnection signal
@@ -244,13 +244,13 @@ EOF
 
 **Example (correct style):**
 ```cpp
-// mycroftcontroller.h
-class MycroftController : public QObject {
+// ovoscontroller.h
+class OVOSController : public QObject {
     Q_OBJECT
     QML_ELEMENT
 
 public:
-    explicit MycroftController(QObject *parent = nullptr);
+    explicit OVOSController(QObject *parent = nullptr);
     void connect();
     void disconnect();
 
@@ -300,7 +300,7 @@ m_socket.close();
 ```qml
 // SkillView.qml
 import QtQuick
-import Mycroft
+import OVOS
 
 Item {
     id: root
@@ -347,7 +347,7 @@ Related to #issue-number
 
 **Examples:**
 ```
-fix: MycroftController reconnects after network failure
+fix: OVOSController reconnects after network failure
 
 - Monitor connection state with QTimer
 - Automatically reconnect when socket disconnects
@@ -359,7 +359,7 @@ Fixes #456
 
 docs: Update ARCHITECTURE.md with signal flow diagram
 
-- Add ASCII diagram showing MycroftController signals
+- Add ASCII diagram showing OVOSController signals
 - Document session data flow for new contributors
 - Link to related code sections
 
@@ -389,14 +389,14 @@ If adding a new feature, add tests to `autotests/`:
 ```cpp
 // autotests/myfeature_test.cpp
 #include <QtTest>
-#include "../import/mycroftcontroller.h"
+#include "../import/ovoscontroller.h"
 
 class MyFeatureTest : public QObject {
     Q_OBJECT
 
 private slots:
     void testNewFeature() {
-        MycroftController controller;
+        OVOSController controller;
         // Test the feature
         QVERIFY(controller.newFeature());
     }
@@ -482,7 +482,7 @@ When adding code, document it:
 ### C++ Classes and Methods
 
 ```cpp
-/// MycroftController manages the WebSocket connection to ovos-gui
+/// OVOSController manages the WebSocket connection to ovos-gui
 ///
 /// This singleton handles:
 /// - Connecting to ovos-gui service on port 18181
@@ -491,13 +491,13 @@ When adding code, document it:
 ///
 /// Usage:
 /// \code
-/// auto controller = MycroftController::instance();
-/// connect(controller, &MycroftController::pageShowRequested,
+/// auto controller = OVOSController::instance();
+/// connect(controller, &OVOSController::pageShowRequested,
 ///         this, &MySkillView::onPageShow);
 /// \endcode
 ///
 /// \sa AbstractSkillView, GuiBusMessages
-class MycroftController : public QObject {
+class OVOSController : public QObject {
     // ...
 };
 ```
@@ -515,7 +515,7 @@ class MycroftController : public QObject {
 /// Example:
 /// \qml
 /// SkillView {
-///     skillView: MycroftController.currentSkillView
+///     skillView: OVOSController.currentSkillView
 ///     isActive: true
 /// }
 /// \endqml

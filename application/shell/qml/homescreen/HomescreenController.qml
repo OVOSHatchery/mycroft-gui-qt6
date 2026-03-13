@@ -21,7 +21,7 @@
  */
 
 import QtQuick
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 QtObject {
     id: homescreenController
@@ -73,7 +73,7 @@ QtObject {
 
     // Subscribe to bus events
     Connections {
-        target: Mycroft.MycroftController
+        target: OVOS.OVOSController
         onIntentRecevied: {
             switch (type) {
             case "homescreen.data.time":

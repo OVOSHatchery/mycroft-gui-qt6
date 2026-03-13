@@ -24,8 +24,8 @@ import org.kde.kirigami as Kirigami
  * like in the following example.
  *
  * @code
- *  Mycroft.Delegate {
- *      background: Mycroft.SlidingImage {
+ *  OVOS.Delegate {
+ *      background: OVOS.SlidingImage {
  *          source: "foo.jpg"
  *      }
  *  }

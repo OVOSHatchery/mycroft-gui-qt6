@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 Popup {
     id: oAuthQrCodePopup
@@ -53,7 +53,7 @@ Popup {
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    height: Mycroft.Units.gridUnit * 3
+                    height: OVOS.Units.gridUnit * 3
                     color: Kirigami.Theme.highlightColor
 
                     Label {
@@ -61,23 +61,23 @@ Popup {
                         fontSizeMode: Text.Fit
                         minimumPixelSize: 10
                         elide: Text.ElideRight
-                        font.pixelSize: Mycroft.Units.gridUnit * 1.5
+                        font.pixelSize: OVOS.Units.gridUnit * 1.5
                         color: Kirigami.Theme.textColor
                         anchors.fill: parent
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
-                        anchors.margins: Mycroft.Units.gridUnit * 0.5
+                        anchors.margins: OVOS.Units.gridUnit * 0.5
                     }
                 }
 
                 Image {
                     id: qrCodeImage
                     anchors.top: qrCodeSetupPageHeading.bottom
-                    anchors.topMargin: Mycroft.Units.gridUnit * 0.5
+                    anchors.topMargin: OVOS.Units.gridUnit * 0.5
                     anchors.left: parent.left
                     anchors.right: parent.right
                     anchors.bottom: qrCodePopupCancelButton.top
-                    anchors.bottomMargin: Mycroft.Units.gridUnit * 0.5
+                    anchors.bottomMargin: OVOS.Units.gridUnit * 0.5
                     fillMode: Image.PreserveAspectFit
                     source: oAuthQrCodePopup.qrCodePath
                 }
@@ -87,12 +87,12 @@ Popup {
                     anchors.bottom: parent.bottom
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    height: Mycroft.Units.gridUnit * 3
+                    height: OVOS.Units.gridUnit * 3
 
                     background: Rectangle {
                         id: qrCodePopupCancelButtonBackground
                         color: Kirigami.Theme.highlightColor
-                        radius: Mycroft.Units.gridUnit * 0.5
+                        radius: OVOS.Units.gridUnit * 0.5
                     }
 
                     contentItem: Item {

@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 Rectangle {
     color: "transparent"
@@ -13,13 +13,13 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: weatherItemBox.left
         height: parent.height
-        spacing: Mycroft.Units.gridUnit
+        spacing: OVOS.Units.gridUnit
     }
 
     WeatherArea {
         id: weatherItemBox
         anchors.right: parent.right
-        anchors.rightMargin: Mycroft.Units.gridUnit * 0.50
+        anchors.rightMargin: OVOS.Units.gridUnit * 0.50
         width: parent.width * 0.30
         height: parent.height
     }

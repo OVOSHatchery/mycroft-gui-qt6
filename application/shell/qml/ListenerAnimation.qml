@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import Qt5Compat.GraphicalEffects
 import org.kde.kirigami as Kirigami
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 Rectangle {
     id: rootAnimator
@@ -16,7 +16,7 @@ Rectangle {
     visible: false
 
     Connections {
-        target: Mycroft.MycroftController
+        target: OVOS.OVOSController
         onIntentRecevied: {
             switch(type){
             case "recognizer_loop:wakeword":

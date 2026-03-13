@@ -20,7 +20,7 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as Controls
 import org.kde.kirigami 2.19 as Kirigami
-import Mycroft 1.0 as Mycroft 
+import OVOS 1.0 as OVOS 
 
 Kirigami.ScrollablePage {
     title: "About"
@@ -45,16 +45,8 @@ Kirigami.ScrollablePage {
         }
         
         Controls.Label {
-            id: andappverlabel
-            visible: Kirigami.Settings.isMobile
-            text: !isAndroid && Kirigami.Settings.isMobile ? "Application Version: " + versionNumber : "Android Application Version: " + versionNumber
-            Layout.fillWidth: true
-        }
-        
-        Controls.Label {
-            id: mycroftguiapplabel
-            visible: !Kirigami.Settings.isMobile
-            text: "Mycroft GUI Version: " + versionNumber
+            id: ovosguiapplabel
+            text: "OVOS GUI Version: " + versionNumber
             Layout.fillWidth: true
         }
         

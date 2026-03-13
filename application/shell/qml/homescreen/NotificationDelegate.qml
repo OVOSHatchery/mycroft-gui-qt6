@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 Rectangle {
     id: delegate
@@ -36,11 +36,11 @@ Rectangle {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        Mycroft.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
+                        OVOS.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
                         if (modelData.action != "") {
-                            Mycroft.MycroftController.sendRequest(modelData.action, modelData.callback_data)
+                            OVOS.OVOSController.sendRequest(modelData.action, modelData.callback_data)
                         }
-                        Mycroft.MycroftController.sendRequest("ovos.notification.api.storage.clear.item", {"notification": modelData})
+                        OVOS.OVOSController.sendRequest("ovos.notification.api.storage.clear.item", {"notification": modelData})
                     }
                 }
             }
@@ -64,11 +64,11 @@ Rectangle {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        Mycroft.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
+                        OVOS.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
                         if (modelData.action != "") {
-                            Mycroft.MycroftController.sendRequest(modelData.action, modelData.callback_data)
+                            OVOS.OVOSController.sendRequest(modelData.action, modelData.callback_data)
                         }
-                        Mycroft.MycroftController.sendRequest("ovos.notification.api.storage.clear.item", {"notification": modelData})
+                        OVOS.OVOSController.sendRequest("ovos.notification.api.storage.clear.item", {"notification": modelData})
                     }
                 }
             }
@@ -101,11 +101,11 @@ Rectangle {
                 }
 
                 onClicked: {
-                    Mycroft.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
+                    OVOS.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
                     if (modelData.action != "") {
-                            Mycroft.MycroftController.sendRequest(modelData.action, modelData.callback_data)
+                            OVOS.OVOSController.sendRequest(modelData.action, modelData.callback_data)
                     }
-                    Mycroft.MycroftController.sendRequest("ovos.notification.api.storage.clear.item", {"notification": modelData})
+                    OVOS.OVOSController.sendRequest("ovos.notification.api.storage.clear.item", {"notification": modelData})
                 }
             }
         }

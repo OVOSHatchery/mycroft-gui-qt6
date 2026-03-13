@@ -4,13 +4,13 @@ Detailed documentation of every major component in mycroft-gui-qt6 for maintenan
 
 ## C++ Classes
 
-### MycroftController (import/mycroftcontroller.h/cpp)
+### OVOSController (import/ovoscontroller.h/cpp)
 
 **What It Does**: Singleton that manages the WebSocket connection to OVOS core
 
 **Key Methods**:
 ```cpp
-static MycroftController* instance();  // Get the singleton
+static OVOSController* instance();  // Get the singleton
 void start();                          // Connect to server
 void sendRequest(const QString &type, const QVariantMap &data);  // Send message
 void registerView(AbstractSkillView *view);  // Register skill UI
@@ -22,7 +22,7 @@ void registerView(AbstractSkillView *view);  // Register skill UI
 - `listening`: Is the system listening for speech?
 
 **How It Works**:
-1. App starts, calls `MycroftController::start()`
+1. App starts, calls `OVOSController::start()`
 2. Attempts to connect to `ws://localhost:18181`
 3. When message arrives from server:
    - Parse JSON
@@ -49,7 +49,7 @@ void triggerEvent(const QString &skillId, const QString &eventName,
 
 **What To Know**:
 - Each skill (weather, timer, etc.) gets its own AbstractSkillView instance
-- Skills are NOT created manually; MycroftController creates them
+- Skills are NOT created manually; OVOSController creates them
 - Session data is stored in QML-accessible models
 - When skill exits, view is destroyed automatically
 
@@ -224,7 +224,7 @@ enum class GUIBusMessageType {
    - `SkillView.qml` - (deprecated - use AbstractSkillView)
 
 **Marked Deprecated**:
-The old Mycroft.Delegate pattern (Delegate.qml, etc.) is deprecated because:
+The old OVOS.Delegate pattern (Delegate.qml, etc.) is deprecated because:
 - Skills sending custom QML is a security risk
 - Templates provide consistency
 - Template system is easier to maintain
@@ -246,9 +246,9 @@ bus.emit_message("gui.page.show", {
 })
 ```
 
-**Step 2: MycroftController Receives**
+**Step 2: OVOSController Receives**
 ```cpp
-void MycroftController::onMainSocketMessageReceived(const QString &message) {
+void OVOSController::onMainSocketMessageReceived(const QString &message) {
     QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8());
     
     // Parse the message
@@ -266,7 +266,7 @@ void MycroftController::onMainSocketMessageReceived(const QString &message) {
 
 **Step 3: Prepare Skill View**
 ```cpp
-void MycroftController::onPageShow(const QJsonObject &data) {
+void OVOSController::onPageShow(const QJsonObject &data) {
     QString skillId = data["skill_id"].toString();  // "weather.openvoiceos"
     QString templateName = data["template"].toString();  // "Weather"
     
@@ -293,7 +293,7 @@ Rectangle {
 // User taps "Details" button
 Button {
     onClicked: {
-        MycroftController.sendRequest(
+        OVOSController.sendRequest(
             "skill.weather.details",
             {}
         )
@@ -347,9 +347,9 @@ make
 
 ### 1. Add Debug Logging
 
-In `mycroftcontroller.cpp`:
+In `ovoscontroller.cpp`:
 ```cpp
-void MycroftController::onMainSocketMessageReceived(const QString &message) {
+void OVOSController::onMainSocketMessageReceived(const QString &message) {
     qDebug() << "Received message:" << message;  // Add this line
     // ... rest of code
 }
@@ -360,8 +360,8 @@ void MycroftController::onMainSocketMessageReceived(const QString &message) {
 ```qml
 Rectangle {
     Component.onCompleted: {
-        console.log("MycroftController status:", MycroftController.status);
-        console.log("Speaking?", MycroftController.speaking);
+        console.log("OVOSController status:", OVOSController.status);
+        console.log("Speaking?", OVOSController.speaking);
     }
 }
 ```
@@ -392,7 +392,7 @@ if (!ok) {
    if (typeStr == "my.new.message") return MyNewMessage;
    ```
 
-3. Add handler in MycroftController:
+3. Add handler in OVOSController:
    ```cpp
    case GUIBusMessageType::MyNewMessage:
        handleMyNewMessage(data);
@@ -414,7 +414,7 @@ if (!ok) {
 2. Add to: `import/mycroft.qrc` if should be embedded
 3. Import in using templates:
    ```qml
-   import Mycroft  // Provides all framework components
+   import OVOS  // Provides all framework components
    ```
 4. Use in template:
    ```qml

@@ -4,13 +4,13 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 Button {
     id: controlButton
-    Layout.preferredWidth: Mycroft.Units.gridUnit * 5
+    Layout.preferredWidth: OVOS.Units.gridUnit * 5
     Layout.fillHeight: true
-    Layout.margins: Mycroft.Units.gridUnit * 0.1
+    Layout.margins: OVOS.Units.gridUnit * 0.1
     property alias buttonIcon: controlButtonContentIcon.source
 
     SequentialAnimation {

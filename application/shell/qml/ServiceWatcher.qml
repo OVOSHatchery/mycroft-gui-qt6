@@ -4,7 +4,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Qt5Compat.GraphicalEffects
 import org.kde.kirigami as Kirigami
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 Item {
     id: serviceWatcherRoot
@@ -12,11 +12,11 @@ Item {
     property bool guiServiceAlive: false
 
     function queryGuiServiceIsAlive() {
-        Mycroft.MycroftController.sendRequest("mycroft.gui_service.is_alive", {})
+        OVOS.OVOSController.sendRequest("mycroft.gui_service.is_alive", {})
     }
 
     function querySkillServiceIsAlive() {
-        Mycroft.MycroftController.sendRequest("mycroft.skills.is_alive", {})
+        OVOS.OVOSController.sendRequest("mycroft.skills.is_alive", {})
     }
 
     Timer {
@@ -31,7 +31,7 @@ Item {
     }
 
     Connections {
-        target: Mycroft.MycroftController
+        target: OVOS.OVOSController
 
         onIntentRecevied: {
             if(type == "mycroft.gui_service.is_alive.response"){

@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 Rectangle {
     id: factoryResetUI
@@ -34,7 +34,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        height: Mycroft.Units.gridUnit * 4
+        height: OVOS.Units.gridUnit * 4
         color: Kirigami.Theme.highlightColor
         radius: 4
         opacity: 0.8
@@ -156,7 +156,7 @@ Rectangle {
         ProgressBar {
             id: progressBar
             width: parent.width * 0.8
-            height: Mycroft.Units.gridUnit * 4
+            height: OVOS.Units.gridUnit * 4
             anchors.centerIn: parent
             indeterminate: true
         }

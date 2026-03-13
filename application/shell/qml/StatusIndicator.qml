@@ -19,7 +19,7 @@
 import QtQuick
 import Qt5Compat.GraphicalEffects
 import org.kde.kirigami as Kirigami
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 Item {
     id: root
@@ -163,9 +163,9 @@ Item {
     ]
 
     Connections {
-        target: Mycroft.MycroftController
+        target: OVOS.OVOSController
         onListeningChanged: {
-            if (Mycroft.MycroftController.listening) {
+            if (OVOS.OVOSController.listening) {
                 root.state = "waiting";
             } else {
                 fadeTimer.restart();
@@ -181,26 +181,26 @@ Item {
             }
         }
         onServerReadyChanged: {
-            if (Mycroft.MycroftController.serverReady) {
+            if (OVOS.OVOSController.serverReady) {
                 root.state = "ok";
             }
         }
         onStatusChanged: {
-            switch (Mycroft.MycroftController.status) {
-            case Mycroft.MycroftController.Open:
-                root.state = Mycroft.MycroftController.serverReady ? "ok" : "loading";
+            switch (OVOS.OVOSController.status) {
+            case OVOS.OVOSController.Open:
+                root.state = OVOS.OVOSController.serverReady ? "ok" : "loading";
                 break;
-            case Mycroft.MycroftController.Connecting:
+            case OVOS.OVOSController.Connecting:
                 root.state = "loading";
                 break;
-            case Mycroft.MycroftController.Error:
+            case OVOS.OVOSController.Error:
             default:
                 root.state = "error";
                 break;
             }
         }
         onCurrentIntentChanged: {
-            if (Mycroft.MycroftController.currentIntent.length == 0) {
+            if (OVOS.OVOSController.currentIntent.length == 0) {
                 if (root.state == "loading") {
                     root.state = "idle";
                 }

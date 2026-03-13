@@ -22,8 +22,8 @@ import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 import QtQuick.Controls.Material 2.15
 import org.kde.kirigami 2.19 as Kirigami
-import Mycroft 1.0 as Mycroft 
-import org.kde.private.mycroftgui 1.0 as MycroftGui
+import OVOS 1.0 as OVOS 
+import org.kde.private.ovosgui 1.0 as OVOSGui
 import Qt5Compat.GraphicalEffects
 
 Kirigami.ApplicationWindow {
@@ -47,21 +47,18 @@ Kirigami.ApplicationWindow {
             showMaximized()
         }
 
-        if (singleSkillHome.length > 0 && Mycroft.MycroftController.status === Mycroft.MycroftController.Open) {
-            Mycroft.MycroftController.sendRequest(singleSkillHome, {});
+        if (singleSkillHome.length > 0 && OVOS.OVOSController.status === OVOS.OVOSController.Open) {
+            OVOS.OVOSController.sendRequest(singleSkillHome, {});
         }
         
-        if(!isAndroid && Kirigami.Settings.isMobile){
-            applicationSettings.usesRemoteSTT = true
-            Mycroft.GlobalSettings.usesRemoteTTS = true
-        }
+        // STT/TTS is handled by ovos-core, not the display layer
     }
 
     Connections {
-        target: Mycroft.MycroftController
+        target: OVOS.OVOSController
         function onStatusChanged(status) {
-            if (singleSkillHome.length > 0 && Mycroft.MycroftController.status === Mycroft.MycroftController.Open) {
-                Mycroft.MycroftController.sendRequest(singleSkillHome, {});
+            if (singleSkillHome.length > 0 && OVOS.OVOSController.status === OVOS.OVOSController.Open) {
+                OVOS.OVOSController.sendRequest(singleSkillHome, {});
             }
         }
         
@@ -153,11 +150,11 @@ Kirigami.ApplicationWindow {
 
     Timer {
         interval: 20000
-        running: Mycroft.GlobalSettings.autoConnect && Mycroft.MycroftController.status != Mycroft.MycroftController.Open
+        running: OVOS.GlobalSettings.autoConnect && OVOS.OVOSController.status != OVOS.OVOSController.Open
         triggeredOnStart: true
         onTriggered: {
-            print("Trying to connect to Mycroft");
-            Mycroft.MycroftController.start();
+            print("Trying to connect to OVOS");
+            OVOS.OVOSController.start();
         }
     }
 
@@ -192,38 +189,7 @@ Kirigami.ApplicationWindow {
                 }
             }
 
-            Popup {
-                id: audioRecorder
-                width: root.width - (Kirigami.Units.largeSpacing * 2)
-                height: root.height / 2
-                closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutsideParent
-                Kirigami.Theme.colorSet: nightSwitch.checked ? Kirigami.Theme.Complementary : Kirigami.Theme.View
-                parent: root
-                x: (root.width - width) / 2
-                y: (root.height - height) / 2
-                
-                background: Rectangle {
-                    color: Kirigami.Theme.backgroundColor
-                    radius: Kirigami.Units.smallSpacing * 0.25
-                    border.width: 1
-                    Kirigami.Theme.colorSet: nightSwitch.checked ? Kirigami.Theme.Complementary : Kirigami.Theme.View
-                    border.color: Qt.rgba(Kirigami.Theme.disabledTextColor.r, Kirigami.Theme.disabledTextColor.g, Kirigami.Theme.disabledTextColor.b, 0.7)
-                }
-                
-                RemoteStt {
-                    id: remoteSttInstance
-                }
-
-                onOpenedChanged: {
-                    if(audioRecorder.opened){
-                        remoteSttInstance.record = true;
-                    } else {
-                        remoteSttInstance.record = false;
-                    }
-                }
-            }
-
-            Mycroft.SkillView {
+            OVOS.SkillView {
                 id: mainView
                 activeSkills.whiteList: singleSkill.length > 0 ? singleSkill : null
                 Kirigami.Theme.colorSet: nightSwitch.checked ? Kirigami.Theme.Complementary : Kirigami.Theme.View
@@ -233,13 +199,13 @@ Kirigami.ApplicationWindow {
             Button {
                 anchors.centerIn: parent
                 text: "start"
-                visible: Mycroft.MycroftController.status == Mycroft.MycroftController.Closed
+                visible: OVOS.OVOSController.status == OVOS.OVOSController.Closed
                 onClicked: (mouse)=> {
-                    Mycroft.MycroftController.start();
+                    OVOS.OVOSController.start();
                 }
             }
 
-            Mycroft.StatusIndicator {
+            OVOS.StatusIndicator {
                 id: si
                 //visible: false
                 anchors {
@@ -278,7 +244,7 @@ Kirigami.ApplicationWindow {
                 }
 
                 Connections {
-                    target: Mycroft.MycroftController
+                    target: OVOS.OVOSController
                     function onIntentRecevied(type, data) {
                         if(type == "recognizer_loop:utterance") {
                             inputQuery.text = data.utterances[0]
@@ -288,7 +254,6 @@ Kirigami.ApplicationWindow {
             }
         }
 
-        //Note: a custom control as ToolBar on Android has a funny color
         footer: Control {
             Kirigami.Theme.colorSet: nightSwitch.checked ? Kirigami.Theme.Complementary : Kirigami.Theme.Window
             visible: !hideTextInput
@@ -307,13 +272,13 @@ Kirigami.ApplicationWindow {
                     Layout.preferredWidth: handleAnchor.width
                     Layout.fillHeight: true
                     Layout.rightMargin: Kirigami.Units.smallSpacing
-                    enabled: !isAndroid && Kirigami.Settings.isMobile ? 1 : 0
+                    enabled: Kirigami.Settings.isMobile ? 1 : 0
                     icon.name: "go-previous"
                     
                     onClicked:(mouse)=> {
                         mainView.currentItem.backRequested()
                     }
-                    visible: !isAndroid && Kirigami.Settings.isMobile ? 1 : 0
+                    visible: Kirigami.Settings.isMobile ? 1 : 0
                 }
                 
                 
@@ -321,9 +286,9 @@ Kirigami.ApplicationWindow {
                     id: qinput
                     Layout.fillWidth: true
 
-                    placeholderText: "Ask Mycroft..."
+                    placeholderText: "Ask OVOS..."
                     onAccepted: {
-                        Mycroft.MycroftController.sendText(qinput.text)
+                        OVOS.OVOSController.sendText(qinput.text)
                     }
                     focus: false
                     Connections {
@@ -348,13 +313,9 @@ Kirigami.ApplicationWindow {
                     icon.name: "audio-input-microphone"
                     
                     onClicked: (mouse)=>  {
-                        if(applicationSettings.usesRemoteSTT){
-                            audioRecorder.open()
-                        } else {
-                            speechIntent.start()
-                        }
+                        speechIntent.start()
                     }
-                    visible: speechIntent.supported || applicationSettings.usesRemoteSTT
+                    visible: speechIntent.supported
                 }
             }
             background: Rectangle {

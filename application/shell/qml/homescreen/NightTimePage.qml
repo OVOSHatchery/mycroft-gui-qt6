@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 Control {
     id: nightTimeOverlayRoot
@@ -18,8 +18,8 @@ Control {
         height: idleRoot.height
         anchors.left: parent.left
         anchors.top: parent.top
-        anchors.leftMargin: -Mycroft.Units.gridUnit * 2
-        anchors.topMargin: -Mycroft.Units.gridUnit * 2
+        anchors.leftMargin: -OVOS.Units.gridUnit * 2
+        anchors.topMargin: -OVOS.Units.gridUnit * 2
         color: "#000000"
     }
 
@@ -27,7 +27,7 @@ Control {
 
         Label {
             anchors.fill: parent
-            anchors.margins: Mycroft.Units.gridUnit * 4
+            anchors.margins: OVOS.Units.gridUnit * 4
             font.capitalization: Font.AllUppercase
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment:Text.AlignVCenter

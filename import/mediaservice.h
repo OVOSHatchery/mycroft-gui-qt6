@@ -28,7 +28,7 @@
 #include <QVideoSink>
 #include <QQmlEngine>
 
-#include "mycroftcontroller.h"
+#include "ovoscontroller.h"
 #include "mediaproviders/audioproviderservice.h"
 #include "mediaproviders/videoproviderservice.h"
 

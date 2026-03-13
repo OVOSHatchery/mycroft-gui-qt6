@@ -22,7 +22,7 @@ import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import QtQuick.Templates 2.2 as T
 import org.kde.kirigami as Kirigami
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 Controls.Control {
     id: root

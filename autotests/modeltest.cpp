@@ -22,7 +22,7 @@
 #include <QQuickView>
 #include <QQmlEngine>
 #include <QAbstractItemModelTester>
-#include "../import/mycroftcontroller.h"
+#include "../import/ovoscontroller.h"
 #include "../import/abstractdelegate.h"
 #include "../import/filereader.h"
 #include "../import/globalsettings.h"

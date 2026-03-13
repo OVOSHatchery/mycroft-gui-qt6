@@ -18,7 +18,7 @@
  */
 
 import QtQuick
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 SliderBase {
     id: root
@@ -34,7 +34,7 @@ SliderBase {
 
     onChangeValueChanged: {
         if (volSync){
-            Mycroft.MycroftController.sendRequest("mycroft.volume.set", {"percent": (changeValue / 100)});
+            OVOS.OVOSController.sendRequest("mycroft.volume.set", {"percent": (changeValue / 100)});
         } else {
             volSync = true
         }
@@ -42,23 +42,23 @@ SliderBase {
 
     onIconClicked: {
         if(muted) {
-            Mycroft.MycroftController.sendRequest("mycroft.volume.unmute", {});
+            OVOS.OVOSController.sendRequest("mycroft.volume.unmute", {});
             muted = false
         } else {
-            Mycroft.MycroftController.sendRequest("mycroft.volume.mute", {});
+            OVOS.OVOSController.sendRequest("mycroft.volume.mute", {});
             muted = true
         }
     }
 
     Component.onCompleted: {
-        Mycroft.MycroftController.sendRequest("mycroft.volume.get", {});
+        OVOS.OVOSController.sendRequest("mycroft.volume.get", {});
     }
 
     Connections {
-        target: Mycroft.MycroftController
+        target: OVOS.OVOSController
         onSocketStatusChanged: {
-            if (Mycroft.MycroftController.status == Mycroft.MycroftController.Open) {
-                Mycroft.MycroftController.sendRequest("mycroft.volume.get", {});
+            if (OVOS.OVOSController.status == OVOS.OVOSController.Open) {
+                OVOS.OVOSController.sendRequest("mycroft.volume.get", {});
             }
         }
         onIntentRecevied: {

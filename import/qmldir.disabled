@@ -1,6 +1,6 @@
-module Mycroft
-plugin mycroftplugin
-classname MycroftPlugin
+module OVOS
+plugin ovosplugin
+classname OVOSPlugin
 
 typeinfo plugins.qmltypes
 

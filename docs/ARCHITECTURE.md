@@ -2,327 +2,318 @@
 
 ## Overview
 
-`mycroft-gui-qt6` is a Qt6-based graphical user interface client for the OpenVoiceOS (OVOS) voice assistant platform. It provides real-time rendering of skill UIs using a template-based system combined with traditional Qt/QML components.
+`mycroft-gui-qt6` is a Qt6-based GUI client for OpenVoiceOS. It renders skill UIs using a template-based system driven by WebSocket messages from the OVOS core stack.
 
-## Core Principles
+---
 
-1. **Protocol-Driven**: Communication with OVOS core happens via WebSocket protocol on port 18181
-2. **Template-Based UI**: Skills don't send custom QML; they use predefined templates with data
-3. **Real-Time Updates**: Session data is pushed from server to client via WebSocket messages
-4. **Model-View Architecture**: C++ models expose skill data to QML views
-
-## System Architecture Diagram
+## System Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    OpenVoiceOS Core (Python)                    │
-│  ┌───────────────────────────────────────────────────────────┐  │
-│  │ Legacy Plugin Adapter (mycroft-gui protocol translation) │  │
-│  └───────────────────────────────────────────────────────────┘  │
-│                           │                                      │
-│                    WebSocket (port 18181)                        │
-│                           │                                      │
-└─────────────────────────────────────────────────────────────────┘
-                            │
-                            │
-┌─────────────────────────────────────────────────────────────────┐
-│                   mycroft-gui-qt6 (This Project)                │
-│                                                                  │
-│  ┌─────────────────────────────────────────────────────────┐   │
-│  │            MycroftController (Singleton)                │   │
-│  │  • Manages WebSocket connection                         │   │
-│  │  • Routes incoming messages to skill views              │   │
-│  │  • Sends user interactions back to server               │   │
-│  └──────────────────┬──────────────────────────────────────┘   │
-│                     │                                            │
-│        ┌────────────┼────────────┐                              │
-│        │            │            │                              │
-│  ┌─────▼──┐  ┌─────▼──┐  ┌─────▼──────────────┐               │
-│  │Skill 1 │  │Skill 2 │  │System Templates    │               │
-│  │View    │  │View    │  │(Text, List, etc)   │               │
-│  └────────┘  └────────┘  └────────────────────┘               │
-│        │            │            │                              │
-│        └────────────┼────────────┘                              │
-│                     │                                            │
-│            Session Data Models                                  │
-│     (ActiveSkillsModel, DelegatesModel)                         │
-│                     │                                            │
-│        QML Framework (Qt 2.12+ syntax)                          │
-│        ✓ Qt/QtQuick primitives                                 │
-│        ✓ Kirigami UI components                                │
-│        ✓ Custom components (AudioPlayer, SlideShow, etc)       │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│                OVOS Core (Python, port 8181)              │
+│  Skills emit gui messages --> ovos-gui service            │
+│  ovos-gui manages namespaces, pages, session data         │
+└──────────────────┬───────────────────────────────────────┘
+                   │
+                   v
+┌──────────────────────────────────────────────────────────┐
+│  ovos-legacy-mycroft-gui-plugin (Tornado, port 18181)    │
+│  Translates OVOS bus messages <--> Qt WebSocket JSON     │
+│  Serves /gui endpoint, supports multiple clients         │
+└──────────────────┬───────────────────────────────────────┘
+                   │ JSON over WebSocket
+                   v
+┌──────────────────────────────────────────────────────────┐
+│              mycroft-gui-qt6 (This Project)              │
+│                                                          │
+│  ┌────────────────────────────────────────────────────┐  │
+│  │          OVOSController (Singleton)                │  │
+│  │  ovoscontroller.h:33 / ovoscontroller.cpp:40       │  │
+│  │  - Owns the single QWebSocket connection           │  │
+│  │  - Routes state change messages locally            │  │
+│  │  - Forwards session/GUI/event msgs to views        │  │
+│  │  - Tracks: isSpeaking, isListening, serverReady    │  │
+│  └────────┬───────────────────────────────────────────┘  │
+│           │ handleIncomingMessage()                       │
+│           v                                              │
+│  ┌────────────────────────────────────────────────────┐  │
+│  │       AbstractSkillView (per-view instance)        │  │
+│  │  abstractskillview.h:33 / abstractskillview.cpp:71 │  │
+│  │  - Owns ActiveSkillsModel                         │  │
+│  │  - Owns per-skill SessionDataMap instances         │  │
+│  │  - Handles all session/GUI/event protocol msgs     │  │
+│  │  - Resolves SYSTEM: template URIs                  │  │
+│  └────────┬───────────────────────────────────────────┘  │
+│           │                                              │
+│     ┌─────┼──────────┐                                   │
+│     v     v          v                                   │
+│  ┌──────┐ ┌────────┐ ┌──────────────┐                   │
+│  │Active│ │Session │ │DelegatesModel│                    │
+│  │Skills│ │DataMap │ │(per-skill)   │                    │
+│  │Model │ │(per-   │ │              │                    │
+│  │      │ │skill)  │ │DelegateLoader│                    │
+│  └──────┘ └───┬────┘ └──────┬───────┘                    │
+│               │             │                            │
+│               v             v                            │
+│          SessionData   AbstractDelegate                  │
+│          Model (lists)  (QML items)                      │
+│                                                          │
+│  ┌────────────────────────────────────────────────────┐  │
+│  │           MediaService (Singleton)                 │  │
+│  │  mediaservice.h:35                                 │  │
+│  │  - Audio/Video playback via Qt6 Multimedia         │  │
+│  │  - AudioProviderService + VideoProviderService     │  │
+│  │  - Spectrum analysis, transport controls           │  │
+│  └────────────────────────────────────────────────────┘  │
+│                                                          │
+│  QML Layer: system-templates/ + qml/ components          │
+│  Uses KF6::Kirigami for UI primitives                    │
+└──────────────────────────────────────────────────────────┘
 ```
 
-## Key Components
+---
 
-### 1. MycroftController (`import/mycroftcontroller.h/cpp`)
+## Message Routing
 
-**Role**: Central message router and connection manager
+`OVOSController::onMainSocketMessageReceived()` -- `ovoscontroller.cpp:153` is the single entry point for all incoming WebSocket messages. It:
 
-**Responsibilities**:
-- Maintains WebSocket connection to OVOS core
-- Parses incoming messages (json format)
-- Routes messages to registered skill views via enum-based message types
-- Handles connection lifecycle (connect, disconnect, reconnect)
-- Exposes properties to QML (status, speaking, listening)
+1. Parses JSON and converts `type` string to `GUIBusMessageType` enum via `GuiBusMessages::fromString()` -- `guibusmessages.h:207`
+2. Handles **state change** messages directly (speaking, listening, stop, ready) -- `ovoscontroller.cpp:179-256`
+3. Forwards **session data**, **page rendering**, and **event** messages to all registered `AbstractSkillView` instances -- `ovoscontroller.cpp:265-272`
 
-**Key Classes**:
+```
+Incoming WebSocket message
+    |
+    v
+Parse JSON, convert type to enum
+    |
+    ├── STATE_CHANGE category --> handle in OVOSController
+    │   (isSpeaking, isListening, serverReady, etc.)
+    │
+    ├── CLEAR_NAMESPACE --> forward to all views
+    │
+    ├── SESSION_DATA / PAGE_RENDERING / EVENTS_TRIGGERED
+    │   --> forward to all views via handleIncomingMessage()
+    │
+    └── Unknown type --> log, check for skill:event pattern
+```
+
+Inside `AbstractSkillView::onGuiSocketMessageReceived()` -- `abstractskillview.cpp:327`:
+
+```
+Incoming message (forwarded from controller)
+    |
+    ├── SESSION_SET --> update SessionDataMap for skill
+    ├── SESSION_DELETE --> remove key from SessionDataMap
+    │
+    ├── SESSION_LIST_INSERT (active_skills) --> ActiveSkillsModel::insertSkills()
+    ├── SESSION_LIST_REMOVE (active_skills) --> cleanup + removeRows()
+    ├── SESSION_LIST_MOVE (active_skills) --> moveRows()
+    │
+    ├── SESSION_LIST_INSERT (skill data) --> SessionDataModel::insertData()
+    ├── SESSION_LIST_UPDATE --> SessionDataModel::updateData()
+    ├── SESSION_LIST_MOVE (skill data) --> SessionDataModel::moveRows()
+    ├── SESSION_LIST_REMOVE (skill data) --> SessionDataModel::removeRows()
+    │
+    ├── GUI_LIST_INSERT --> create DelegateLoaders, resolve URLs
+    ├── GUI_LIST_REMOVE --> DelegatesModel::removeRows()
+    ├── GUI_LIST_MOVE --> DelegatesModel::moveRows()
+    │
+    └── EVENTS_TRIGGERED --> dispatch to AbstractDelegate::guiEvent()
+        ├── page_gained_focus --> focus specific delegate
+        ├── mycroft.gui.close.screen --> emit activeSkillClosed()
+        └── other --> broadcast to all skill delegates
+```
+
+---
+
+## Data Flow: Skill Activation
+
+```
+Server                          Client
+  |                               |
+  |-- session.list.insert ------->|  Add skill to ActiveSkillsModel
+  |   (active_skills)             |
+  |                               |
+  |-- session.set --------------->|  Populate SessionDataMap
+  |   (skill data)                |
+  |                               |
+  |-- gui.list.insert ----------->|  Create DelegateLoader(s)
+  |   (page templates)            |    resolve SYSTEM: URIs
+  |                               |    load QML components
+  |                               |
+  |-- events.triggered ---------->|  page_gained_focus
+  |   (focus page)                |    set focus on delegate
+  |                               |
+  |                               |  QML binds to SessionDataMap
+  |                               |  properties, renders template
+```
+
+---
+
+## Qt6-Specific Architecture Details
+
+### Module Dependencies
+
+```cmake
+# Required (CMakeLists.txt:13-23)
+Qt6::Core, Qt6::Qml, Qt6::Quick, Qt6::Network,
+Qt6::WebSockets, Qt6::Multimedia, Qt6::Gui, Qt6::Widgets, Qt6::DBus
+
+# KDE Frameworks 6 (CMakeLists.txt:32-40)
+KF6::Kirigami, KF6::CoreAddons, KF6::GuiAddons,
+KF6::Config, KF6::ConfigWidgets, KF6::IconThemes, KF6::DBusAddons
+
+# Optional
+Qt6::WebView, KF6::Plasma, KF6::KIO
+```
+
+### QML_ELEMENT Registration (vs Qt5 qmlRegisterType)
+
+Qt5 required explicit registration in the plugin loader:
+
 ```cpp
-class MycroftController : public QObject {
+// Qt5 (old)
+void MycroftPlugin::registerTypes(const char *uri) {
+    qmlRegisterSingletonType<MycroftController>(uri, 1, 0, "MycroftController", ...);
+    qmlRegisterType<AbstractDelegate>(uri, 1, 0, "Delegate");
+}
+```
+
+Qt6 uses the `QML_ELEMENT` macro in class declarations:
+
+```cpp
+// Qt6 (current) -- ovoscontroller.h:36, abstractskillview.h:36, abstractdelegate.h:61
+class OVOSController : public QObject {
     Q_OBJECT
-    QML_ELEMENT  // Makes it available to QML
-    
-public:
-    enum Status { Connecting, Open, Closing, Closed, Error };
-    static MycroftController* instance();  // Singleton
-    void registerView(AbstractSkillView *view);
-    void sendRequest(const QString &type, const QVariantMap &data);
+    QML_ELEMENT  // Automatically registered at compile time
+    ...
 };
 ```
 
-**Protocol Flow**:
-1. Client connects to `ws://localhost:18181`
-2. Server announces available templates
-3. Client registers skill views
-4. Server sends skill data when activated
-5. Client renders appropriate template with server data
-6. User interactions sent back to server via sendRequest()
+The `OVOSPlugin::registerTypes()` method is now a no-op -- `ovosplugin.cpp:69-76`. Singletons are instantiated in `main.cpp` and registered via context properties.
 
-### 2. AbstractSkillView (`import/abstractskillview.h/cpp`)
+### MediaService and Qt6 Multimedia
 
-**Role**: Base class for skill UI rendering
+The `MediaService` class wraps Qt6 Multimedia APIs:
 
-**Responsibilities**:
-- Manages per-skill WebSocket connection
-- Translates server-sent skill data into QML-accessible models
-- Handles skill session lifecycle (activation, deactivation)
-- Coordinates between global MycroftController and skill-specific data
+- Uses `QVideoSink` instead of Qt5's `QVideoWidget` -- `mediaservice.h:22`
+- `AudioProviderService` handles audio playback with FFT spectrum analysis -- `mediaproviders/audioproviderservice.h`
+- `VideoProviderService` handles video with `QVideoSink` integration -- `mediaproviders/videoproviderservice.h`
+- Provider switching via `changeProvider()` -- `mediaservice.h:83`
 
-**Key Data Structures**:
-```cpp
-class AbstractSkillView : public QQuickItem {
-    Q_OBJECT
-    QML_ELEMENT
-    
-private:
-    QHash<QString, SessionDataMap*> m_skillData;  // Per-skill session data
-    ActiveSkillsModel* m_activeSkillsModel;       // Track active skills
-    QWebSocket* m_guiWebSocket;                   // Skill-specific connection
-};
-```
+### C++17 and Qt6 API Changes
 
-**Session Data Management**:
-- Each skill gets a `SessionDataMap` (QML property map)
-- Server sends updates via `SessionDataModel` messages
-- QML components bind to these properties for real-time updates
+- C++17 required (`CMAKE_CXX_STANDARD 17`) -- `CMakeLists.txt:6`
+- `QOverload<>` used for overloaded signal connections -- `ovoscontroller.cpp:124`
+- `qsizetype` replaces `int` in list property accessors -- `abstractdelegate.h:258`
+- `geometryChange()` replaces `geometryChanged()` -- `abstractdelegate.h:207`
 
-### 3. Message Routing (`import/guibusmessages.h`)
+---
 
-**Role**: Type-safe message type enumeration
+## Threading Model
 
-**Why It Matters**:
-- Qt5 code used string literals like "gui.page.show" (error-prone)
-- Qt6 code uses `GUIBusMessageType::PageShow` (compile-time checked)
-- 23 OVOS bus message types defined
+- **Main thread**: Qt event loop handles all signal/slot connections, QML rendering, and WebSocket I/O
+- **WebSocket**: Qt's internal thread pool manages socket I/O; messages are delivered to the main thread
+- **QML rendering**: Qt's scene graph renderer runs on a dedicated render thread (GPU)
+- **All model updates** happen on the main thread -- thread-safe by design
 
-**Example Message Types**:
-```cpp
-enum class GUIBusMessageType {
-    PageShow,           // Display a skill template
-    PageDelete,         // Remove a skill from UI
-    SessionDataUpdate,  // Update session properties
-    ClearNamespace,     // Clean up when skill exits
-    // ... 19 more types
-};
-```
-
-### 4. Model Classes (`import/*model*.h/cpp`)
-
-#### ActiveSkillsModel
-- Tracks which skills are active
-- Emits signals when skills are added/removed
-- Used by QML to populate skill lists
-
-#### SessionDataModel
-- Holds dynamic key-value data for each skill
-- Implements QAbstractTableModel for SQL-like access
-- Reflects server updates in real-time
-
-#### DelegatesModel
-- Maps skill IDs to QML delegate components
-- Manages delegate lifecycle (creation, destruction)
-
-### 5. QML Framework (`import/qml/` directory)
-
-**System Templates** (`import/system-templates/`):
-- 25 predefined templates for common skill patterns
-- Examples: Text, List, Image, AudioPlayer, VideoPlayer
-- Designed by OVOS team for consistency
-
-**Framework Components** (`import/qml/`):
-- 17 reusable UI components
-- Examples: AutoFitLabel, SlideShow, CardDelegate
-- Supporting components for template customization
-- Some marked as deprecated (old Mycroft.Delegate pattern)
-
-## Data Flow Example
-
-### Scenario: User Speaks, Gets Weather Info
-
-1. **OVOS Core** (Python)
-   - Processes speech: "What's the weather?"
-   - Activates weather skill
-   - Sends to MycroftController:
-     ```json
-     {
-       "type": "gui.page.show",
-       "data": {
-         "template": "Weather",
-         "current_temp": 72,
-         "conditions": "Sunny"
-       }
-     }
-     ```
-
-2. **MycroftController** (C++)
-   - Receives message on WebSocket
-   - Parses JSON
-   - Routes to: `GUIBusMessageType::PageShow`
-   - Calls `AbstractSkillView::onGuiSocketMessageReceived()`
-
-3. **AbstractSkillView** (C++)
-   - Updates `SessionDataMap` with weather data
-   - Emits `sessionDataChanged()` signal
-   - QML automatically re-renders
-
-4. **QML** (Qt/Kirigami)
-   - Detects `Weather` template in data
-   - Loads `system-templates/Weather.qml`
-   - Binds to SessionDataMap properties
-   - Displays: "Current: 72°F, Sunny"
-
-5. **User Interaction**
-   - Taps button in Weather template
-   - QML sends: `Mycroft.Controller.sendRequest("skill.weather.details", {})`
-   - Back to step 1 (cycle repeats)
+---
 
 ## Connection Lifecycle
 
 ```
-DISCONNECTED
-    ↓
-[connect() called]
-    ↓
-CONNECTING (connecting websocket)
-    ↓
-[websocket connected]
-    ↓
-OPEN (ready for messages)
-    ↑        ↓
-    │    [error or disconnect]
-    │        ↓
-    │    CLOSING
-    │        ↓
-    │    CLOSED
-    └────[reconnect timer triggered]
+                    start()
+                      |
+                      v
+              ┌───────────────┐
+              │  CONNECTING    │  open WebSocket
+              │  (reconnect    │
+              │   timer may    │
+              │   be active)   │
+              └───────┬───────┘
+                      |
+              [connected]
+                      |
+                      v
+              ┌───────────────┐
+              │     OPEN       │  send mycroft.gui.connected
+              │                │  send mycroft.skills.all_loaded
+              │                │  receive messages
+              └───────┬───────┘
+                      |
+              [error or close]
+                      |
+                      v
+              ┌───────────────┐
+              │    CLOSED      │  clear session data
+              │                │  start reconnect timer (1s)
+              └───────┬───────┘
+                      |
+              [timer fires]
+                      |
+                      v
+              (back to CONNECTING)
 ```
 
-## Threading Model
+Reconnect timer: 1 second interval -- `ovoscontroller.cpp:94`.
 
-- **Qt Event Loop**: Single-threaded (standard for Qt/QML apps)
-- **WebSocket**: Handled by Qt's internal thread pool
-- **QML Rendering**: Qt's scene graph renderer (GPU)
-- **Signal/Slots**: Thread-safe, all in main thread
-
-## Plugin Registration (Qt6 vs Qt5)
-
-### Qt5 Approach (Old)
-```cpp
-// mycroft-plugin.cpp
-qmlRegisterType<MycroftController>("Mycroft", 1, 0, "MycroftController");
-```
-
-### Qt6 Approach (Modern)
-```cpp
-// mycroftcontroller.h
-class MycroftController : public QObject {
-    Q_OBJECT
-    QML_ELEMENT  // ← Automatic registration!
-};
-```
-
-**Benefits of Qt6 approach**:
-- Compile-time checking
-- Less boilerplate code
-- Better IDE support
-- Centralized metadata
-
-## Session Data Example
-
-When a skill requests template, session data flows like this:
-
-```
-Skill sends to core: "I need Weather template"
-         │
-         ↓
-Core formats for GUI:
-{
-  "type": "gui.page.show",
-  "data": {
-    "template": "Weather",
-    "location": "San Francisco",
-    "temp": 72,
-    "icon": "sunny"
-  }
-}
-         │
-         ↓
-MycroftController receives + parses
-         │
-         ↓
-AbstractSkillView.m_skillData["weather_skill"] updates:
-  location → "San Francisco"
-  temp → 72
-  icon → "sunny"
-         │
-         ↓
-QML binds to these properties:
-  Text { text: skillData.location }  // "San Francisco"
-  Image { source: skillData.icon }   // Loads sunny.png
-         │
-         ↓
-User sees weather in real-time (sub-100ms update)
-```
-
-## Error Handling Strategy
-
-1. **Connection Errors**: 
-   - Automatic reconnect with exponential backoff
-   - Status property updated for QML to show error state
-
-2. **Message Parsing Errors**:
-   - Log to console
-   - Skip malformed messages
-   - Continue processing next message
-
-3. **QML/Template Errors**:
-   - Qt's declarative engine logs and continues
-   - Broken template shows as gray box
-   - Doesn't crash app
+---
 
 ## Memory Management
 
-- **Singleton Pattern**: MycroftController exists for app lifetime
-- **Skill Views**: Created on demand, destroyed when skill exits
-- **Models**: Owned by their parent views, cleaned up automatically
-- **Signal/Slots**: Qt handles cleanup via parent/child hierarchy
+- `OVOSController`: Singleton, lives for application lifetime -- `ovoscontroller.cpp:40-47`
+- `AbstractSkillView`: Created by QML, registered with controller. Auto-deregistered on destruction -- `ovoscontroller.cpp:343-345`
+- `SessionDataMap`: Created per-skill on demand. Destroyed when skill is removed from active list or socket disconnects -- `abstractskillview.cpp:89-96`, `abstractskillview.cpp:467-473`
+- `SessionDataModel`: Owned by parent `SessionDataMap`. Destroyed via `deleteLater()` when replaced or cleared
+- `DelegateLoader`: Owned by `DelegatesModel`. Triggers QML component cache cleanup on destruction -- `abstractskillview.cpp:554`
+- `QTranslator`: Per-skill, removed and deleted when skill is removed -- `abstractskillview.cpp:460-465`
 
-## Performance Considerations
+---
 
-1. **Message Rate**: Server sends updates ~10-30 times/sec
-2. **QML Rendering**: Efficient thanks to Qt's scene graph
-3. **Memory**: ~50MB for app + library (typical)
-4. **Latency**: <100ms from server update to screen render
+## Template Resolution
 
+When the server sends a page URL like `"SYSTEM:Weather.qml"`, it is resolved by `resolveDelegate()` -- `abstractskillview.cpp:62-69`:
+
+1. If URL starts with `SYSTEM:`, strip prefix and call `resolveSystemTemplate()`
+2. `resolveSystemTemplate()` checks `$OVOS_SYSTEM_TEMPLATES` env var first -- `abstractskillview.cpp:50-55`
+3. Falls back to compiled-in `OVOS_SYSTEM_TEMPLATES_DIR` -- `abstractskillview.cpp:57-59`
+4. Non-SYSTEM URLs are passed through `QUrl::fromUserInput()` (supports `file://` and remote URLs)
+
+---
+
+## Error Handling
+
+| Layer | Strategy |
+|-------|----------|
+| WebSocket connection | Automatic reconnect with 1s timer |
+| JSON parsing | Log warning, skip malformed messages |
+| Missing namespace | Log warning, return without processing |
+| Invalid position/count | Log warning, return without modification |
+| Unknown message type | Log debug, ignore (allows protocol extensions) |
+| QML template errors | Qt declarative engine logs and continues; broken template shows empty |
+| Socket send while disconnected | Log warning, return without sending |
+
+---
+
+## Build Targets
+
+| Target | Type | Output |
+|--------|------|--------|
+| `mycroft-gui-qt6` | Shared library | `libmycroft-gui-qt6.so` |
+| `ovosplugin` | QML plugin library | Installed to `${KDE_INSTALL_QMLDIR}/OVOS` |
+| `mycroft-gui-app` | Application | Desktop GUI executable |
+| `servertest` | Test | WebSocket/connection tests |
+| `modeltest` | Test | Data model tests |
+| `stresstest` | Test | Load tests |
+| `message_routing_test` | Test | Protocol routing tests |
+| `qml_framework_components_test` | Test | QML component tests |
+
+---
+
+## See Also
+
+- [PROTOCOL.md](PROTOCOL.md) -- Complete wire protocol specification
+- [MIGRATION_FROM_LEGACY.md](MIGRATION_FROM_LEGACY.md) -- Changes from legacy mycroft-gui
+- [COMPONENTS.md](COMPONENTS.md) -- API reference
+- [SESSION_AND_SITE_ID.md](SESSION_AND_SITE_ID.md) -- Multi-screen identifiers

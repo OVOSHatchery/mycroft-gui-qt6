@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import Qt5Compat.GraphicalEffects
 import org.kde.kirigami as Kirigami
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 Popup {
     id: shutdownMenuPopup
@@ -58,11 +58,11 @@ Popup {
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.right: parent.right                
-                anchors.margins: Mycroft.Units.gridUnit * 4
+                anchors.margins: OVOS.Units.gridUnit * 4
                 id: shutdownMenuGridLayout
                 columns: parent.width > parent.height ? 3 : 1
-                columnSpacing: Mycroft.Units.gridUnit
-                rowSpacing: Mycroft.Units.gridUnit
+                columnSpacing: OVOS.Units.gridUnit
+                rowSpacing: OVOS.Units.gridUnit
 
                 Item {
                     id: menuItemShutdown
@@ -117,7 +117,7 @@ Popup {
                         anchors.fill: parent
 
                         onClicked: {
-                            Mycroft.MycroftController.sendRequest("system.shutdown", {"display": true})
+                            OVOS.OVOSController.sendRequest("system.shutdown", {"display": true})
                             shutdownMenuPopup.close()
                         }
                         onPressed: {
@@ -182,7 +182,7 @@ Popup {
                         anchors.fill: parent
 
                         onClicked: {
-                            Mycroft.MycroftController.sendRequest("system.reboot", {"display": true})
+                            OVOS.OVOSController.sendRequest("system.reboot", {"display": true})
                             shutdownMenuPopup.close()
                         }
                         onPressed: {

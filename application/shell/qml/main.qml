@@ -137,7 +137,7 @@ Kirigami.AbstractApplicationWindow {
         running: GlobalSettings.autoConnect && OVOSController.status != OVOSController.Open
         triggeredOnStart: true
         onTriggered: {
-            console.log("Trying to connect to Mycroft");
+            console.log("Trying to connect to OVOS");
             OVOSController.start();
             slidingPanel.close();
             // updateSchemeList would be called on OVOSPlugin.Configuration if available
@@ -278,7 +278,7 @@ Kirigami.AbstractApplicationWindow {
                 pullDownMenuFlickableArea.returnToBounds()
             }
 
-            // Template renderer (replaces Mycroft.SkillView)
+            // Template renderer (replaces OVOS.SkillView)
             Rectangle {
                 id: mainView
                 Kirigami.Theme.colorSet: Kirigami.Theme.Complementary

@@ -29,7 +29,7 @@
 import QtQuick
 import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 // Design Decision: Keep AbstractDelegate pattern instead of Kirigami Page
 // AbstractDelegate provides a lightweight, composable base for skill UI without
@@ -37,7 +37,7 @@ import Mycroft 1.0 as Mycroft
 // This allows simpler skill layouts while maintaining consistent theming.
 //
 // NOTE: New skills should use template-based system instead (SYSTEM_text, SYSTEM_weather, etc.)
-Mycroft.AbstractDelegate {
+OVOS.AbstractDelegate {
     id: control
 
     signal backRequested

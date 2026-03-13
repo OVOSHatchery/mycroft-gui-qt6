@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 Rectangle {
     color: "transparent"
@@ -12,10 +12,10 @@ Rectangle {
 
     RowLayout {
         anchors.fill: parent
-        anchors.margins: Mycroft.Units.gridUnit / 2
+        anchors.margins: OVOS.Units.gridUnit / 2
 
         Rectangle {
-            Layout.preferredWidth: offlineModeIconLayerOne.implicitWidth + Mycroft.Units.gridUnit * 3
+            Layout.preferredWidth: offlineModeIconLayerOne.implicitWidth + OVOS.Units.gridUnit * 3
             Layout.fillHeight: true
             Layout.alignment: weatherItemBox.verticalMode ? Qt.AlignHCenter : Qt.AlignRight
             color: "transparent"
@@ -74,7 +74,7 @@ Rectangle {
                 width: parent.height * 0.90
                 height: width
                 anchors.right: parent.right
-                anchors.rightMargin: weatherItemBox.verticalMode ? Mycroft.Units.gridUnit / 2 : 0
+                anchors.rightMargin: weatherItemBox.verticalMode ? OVOS.Units.gridUnit / 2 : 0
                 anchors.verticalCenter: parent.verticalCenter
                 visible: true
                 layer.enabled: true

@@ -3,13 +3,13 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import QtQuick.Window
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 Column {
     id: notificationsSys
     anchors.fill: parent
-    anchors.margins: Mycroft.Units.gridUnit * 2
-    spacing: Mycroft.Units.gridUnit * 2
+    anchors.margins: OVOS.Units.gridUnit * 2
+    spacing: OVOS.Units.gridUnit * 2
     property int cellWidth: notificationsSys.width
     property int cellHeight: notificationsSys.height
     signal clearNotificationSessionData
@@ -20,7 +20,7 @@ Column {
     property var controlledNotificationObject
 
     Connections {
-        target: Mycroft.MycroftController
+        target: OVOS.OVOSController
 
         onIntentRecevied: {
             if (type == "ovos.notification.notification_data") {
@@ -45,7 +45,7 @@ Column {
     Connections {
         target: notificationsSys
         onClearNotificationSessionData: {
-            Mycroft.MycroftController.sendRequest("ovos.notification.api.pop.clear", {"notification": notificationsSys.notificationData})
+            OVOS.OVOSController.sendRequest("ovos.notification.api.pop.clear", {"notification": notificationsSys.notificationData})
         }
     }
 

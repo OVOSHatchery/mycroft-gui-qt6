@@ -11,9 +11,15 @@ configure_file(
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/../import)
 
+# System templates directory (needed by abstractskillview.cpp)
+if(NOT OVOS_SYSTEM_TEMPLATES_DIR)
+    set(OVOS_SYSTEM_TEMPLATES_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/ovos-gui/system-templates")
+endif()
+add_definitions(-DOVOS_SYSTEM_TEMPLATES_DIR="${OVOS_SYSTEM_TEMPLATES_DIR}")
+
 set(import_SRCS
     ${CMAKE_SOURCE_DIR}/import/abstractdelegate.cpp
-    ${CMAKE_SOURCE_DIR}/import/mycroftcontroller.cpp
+    ${CMAKE_SOURCE_DIR}/import/ovoscontroller.cpp
     ${CMAKE_SOURCE_DIR}/import/activeskillsmodel.cpp
     ${CMAKE_SOURCE_DIR}/import/delegatesmodel.cpp
     ${CMAKE_SOURCE_DIR}/import/sessiondatamap.cpp
@@ -23,7 +29,7 @@ set(import_SRCS
     ${CMAKE_SOURCE_DIR}/import/abstractskillview.cpp
    )
 
-qt6_add_resources(import_SRCS ${CMAKE_SOURCE_DIR}/import/mycroft.qrc)
+qt6_add_resources(import_SRCS ${CMAKE_SOURCE_DIR}/import/ovos.qrc)
 
 ecm_add_test(
   servertest.cpp

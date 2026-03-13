@@ -3,19 +3,19 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 Rectangle {
     id: popbox
     color: "#313131"
-    radius: Mycroft.Units.gridUnit / 2
+    radius: OVOS.Units.gridUnit / 2
     anchors.left: parent.left
     anchors.right: parent.right
     anchors.leftMargin: Kirigami.Units.largeSpacing
     anchors.rightMargin: Kirigami.Units.largeSpacing
-    border.width: Mycroft.Units.smallSpacing
+    border.width: OVOS.Units.smallSpacing
     border.color: styleAreaNotifier.color
-    height: Mycroft.Units.gridUnit * 4
+    height: OVOS.Units.gridUnit * 4
     property var currentNotification
     property string notifstyle: currentNotification.style
 
@@ -35,8 +35,8 @@ Rectangle {
         }
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
-        height: Mycroft.Units.gridUnit * 3
-        width: Mycroft.Units.gridUnit * 3
+        height: OVOS.Units.gridUnit * 3
+        width: OVOS.Units.gridUnit * 3
         radius: parent.radius / 2
         layer.enabled: true
         layer.effect: DropShadow {
@@ -50,7 +50,7 @@ Rectangle {
 
         Kirigami.Icon {
             anchors.fill: parent
-            anchors.margins: Mycroft.Units.smallSpacing
+            anchors.margins: OVOS.Units.smallSpacing
             source: switch(popbox.notifstyle) {
                 case "info":
                     return "documentinfo"
@@ -73,14 +73,14 @@ Rectangle {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.right: parent.right
-        anchors.margins: Mycroft.Units.largeSpacing
+        anchors.margins: OVOS.Units.largeSpacing
 
         Label {
             id: notificationContent
             text: currentNotification.text
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.bottomMargin: Mycroft.Units.smallSpacing
+            Layout.bottomMargin: OVOS.Units.smallSpacing
             wrapMode: Text.WordWrap
             verticalAlignment: Text.AlignVCenter
             font.pixelSize: parent.width * 0.045
@@ -98,7 +98,7 @@ Rectangle {
         }
 
         Item {
-            Layout.preferredWidth: Mycroft.Units.gridUnit * 4
+            Layout.preferredWidth: OVOS.Units.gridUnit * 4
             Layout.fillHeight: true
 
             AbstractButton {
@@ -113,8 +113,8 @@ Rectangle {
                 contentItem: Item {
                     Kirigami.Icon {
                     anchors.centerIn: parent
-                    width: Mycroft.Units.iconSizes.medium
-                    height: Mycroft.Units.iconSizes.medium
+                    width: OVOS.Units.iconSizes.medium
+                    height: OVOS.Units.iconSizes.medium
                     source: Qt.resolvedUrl("icons/close.svg")
                     }
                 }

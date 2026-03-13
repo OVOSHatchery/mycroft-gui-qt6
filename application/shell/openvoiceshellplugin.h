@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef QMYCROFTPLUGIN_H
-#define QMYCROFTPLUGIN_H
+#ifndef QOVOSPLUGIN_H
+#define QOVOSPLUGIN_H
 
 #include <QQmlExtensionPlugin>
 

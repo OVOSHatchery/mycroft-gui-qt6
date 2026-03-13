@@ -21,7 +21,7 @@
 #include <QAbstractItemModel>
 #include <QQuickView>
 #include <QQmlEngine>
-#include "../import/mycroftcontroller.h"
+#include "../import/ovoscontroller.h"
 #include "../import/abstractdelegate.h"
 #include "../import/filereader.h"
 #include "../import/globalsettings.h"
@@ -51,7 +51,7 @@ private:
     QList <AbstractDelegate *>delegatesForSkill(const QString &skill);
 
     //Client
-    MycroftController *m_controller;
+    OVOSController *m_controller;
     AbstractSkillView *m_view;
 
     QQuickView *m_window;
@@ -86,7 +86,7 @@ static QObject *mycroftControllerSingletonProvider(QQmlEngine *engine, QJSEngine
     Q_UNUSED(engine);
     Q_UNUSED(scriptEngine);
 
-    return MycroftController::instance();
+    return OVOSController::instance();
 }
 
 
@@ -124,7 +124,7 @@ void ServerTest::initTestCase()
     m_guiServerSocket = new QWebSocketServer(QStringLiteral("gui"),
                                             QWebSocketServer::NonSecureMode, this);
     m_guiServerSocket->listen(QHostAddress::Any, 1818);
-    m_controller = MycroftController::instance();
+    m_controller = OVOSController::instance();
     //TODO: delete
     //m_view = new AbstractSkillView;
     m_window = new QQuickView;
@@ -139,7 +139,7 @@ void ServerTest::initTestCase()
     }
 
     if (!pluginFound) {
-        qmlRegisterSingletonType<MycroftController>("Mycroft", 1, 0, "MycroftController", mycroftControllerSingletonProvider);
+        qmlRegisterSingletonType<OVOSController>("Mycroft", 1, 0, "MycroftController", mycroftControllerSingletonProvider);
         qmlRegisterSingletonType<GlobalSettings>("Mycroft", 1, 0, "GlobalSettings", globalSettingsSingletonProvider);
         qmlRegisterSingletonType<FileReader>("Mycroft", 1, 0, "FileReader", fileReaderSingletonProvider);
         qmlRegisterType<AbstractSkillView>("Mycroft", 1, 0, "AbstractSkillView");
@@ -185,7 +185,7 @@ void ServerTest::initTestCase()
 void ServerTest::testGuiConnection()
 {
     QSignalSpy newConnectionSpy(m_mainServerSocket, &QWebSocketServer::newConnection);
-    QSignalSpy controllerSocketStatusChangedSpy(m_controller, &MycroftController::socketStatusChanged);
+    QSignalSpy controllerSocketStatusChangedSpy(m_controller, &OVOSController::socketStatusChanged);
     m_controller->start();
 
     //wait the server received a connection and the client got connected state
@@ -196,7 +196,7 @@ void ServerTest::testGuiConnection()
     QVERIFY(m_mainWebSocket);
 
     controllerSocketStatusChangedSpy.wait();
-    QCOMPARE(m_controller->status(), MycroftController::Open);
+    QCOMPARE(m_controller->status(), OVOSController::Open);
 
     textFromMainSpy.wait();
     auto doc = QJsonDocument::fromJson(textFromMainSpy.first().first().toString().toLatin1());

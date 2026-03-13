@@ -20,15 +20,13 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as Controls
 import org.kde.kirigami 2.19 as Kirigami
-import Mycroft 1.0 as Mycroft
-import Qt5Compat.GraphicalEffects
 
 Kirigami.AbstractCard {
     id: skillDelegate
     property string imageSource
     property string title
     property string category
-    property variant examples
+    property var examples: []
 
     contentItem: Item {
         implicitWidth: delegateLayout.implicitWidth;
@@ -61,33 +59,23 @@ Kirigami.AbstractCard {
                     id: innerskImg
                     source: imageSource;
                     fillMode: Image.PreserveAspectFit
-                    Layout.preferredWidth: innerskImg.width
-                    Layout.preferredHeight: innerskImg.height
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 2
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                     width: Kirigami.Units.gridUnit * 2
                     height: Kirigami.Units.gridUnit * 2
-                    ColorOverlay {
-                        id: colorOverlay
-                        source: innerskImg
-                        color: Kirigami.Theme.linkColor
-                        anchors.fill: parent
-                    }
-
                 }
 
                 ColumnLayout {
                     id: innerskillscolumn
                     spacing: 2;
-                    Controls.Label {
-                        wrapMode: Text.WordWrap;
-                        width: skillDelegate.width;
-                        color: Kirigami.Theme.textColor;
-                        text: examples[1];
-                    }
-                    Controls.Label {
-                        wrapMode: Text.WordWrap;
-                        width: skillDelegate.width;
-                        color: Kirigami.Theme.textColor;
-                        text: examples[2];
+                    Repeater {
+                        model: examples
+                        Controls.Label {
+                            wrapMode: Text.WordWrap;
+                            width: skillDelegate.width;
+                            color: Kirigami.Theme.textColor;
+                            text: modelData;
+                        }
                     }
                 }
             }

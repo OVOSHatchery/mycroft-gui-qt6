@@ -17,11 +17,13 @@
  */
 
 #include "abstractskillview.h"
+#include "guibusmessages.h"
 #include "activeskillsmodel.h"
 #include "abstractdelegate.h"
 #include "sessiondatamap.h"
 #include "sessiondatamodel.h"
 #include "delegatesmodel.h"
+#include "controllerconfig.h"
 
 #include <QWebSocket>
 #include <QUuid>
@@ -31,6 +33,40 @@
 #include <QQmlContext>
 #include <QQmlEngine>
 #include <QTranslator>
+#include <QFileInfo>
+
+// ---------------------------------------------------------------------------
+// SYSTEM: URI scheme
+//
+// The OVOS server sends "SYSTEM:<TemplateName>.qml" instead of a file:// URI.
+// This keeps QML resources client-side: the server never needs the Qt install.
+//
+// Resolution order:
+//   1. $OVOS_SYSTEM_TEMPLATES/<TemplateName>.qml   (runtime override)
+//   2. OVOS_SYSTEM_TEMPLATES_DIR/<TemplateName>.qml  (compiled-in default)
+// ---------------------------------------------------------------------------
+static QUrl resolveSystemTemplate(const QString &templateName)
+{
+    const QString envDir = qEnvironmentVariable("OVOS_SYSTEM_TEMPLATES");
+    if (!envDir.isEmpty()) {
+        const QString envPath = envDir + QLatin1Char('/') + templateName;
+        if (QFileInfo::exists(envPath)) {
+            return QUrl::fromLocalFile(envPath);
+        }
+    }
+    return QUrl::fromLocalFile(
+        QLatin1String(OVOS_SYSTEM_TEMPLATES_DIR) + QLatin1Char('/') + templateName
+    );
+}
+
+static QUrl resolveDelegate(const QString &urlString)
+{
+    static const QString systemPrefix = QStringLiteral("SYSTEM:");
+    if (urlString.startsWith(systemPrefix)) {
+        return resolveSystemTemplate(urlString.mid(systemPrefix.length()));
+    }
+    return QUrl::fromUserInput(urlString);
+}
 
 AbstractSkillView::AbstractSkillView(QQuickItem *parent)
     : QQuickItem(parent),
@@ -45,6 +81,7 @@ AbstractSkillView::AbstractSkillView(QQuickItem *parent)
     connect(m_guiWebSocket, &QWebSocket::connected, this,
             [this] () {
                 m_reconnectTimer.stop();
+                m_reconnectTimer.setInterval(1000);  // Reset backoff on successful connect
                 emit statusChanged();
             });
 
@@ -52,6 +89,17 @@ AbstractSkillView::AbstractSkillView(QQuickItem *parent)
 
     connect(m_guiWebSocket, &QWebSocket::disconnected, this, [this]() {
         m_activeSkillsModel->removeRows(0, m_activeSkillsModel->rowCount());
+        // Clear all session data when socket disconnects
+        for (auto it = m_skillData.begin(); it != m_skillData.end(); ++it) {
+            it.value()->deleteLater();
+        }
+        m_skillData.clear();
+        // Clean up translators to prevent stale state on reconnect
+        for (auto it = m_translatorsForSkill.begin(); it != m_translatorsForSkill.end(); ++it) {
+            QCoreApplication::removeTranslator(it.value());
+            delete it.value();
+        }
+        m_translatorsForSkill.clear();
     });
 
     connect(m_guiWebSocket, &QWebSocket::stateChanged, this,
@@ -63,15 +111,12 @@ AbstractSkillView::AbstractSkillView(QQuickItem *parent)
 
     connect(m_guiWebSocket, &QWebSocket::stateChanged, this,
             [this](QAbstractSocket::SocketState socketState) {
-                //TODO: when the connection closes, all session data and guis should be destroyed
-                //qWarning()<<"GUI SOCKET STATE:"<<socketState;
-                //Try to reconnect if our connection died but the main server connection is still alive
                 if (socketState == QAbstractSocket::UnconnectedState && m_url.isValid() && m_controller->status() == OVOSController::Open) {
                     m_reconnectTimer.start();
                 }
             });
 
-    connect(m_guiWebSocket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this,
+    connect(m_guiWebSocket, &QWebSocket::errorOccurred, this,
             [this](QAbstractSocket::SocketError error) {
                 qWarning() << "Gui socket Connection Error:" << error;
                 m_reconnectTimer.start();
@@ -87,11 +132,14 @@ AbstractSkillView::AbstractSkillView(QQuickItem *parent)
                 }
             });
 
-    // Reconnect timer
+    // Reconnect timer with exponential backoff (1s, 2s, 4s, 8s, ... up to 30s)
     m_reconnectTimer.setInterval(1000);
     connect(&m_reconnectTimer, &QTimer::timeout, this, [this]() {
         m_guiWebSocket->close();
         m_guiWebSocket->open(m_url);
+        // Exponential backoff: double interval up to 30s max
+        int nextInterval = qMin(m_reconnectTimer.interval() * 2, 30000);
+        m_reconnectTimer.setInterval(nextInterval);
     });
 
     // Trim components cache timer
@@ -140,10 +188,15 @@ QString AbstractSkillView::id() const
     return m_id;
 }
 
+void AbstractSkillView::handleIncomingMessage(const QString &message)
+{
+    onGuiSocketMessageReceived(message);
+}
+
 void AbstractSkillView::triggerEvent(const QString &skillId, const QString &eventName, const QVariantMap &parameters)
 {
     if (m_guiWebSocket->state() != QAbstractSocket::ConnectedState) {
-        qWarning() << "Error: Mycroft gui connection not open!";
+        qWarning() << "Error: OVOS GUI connection not open!";
         return;
     }
     QJsonObject root;
@@ -160,7 +213,7 @@ void AbstractSkillView::triggerEvent(const QString &skillId, const QString &even
 void AbstractSkillView::writeProperties(const QString &skillId, const QVariantMap &data)
 {
     if (m_guiWebSocket->state() != QAbstractSocket::ConnectedState) {
-        qWarning() << "Error: Mycroft gui connection not open!";
+        qWarning() << "Error: OVOS GUI connection not open!";
         return;
     }
     QJsonObject root;
@@ -176,7 +229,7 @@ void AbstractSkillView::writeProperties(const QString &skillId, const QVariantMa
 void AbstractSkillView::deleteProperty(const QString &skillId, const QString &property)
 {
     if (m_guiWebSocket->state() != QAbstractSocket::ConnectedState) {
-        qWarning() << "Error: Mycroft gui connection not open!";
+        qWarning() << "Error: OVOS GUI connection not open!";
         return;
     }
     QJsonObject root;
@@ -271,11 +324,6 @@ QStringList jsonModelToStringList(const QString &key, const QJsonValue &data)
             return items;
         }
         const auto &obj = item.toObject();
-        if (obj.keys().length() != 1 || !obj.contains(key)) {
-            qWarning() << "Error: Item with a wrong key encountered, expected: " << key << "Encountered: " << obj.keys();
-            items.clear();
-            return items;
-        }
         const auto &value = obj.value(key);
         if (!value.isString()) {
             qWarning() << "Error: item in model not a string" << value;
@@ -296,18 +344,26 @@ void AbstractSkillView::onGuiSocketMessageReceived(const QString &message)
         return;
     }
 
-    auto type = doc[QStringLiteral("type")].toString();
+    auto typeStr = doc[QStringLiteral("type")].toString();
 
-    if (type.isEmpty()) {
+    if (typeStr.isEmpty()) {
         qWarning() << "Empty type in the JSON message on the gui socket";
         return;
     }
 
-    //qDebug() << "gui message type" << type;
+    //qDebug() << "gui message type" << typeStr;
+
+    auto parsed = GuiBusMessages::parseMessage(typeStr);
+
+    // All messages handled here are wire protocol messages (session data, GUI pages, events).
+    // Assistant events and shell events are handled by OVOSController, not forwarded here.
+    if (parsed.layer != GuiBusMessages::MessageLayer::WIRE) {
+        return;
+    }
+    auto wireMsg = parsed.wire;
 
 //BEGIN SKILLDATA
-    // The SkillData was updated by the server
-    if (type == QLatin1String("mycroft.session.set")) {
+    if (wireMsg == GuiBusMessages::WireMessage::SESSION_SET) {
         const QString skillId = doc[QStringLiteral("namespace")].toString();
         const QVariantMap data = doc[QStringLiteral("data")].toVariant().toMap();
 
@@ -332,21 +388,10 @@ void AbstractSkillView::onGuiSocketMessageReceived(const QString &message)
         QVariantMap::const_iterator i;
         for (i = data.constBegin(); i != data.constEnd(); ++i) {
             //insert it as a model
-            //QList<QVariantMap> list = variantListToOrderedMap(i.value().value<QVariantList>());
-
-            QVariantList variantList = i.value().toList();
-            QList<QVariantMap> list;
-            if(i.value().userType() != QMetaType::QString) {
-                for (const QVariant &variant : variantList) {
-                    QVariantMap map = variant.toMap();
-                    list.append(map);
-                }
-            }
-
+            QList<QVariantMap> list = variantListToOrderedMap(i.value().value<QVariantList>());
             SessionDataModel *dm = map->value(i.key()).value<SessionDataModel *>();
 
             if (!list.isEmpty()) {
-                qDebug() << "list is not empty";
                 if (!dm) {
                     dm = new SessionDataModel(map);
                     map->insertAndNotify(i.key(), QVariant::fromValue(dm));
@@ -357,17 +402,15 @@ void AbstractSkillView::onGuiSocketMessageReceived(const QString &message)
 
             //insert it as is.
             } else {
-                qDebug() << "inserting as it is";
                 if (dm) {
                     dm->deleteLater();
                 }
                 map->insertAndNotify(i.key(), i.value());
             }
-            //qDebug() << "             " << i.key() << " = " << i.value();
         }
 
     // The SkillData was removed by the server
-    } else if (type == QLatin1String("mycroft.session.delete")) {
+    } else if (wireMsg == GuiBusMessages::WireMessage::SESSION_DELETE) {
         const QString skillId = doc[QStringLiteral("namespace")].toString();
         const QString property = doc[QStringLiteral("property")].toString();
         if (skillId.isEmpty()) {
@@ -395,7 +438,7 @@ void AbstractSkillView::onGuiSocketMessageReceived(const QString &message)
 
 //BEGIN ACTIVESKILLS
     // Insert new active skill
-    } else if (type == QLatin1String("mycroft.session.list.insert") && doc[QStringLiteral("namespace")].toString() == QLatin1String("mycroft.system.active_skills")) {
+    } else if (wireMsg == GuiBusMessages::WireMessage::SESSION_LIST_INSERT && doc[QStringLiteral("namespace")].toString() == QLatin1String("mycroft.system.active_skills")) {
         const int position = doc[QStringLiteral("position")].toInt();
 
         if (position < 0 || position > m_activeSkillsModel->rowCount()) {
@@ -414,7 +457,7 @@ void AbstractSkillView::onGuiSocketMessageReceived(const QString &message)
 
 
     // Active skill removed
-    } else if (type == QLatin1String("mycroft.session.list.remove") && doc[QStringLiteral("namespace")].toString() == QLatin1String("mycroft.system.active_skills")) {
+    } else if (wireMsg == GuiBusMessages::WireMessage::SESSION_LIST_REMOVE && doc[QStringLiteral("namespace")].toString() == QLatin1String("mycroft.system.active_skills")) {
         const int position = doc[QStringLiteral("position")].toInt();
         const int itemsNumber = doc[QStringLiteral("items_number")].toInt();
 
@@ -431,7 +474,7 @@ void AbstractSkillView::onGuiSocketMessageReceived(const QString &message)
 
             const QString skillId = m_activeSkillsModel->data(m_activeSkillsModel->index(position+i, 0)).toString();
 
-            if (!m_translatorsForSkill.contains(skillId)) {
+            if (m_translatorsForSkill.contains(skillId)) {
                 QTranslator *translator = m_translatorsForSkill[skillId];
                 QCoreApplication::removeTranslator(translator);
                 m_translatorsForSkill.remove(skillId);
@@ -449,7 +492,7 @@ void AbstractSkillView::onGuiSocketMessageReceived(const QString &message)
         m_activeSkillsModel->removeRows(position, itemsNumber);
 
     // Active skill moved
-    } else if (type == QLatin1String("mycroft.session.list.move") && doc[QStringLiteral("namespace")].toString() == QLatin1String("mycroft.system.active_skills")) {
+    } else if (wireMsg == GuiBusMessages::WireMessage::SESSION_LIST_MOVE && doc[QStringLiteral("namespace")].toString() == QLatin1String("mycroft.system.active_skills")) {
         const int from = doc[QStringLiteral("from")].toInt();
         const int to = doc[QStringLiteral("to")].toInt();
         const int itemsNumber = doc[QStringLiteral("items_number")].toInt();
@@ -473,7 +516,7 @@ void AbstractSkillView::onGuiSocketMessageReceived(const QString &message)
 
 //BEGIN GUI MODEL
     // Insert new new gui delegates
-    } else if (type == QLatin1String("mycroft.gui.list.insert")) {
+    } else if (wireMsg == GuiBusMessages::WireMessage::GUI_LIST_INSERT) {
         const QString skillId = doc[QStringLiteral("namespace")].toString();
         if (skillId.isEmpty()) {
             qWarning() << "No skill_id provided in mycroft.gui.list.insert";
@@ -504,7 +547,7 @@ void AbstractSkillView::onGuiSocketMessageReceived(const QString &message)
 
         QList <DelegateLoader *> delegateLoaders;
         for (const auto &urlString : delegateUrls) {
-            const QUrl delegateUrl = QUrl::fromUserInput(urlString);
+            const QUrl delegateUrl = resolveDelegate(urlString);
 
             if (!delegateUrl.isValid()) {
                 continue;
@@ -517,7 +560,6 @@ void AbstractSkillView::onGuiSocketMessageReceived(const QString &message)
 
             if (!m_translatorsForSkill.contains(skillId)) {
                 QTranslator *translator = new QTranslator(this);
-                // TODO: download translations if skills are remote
                 if (translator->load(QLocale(), skillId, QLatin1String("_"), loader->translationsUrl().path())) {
                     QCoreApplication::installTranslator(translator);
                     m_translatorsForSkill[skillId] = translator;
@@ -539,7 +581,7 @@ void AbstractSkillView::onGuiSocketMessageReceived(const QString &message)
 
 
     // Gui delegates removed
-    } else if (type == QLatin1String("mycroft.gui.list.remove")) {
+    } else if (wireMsg == GuiBusMessages::WireMessage::GUI_LIST_REMOVE) {
         const QString skillId = doc[QStringLiteral("namespace")].toString();
         if (skillId.isEmpty()) {
             qWarning() << "No skill_id provided in mycroft.gui.list.remove";
@@ -569,7 +611,7 @@ void AbstractSkillView::onGuiSocketMessageReceived(const QString &message)
         delegatesModel->removeRows(position, itemsNumber);
 
     // Gui delegates moved
-    } else if (type == QLatin1String("mycroft.gui.list.move")) {
+    } else if (wireMsg == GuiBusMessages::WireMessage::GUI_LIST_MOVE) {
 
         const QString skillId = doc[QStringLiteral("namespace")].toString();
         if (skillId.isEmpty()) {
@@ -607,7 +649,8 @@ void AbstractSkillView::onGuiSocketMessageReceived(const QString &message)
 //TODO: manage nested models?
 //BEGIN DATA MODELS
     // Insert new items in an existing list, or creates one under "property"
-    } else if (type == QLatin1String("mycroft.session.list.insert")) {
+    // NOTE: Generic data lists (skill custom lists) - different from active_skills list
+    } else if (wireMsg == GuiBusMessages::WireMessage::SESSION_LIST_INSERT && doc[QStringLiteral("namespace")].toString() != QLatin1String("mycroft.system.active_skills")) {
         const QString skillId = doc[QStringLiteral("namespace")].toString();
         if (skillId.isEmpty()) {
             qWarning() << "No skill_id provided in mycroft.session.list.insert";
@@ -634,14 +677,7 @@ void AbstractSkillView::onGuiSocketMessageReceived(const QString &message)
             return;
         }
 
-        // QList<QVariantMap> list = variantListToOrderedMap(doc[QStringLiteral("data")].toVariant().value<QVariantList>());
-        QVariantList variantList = doc[QStringLiteral("data")].toVariant().toList();
-        QList<QMap<QString, QVariant>> list;
-
-        for (const QVariant &variant : variantList) {
-            QVariantMap map = variant.toMap();
-            list.append(map);
-        }
+        QList<QVariantMap> list = variantListToOrderedMap(doc[QStringLiteral("data")].toVariant().value<QVariantList>());
 
         if (list.isEmpty()) {
             qWarning() << "Error: invalid data in mycroft.session.list.insert:" << doc[QStringLiteral("data")];
@@ -651,7 +687,7 @@ void AbstractSkillView::onGuiSocketMessageReceived(const QString &message)
         dm->insertData(position, list);
 
     // Updates the value of items in an existing list, Error if under "property" no list exists
-    } else if (type == QLatin1String("mycroft.session.list.update")) {
+    } else if (wireMsg == GuiBusMessages::WireMessage::SESSION_LIST_UPDATE) {
         const QString skillId = doc[QStringLiteral("namespace")].toString();
         if (skillId.isEmpty()) {
             qWarning() << "No skill_id provided in mycroft.session.list.update";
@@ -678,28 +714,21 @@ void AbstractSkillView::onGuiSocketMessageReceived(const QString &message)
             return;
         }
 
-        //QList<QVariantMap> list = variantListToOrderedMap(doc[QStringLiteral("data")].toVariant().value<QVariantList>());
-
-        QVariantList variantList = doc[QStringLiteral("data")].toVariant().toList();
-        QList<QMap<QString, QVariant>> list;
-
-        for (const QVariant &variant : variantList) {
-            QVariantMap map = variant.toMap();
-            list.append(map);
-        }
+        QList<QVariantMap> list = variantListToOrderedMap(doc[QStringLiteral("data")].toVariant().value<QVariantList>());
 
         if (list.isEmpty()) {
-            qWarning() << "Error: invalid data in mycroft.session.list.insert:" << doc[QStringLiteral("data")];
+            qWarning() << "Error: invalid data in mycroft.session.list.update:" << doc[QStringLiteral("data")];
             return;
         }
 
         dm->updateData(position, list);
 
     // Moves items within an existing list, Error if under "property" no list exists
-    } else if (type == QLatin1String("mycroft.session.list.move")) {
+    // NOTE: Generic data lists (skill custom lists) - different from active_skills list
+    } else if (wireMsg == GuiBusMessages::WireMessage::SESSION_LIST_MOVE && doc[QStringLiteral("namespace")].toString() != QLatin1String("mycroft.system.active_skills")) {
         const QString skillId = doc[QStringLiteral("namespace")].toString();
         if (skillId.isEmpty()) {
-            qWarning() << "No skill_id provided in mycroft.session.list.update";
+            qWarning() << "No skill_id provided in mycroft.session.list.move";
             return;
         }
         const QString &property = doc[QStringLiteral("property")].toString();
@@ -735,15 +764,16 @@ void AbstractSkillView::onGuiSocketMessageReceived(const QString &message)
         dm->moveRows(QModelIndex(), from, itemsNumber, QModelIndex(), to);
 
     // Removes items from an existing list, Error if under "property" no list exists
-    } else if (type == QLatin1String("mycroft.session.list.remove")) {
+    // NOTE: Generic data lists (skill custom lists) - different from active_skills list
+    } else if (wireMsg == GuiBusMessages::WireMessage::SESSION_LIST_REMOVE && doc[QStringLiteral("namespace")].toString() != QLatin1String("mycroft.system.active_skills")) {
         const QString skillId = doc[QStringLiteral("namespace")].toString();
         if (skillId.isEmpty()) {
-            qWarning() << "No skill_id provided in mycroft.session.list.update";
+            qWarning() << "No skill_id provided in mycroft.session.list.remove";
             return;
         }
         const QString &property = doc[QStringLiteral("property")].toString();
         if (property.isEmpty()) {
-            qWarning() << "Error: Invalid or empty \"property\" in mycroft.session.list.move";
+            qWarning() << "Error: Invalid or empty \"property\" in mycroft.session.list.remove";
             return;
         }
 
@@ -751,7 +781,7 @@ void AbstractSkillView::onGuiSocketMessageReceived(const QString &message)
         SessionDataModel *dm = map->value(property).value<SessionDataModel *>();
 
         if (!dm) {
-            qWarning() << "Error: no list model existing under property" << property << "in mycroft.session.list.move";
+            qWarning() << "Error: no list model existing under property" << property << "in mycroft.session.list.remove";
             return;
         }
 
@@ -759,11 +789,11 @@ void AbstractSkillView::onGuiSocketMessageReceived(const QString &message)
         const int itemsNumber = doc[QStringLiteral("items_number")].toInt();
 
         if (position < 0 || position > dm->rowCount() - 1) {
-            qWarning() << "Error: Invalid position in mycroft.session.list.remove of mycroft.system.active_skills";
+            qWarning() << "Error: Invalid position in mycroft.session.list.remove";
             return;
         }
         if (itemsNumber < 0 || itemsNumber > dm->rowCount() - position) {
-            qWarning() << "Error: Invalid items_number in mycroft.session.list.remove of mycroft.system.active_skills";
+            qWarning() << "Error: Invalid items_number in mycroft.session.list.remove";
             return;
         }
 
@@ -773,23 +803,17 @@ void AbstractSkillView::onGuiSocketMessageReceived(const QString &message)
 
 //BEGIN EVENTS
     // Action triggered from the server
-    } else if (type == QLatin1String("mycroft.events.triggered")) {
+    } else if (wireMsg == GuiBusMessages::WireMessage::EVENTS_TRIGGERED) {
         const QString skillOrSystem = doc[QStringLiteral("namespace")].toString();
 
         if (skillOrSystem.isEmpty()) {
             qWarning() << "No namespace provided for mycroft.events.triggered";
             return;
         }
-        /*FIXME: do we need to keep this check? we need to also include skills without gui
-        // If it's a skill it must exist
-        if (skillOrSystem != QLatin1String("system") && !m_activeSkillsModel->skillIndex(skillOrSystem).isValid()) {
-            qWarning() << "Invalid skill id passed as namespace for mycroft.events.triggered:" << skillOrSystem;
-            return;
-        }*/
 
         const QString eventName = doc[QStringLiteral("event_name")].toString();
         if (eventName.isEmpty()) {
-            qWarning() << "No namespace provided for mycroft.events.triggered";
+            qWarning() << "No event_name provided for mycroft.events.triggered";
             return;
         }
 
@@ -825,7 +849,7 @@ void AbstractSkillView::onGuiSocketMessageReceived(const QString &message)
             }
         }
     } else {
-        qWarning() << "Unrecognized operation" << type;
+        qWarning() << "Unrecognized operation" << typeStr;
     }
 //END EVENTS
 }

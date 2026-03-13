@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 import "." as Local
 
 Item {
@@ -94,9 +94,9 @@ Item {
     // -----------------------------------------------------------------------
     function triggerGuiEvent(eventName, data) {
         if (eventName === "homescreen.swipe.change.wallpaper") {
-            Mycroft.MycroftController.sendRequest("ovos.wallpaper.manager.change.wallpaper", {})
+            OVOS.OVOSController.sendRequest("ovos.wallpaper.manager.change.wallpaper", {})
         } else {
-            Mycroft.MycroftController.sendRequest(eventName, data || {})
+            OVOS.OVOSController.sendRequest(eventName, data || {})
         }
     }
 
@@ -149,17 +149,17 @@ Item {
     // Bus events not related to homescreen data
     // -----------------------------------------------------------------------
     Connections {
-        target: Mycroft.MycroftController
+        target: OVOS.OVOSController
         onIntentRecevied: {
             if (type == "phal.brightness.control.auto.night.mode.enabled") {
                 mainView.currentIndex = 0
             } else if (type == "ovos.homescreen.main_view.current_index.set") {
                 mainView.currentIndex = data.current_index
-                Mycroft.MycroftController.sendRequest(
+                OVOS.OVOSController.sendRequest(
                     "ovos.homescreen.main_view.current_index.get.response",
                     {"current_index": mainView.currentIndex})
             } else if (type == "ovos.homescreen.main_view.current_index.get") {
-                Mycroft.MycroftController.sendRequest(
+                OVOS.OVOSController.sendRequest(
                     "ovos.homescreen.main_view.current_index.get.response",
                     {"current_index": mainView.currentIndex})
             }
@@ -212,23 +212,23 @@ Item {
     // Right-edge swipe handle (navigate forward in mainView)
     // -----------------------------------------------------------------------
     Item {
-        width: Mycroft.Units.gridUnit * 4
-        height: Mycroft.Units.gridUnit * 12
+        width: OVOS.Units.gridUnit * 4
+        height: OVOS.Units.gridUnit * 12
         anchors.right: parent.right
-        anchors.rightMargin: -Mycroft.Units.gridUnit * 2
+        anchors.rightMargin: -OVOS.Units.gridUnit * 2
         anchors.verticalCenter: parent.verticalCenter
         visible: mainView.currentIndex == 0
         enabled: mainView.currentIndex == 0
         z: 2
 
         Rectangle {
-            width: Mycroft.Units.gridUnit * 0.5
-            height: horizontalMode ? Mycroft.Units.gridUnit * 3.5 : Mycroft.Units.gridUnit * 2.5
+            width: OVOS.Units.gridUnit * 0.5
+            height: horizontalMode ? OVOS.Units.gridUnit * 3.5 : OVOS.Units.gridUnit * 2.5
             anchors.right: parent.right
-            anchors.rightMargin: Mycroft.Units.gridUnit * 0.5
+            anchors.rightMargin: OVOS.Units.gridUnit * 0.5
             anchors.verticalCenter: parent.verticalCenter
             color: Qt.rgba(0.5, 0.5, 0.5, 0.5)
-            radius: Mycroft.Units.gridUnit
+            radius: OVOS.Units.gridUnit
             z: 2
         }
 
@@ -236,13 +236,13 @@ Item {
             anchors.fill: parent
             onClicked: {
                 appsDrawer.close()
-                Mycroft.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
+                OVOS.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
                 if (mainView.currentIndex == 0) {
                     mainView.currentIndex = 1
                 } else if (mainView.currentIndex == 1) {
                     mainView.currentIndex = 2
                 }
-                Mycroft.MycroftController.sendRequest(
+                OVOS.OVOSController.sendRequest(
                     "ovos.homescreen.main_view.current_index.get.response",
                     {"current_index": mainView.currentIndex})
             }
@@ -253,30 +253,30 @@ Item {
     // Bottom-edge apps drawer handle
     // -----------------------------------------------------------------------
     Item {
-        width: Mycroft.Units.gridUnit * 12
-        height: Mycroft.Units.gridUnit * 4
+        width: OVOS.Units.gridUnit * 12
+        height: OVOS.Units.gridUnit * 4
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: -Mycroft.Units.gridUnit * 2
+        anchors.bottomMargin: -OVOS.Units.gridUnit * 2
         anchors.horizontalCenter: parent.horizontalCenter
         visible: mainView.currentIndex == 1 && idleRoot.appsEnabled
         enabled: mainView.currentIndex == 1
         z: 2
 
         Rectangle {
-            width: horizontalMode ? Mycroft.Units.gridUnit * 3.5 : Mycroft.Units.gridUnit * 2.5
-            height: Mycroft.Units.gridUnit * 0.5
+            width: horizontalMode ? OVOS.Units.gridUnit * 3.5 : OVOS.Units.gridUnit * 2.5
+            height: OVOS.Units.gridUnit * 0.5
             anchors.bottom: parent.bottom
-            anchors.bottomMargin: Mycroft.Units.gridUnit * 0.5
+            anchors.bottomMargin: OVOS.Units.gridUnit * 0.5
             anchors.horizontalCenter: parent.horizontalCenter
             color: Qt.rgba(0.5, 0.5, 0.5, 0.5)
-            radius: Mycroft.Units.gridUnit
+            radius: OVOS.Units.gridUnit
             visible: !appsDrawer.visible
         }
 
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                Mycroft.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
+                OVOS.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
                 appsDrawer.open()
             }
         }
@@ -286,36 +286,36 @@ Item {
     // Left-edge swipe handle (navigate backward in mainView)
     // -----------------------------------------------------------------------
     Item {
-        width: Mycroft.Units.gridUnit * 4
-        height: Mycroft.Units.gridUnit * 12
+        width: OVOS.Units.gridUnit * 4
+        height: OVOS.Units.gridUnit * 12
         anchors.left: parent.left
-        anchors.leftMargin: -Mycroft.Units.gridUnit * 2
+        anchors.leftMargin: -OVOS.Units.gridUnit * 2
         anchors.verticalCenter: parent.verticalCenter
         visible: mainView.currentIndex == 1 || mainView.currentIndex == 2
         enabled: mainView.currentIndex == 1 || mainView.currentIndex == 2
         z: 2
 
         Rectangle {
-            width: Mycroft.Units.gridUnit * 0.5
-            height: horizontalMode ? Mycroft.Units.gridUnit * 3.5 : Mycroft.Units.gridUnit * 2.5
+            width: OVOS.Units.gridUnit * 0.5
+            height: horizontalMode ? OVOS.Units.gridUnit * 3.5 : OVOS.Units.gridUnit * 2.5
             anchors.left: parent.left
-            anchors.leftMargin: Mycroft.Units.gridUnit * 0.5
+            anchors.leftMargin: OVOS.Units.gridUnit * 0.5
             anchors.verticalCenter: parent.verticalCenter
             color: Qt.rgba(0.5, 0.5, 0.5, 0.5)
-            radius: Mycroft.Units.gridUnit
+            radius: OVOS.Units.gridUnit
         }
 
         MouseArea {
             anchors.fill: parent
             onClicked: {
                 appsDrawer.close()
-                Mycroft.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
+                OVOS.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
                 if (mainView.currentIndex == 1) {
                     mainView.currentIndex = 0
                 } else if (mainView.currentIndex == 2) {
                     mainView.currentIndex = 1
                 }
-                Mycroft.MycroftController.sendRequest(
+                OVOS.OVOSController.sendRequest(
                     "ovos.homescreen.main_view.current_index.get.response",
                     {"current_index": mainView.currentIndex})
             }
@@ -471,9 +471,9 @@ Item {
                 MouseArea {
                     anchors.fill: parent
                     onClicked: {
-                        Mycroft.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
+                        OVOS.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
                         sendAllNotificationActions()
-                        Mycroft.MycroftController.sendRequest("ovos.notification.api.storage.clear", {})
+                        OVOS.OVOSController.sendRequest("ovos.notification.api.storage.clear", {})
                     }
                 }
             }
@@ -547,7 +547,7 @@ Item {
         if (!notificationModel || !notificationModel.storedmodel) return
         notificationModel.storedmodel.forEach(function(modelData) {
             if (modelData.action !== "") {
-                Mycroft.MycroftController.sendRequest(modelData.action, modelData.callback_data)
+                OVOS.OVOSController.sendRequest(modelData.action, modelData.callback_data)
             }
         })
     }

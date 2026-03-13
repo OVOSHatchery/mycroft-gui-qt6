@@ -19,7 +19,7 @@
 
 #include "ovosplugin.h"
 
-#include "mycroftcontroller.h"
+#include "ovoscontroller.h"
 #include "globalsettings.h"
 #include "filereader.h"
 #include "abstractdelegate.h"
@@ -27,7 +27,6 @@
 #include "activeskillsmodel.h"
 #include "delegatesmodel.h"
 #include "sessiondatamap.h"
-#include "audiorec.h"
 #include "mediaservice.h"
 
 #include <QQmlEngine>
@@ -50,21 +49,13 @@ static QObject *globalSettingsSingletonProvider(QQmlEngine *engine, QJSEngine *s
     return new GlobalSettings;
 }
 
-static QObject *mycroftControllerSingletonProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
+static QObject *ovosControllerSingletonProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
 {
     Q_UNUSED(scriptEngine);
 
     //singleton managed internally, qml should never delete it
     engine->setObjectOwnership(OVOSController::instance(), QQmlEngine::CppOwnership);
     return OVOSController::instance();
-}
-
-static QObject *audioRecSingletonProvider(QQmlEngine *engine, QJSEngine *scriptEngine)
-{
-    Q_UNUSED(engine)
-    Q_UNUSED(scriptEngine)
-
-    return new AudioRec;
 }
 
 static QObject *mediaServiceSingletonProvider(QQmlEngine *engine, QJSEngine *scriptEngine)

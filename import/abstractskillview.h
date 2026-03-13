@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "mycroftcontroller.h"
+#include "ovoscontroller.h"
 
 #include <QQuickItem>
 #include <QPointer>
@@ -68,6 +68,13 @@ public:
     QString id() const;
 
     /**
+     * Handle an incoming message from the controller's main WebSocket.
+     * The legacy plugin sends ALL messages on a single socket, so the
+     * controller forwards session/GUI/event messages here for processing.
+     */
+    void handleIncomingMessage(const QString &message);
+
+    /**
      * @internal triggers an event: invoked by the c++ side of the delegates via AbstractDelegate::triggerEvent
      */
     void triggerEvent(const QString &skillId, const QString &eventName, const QVariantMap &parameters);
@@ -105,4 +112,3 @@ private:
     QWebSocket *m_guiWebSocket;
     ActiveSkillsModel *m_activeSkillsModel;
 };
-

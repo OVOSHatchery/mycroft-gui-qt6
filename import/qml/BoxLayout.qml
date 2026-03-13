@@ -18,7 +18,7 @@
 //DEPRECATED or inherit fom c++ Delegate?
 import QtQuick
 import QtQuick.Layouts
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 Item {
     id: root

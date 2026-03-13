@@ -16,7 +16,7 @@
  */
 
 #include "abstractdelegate.h"
-#include "mycroftcontroller.h"
+#include "ovoscontroller.h"
 
 #include <QQmlEngine>
 #include <QQmlContext>
@@ -91,7 +91,7 @@ void DelegateLoader::createObject()
     }
 
     if (!m_delegate) {
-        qWarning()<<"ERROR: QML gui" << guiObject << "not a Mycroft.AbstractDelegate instance";
+        qWarning()<<"ERROR: QML gui" << guiObject << "not an OVOS.AbstractDelegate instance";
         guiObject->deleteLater();
         return;
     }

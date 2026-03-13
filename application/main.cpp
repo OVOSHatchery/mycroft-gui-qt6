@@ -39,10 +39,9 @@
 #include "shell/plugins/ResetOperations.h"
 
 // GUI components (from import plugin)
-#include "../import/mycroftcontroller.h"
+#include "../import/ovoscontroller.h"
 #include "../import/globalsettings.h"
 #include "../import/filereader.h"
-#include "../import/audiorec.h"
 #include "../import/mediaservice.h"
 
 int main(int argc, char *argv[])
@@ -86,10 +85,10 @@ int main(int argc, char *argv[])
         app.setOrganizationDomain(QStringLiteral("OpenVoiceOS.com"));
         qputenv("QT_IM_MODULE", QByteArray("qtvirtualkeyboard"));
     } else {
-        app.setApplicationName(QStringLiteral("mycroft.gui"));
-        app.setOrganizationDomain(QStringLiteral("kde.org"));
+        app.setApplicationName(QStringLiteral("ovos.gui"));
+        app.setOrganizationDomain(QStringLiteral("OpenVoiceOS.com"));
     }
-    app.setWindowIcon(QIcon::fromTheme(QStringLiteral("mycroft")));
+    app.setWindowIcon(QIcon::fromTheme(QStringLiteral("ovos")));
 
     // NOTE: Have to manually implement a --help option because the parser.addHelpOption() would
     //       be triggered at parser.process() time, but it requires the QApplication. But the
@@ -114,7 +113,7 @@ int main(int argc, char *argv[])
     engine.rootContext()->setContextProperty(QStringLiteral("deviceMaximized"), maximize);
     engine.rootContext()->setContextProperty(QStringLiteral("hideTextInput"), parser.isSet(hideTextInputOption));
     engine.rootContext()->setContextProperty(QStringLiteral("globalScreenRotation"), parser.isSet(rotateScreen) ? rotation : 0);
-    engine.rootContext()->setContextProperty(QStringLiteral("versionNumber"), QStringLiteral(mycroftguiapp_VERSION_STRING));
+    engine.rootContext()->setContextProperty(QStringLiteral("versionNumber"), QStringLiteral(ovosguiapp_VERSION_STRING));
 
     QString singleSkill = parser.value(skillOption);
     if (singleSkill.endsWith(QStringLiteral(".home"))) {
@@ -127,7 +126,7 @@ int main(int argc, char *argv[])
     }
 
     if (parser.isSet(skillOption)) {
-        app.setApplicationName(QStringLiteral("mycroft.gui.") + singleSkill);
+        app.setApplicationName(QStringLiteral("ovos.gui.") + singleSkill);
 #ifdef HAVE_KDBUS_SERVICE
         KDBusService service(KDBusService::Unique);
 #endif
@@ -136,11 +135,10 @@ int main(int argc, char *argv[])
     AppSettings *appSettings = new AppSettings(&view);
     engine.rootContext()->setContextProperty(QStringLiteral("applicationSettings"), appSettings);
 
-    // Register GUI component singletons in QML context (replacing Mycroft module imports)
+    // Register GUI component singletons in QML context
     engine.rootContext()->setContextProperty(QStringLiteral("OVOSController"), OVOSController::instance());
     engine.rootContext()->setContextProperty(QStringLiteral("GlobalSettings"), new GlobalSettings(&engine));
     engine.rootContext()->setContextProperty(QStringLiteral("FileReader"), new FileReader(&engine));
-    engine.rootContext()->setContextProperty(QStringLiteral("AudioRec"), new AudioRec(&engine));
     engine.rootContext()->setContextProperty(QStringLiteral("MediaService"), new MediaService(&engine));
 
     if (shellMode) {

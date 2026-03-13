@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 Item {
     id: mainPageControl
@@ -37,10 +37,10 @@ Item {
             Kirigami.Icon {
                 id: downArrowMenuHint
                 anchors.top: parent.top
-                anchors.topMargin: -Mycroft.Units.gridUnit
+                anchors.topMargin: -OVOS.Units.gridUnit
                 anchors.horizontalCenter: parent.horizontalCenter
-                width: Mycroft.Units.gridUnit * 2.5
-                height: Mycroft.Units.gridUnit * 2.5
+                width: OVOS.Units.gridUnit * 2.5
+                height: OVOS.Units.gridUnit * 2.5
                 opacity: mainPageControl.dropDownMenuHintPersistence ? 0.5 : 0
                 source:  Qt.resolvedUrl("icons/down.svg")
                 color: "white"

@@ -20,7 +20,7 @@ import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
 import QtGraphicalEffects
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 Delegate {
     id: root
@@ -28,7 +28,7 @@ Delegate {
     bottomPadding: 0
     topPadding: 0
     rightPadding: 0
-    property int gridUnit: Mycroft.Units.gridUnit
+    property int gridUnit: OVOS.Units.gridUnit
     
     skillBackgroundColorOverlay: "black"
     

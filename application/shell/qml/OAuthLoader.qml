@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 import QtWebEngine 1.9
 
 Popup {
@@ -19,7 +19,7 @@ Popup {
     property bool needsCredentials: false
 
     function forwardAuthentication(redirectURL) {
-        Mycroft.MycroftController.sendRequest("ovos.shell.oauth.authentication.forward", {
+        OVOS.OVOSController.sendRequest("ovos.shell.oauth.authentication.forward", {
             "redirectURL": redirectURL,
             "app_id": oAuthPopup.appID,
             "skill_id": oAuthPopup.skillID
@@ -103,7 +103,7 @@ Popup {
                         text: qsTr("Submit")
                         
                         onClicked: {
-                            Mycroft.MycroftController.sendRequest("ovos.shell.oauth.register.credentials", {
+                            OVOS.OVOSController.sendRequest("ovos.shell.oauth.register.credentials", {
                                 "app_id": oAuthPopup.appID,
                                 "skill_id": oAuthPopup.skillID,
                                 "client_id": oAuthClientID.text,

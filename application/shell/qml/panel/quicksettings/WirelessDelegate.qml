@@ -18,12 +18,12 @@
 import QtQuick
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
-import Mycroft 1.0 as Mycroft
+import OVOS 1.0 as OVOS
 
 Delegate {
     iconSource: "qrc://icons/wireless"
     text: qsTr("Wireless")
     onClicked: {
-        Mycroft.MycroftController.sendRequest("ovos.phal.wifi.plugin.user.activated", {})
+        OVOS.OVOSController.sendRequest("ovos.phal.wifi.plugin.user.activated", {})
     }
 }
