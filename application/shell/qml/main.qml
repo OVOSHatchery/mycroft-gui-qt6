@@ -36,7 +36,7 @@ Kirigami.AbstractApplicationWindow {
     visible: true
     visibility: "Maximized"
     flags: Qt.FramelessWindowHint
-    property var controllerStatus: OVOSController.status
+    property var controllerStatus: GuiBusClient.status
     property bool platformEGLFS: true
     property bool slidingPanelShouldOpen: false
 
@@ -79,8 +79,8 @@ Kirigami.AbstractApplicationWindow {
     }
 
     Connections {
-        target: OVOSController
-        onIntentRecevied: {
+        target: GuiBusClient
+        onProtocolMessageReceived: {
             if (type == "ovos.shell.exec.factory.reset") {
                 var script_to_run_path = data.script
                 resetOperations.runResetOperations(script_to_run_path)
@@ -104,14 +104,14 @@ Kirigami.AbstractApplicationWindow {
                 mainView.grabToImage(function(result) {
                     result.saveToFile(filepath);
                 });
-                OVOSController.sendRequest("ovos.display.screenshot.get.response", {"result": filepath});
+                GuiBusClient.sendRequest("ovos.display.screenshot.get.response", {"result": filepath});
             }
             if (type == "ovos.shell.get.menuLabels.status") {
-                OVOSController.sendRequest("ovos.shell.get.menuLabels.status.response", {"enabled": applicationSettings.menuLabels});
+                GuiBusClient.sendRequest("ovos.shell.get.menuLabels.status.response", {"enabled": applicationSettings.menuLabels});
             }
             if (type == "ovos.shell.set.menuLabels") {
                 applicationSettings.menuLabels = data.enabled
-                OVOSController.sendRequest("ovos.shell.get.menuLabels.status.response", {"enabled": applicationSettings.menuLabels});
+                GuiBusClient.sendRequest("ovos.shell.get.menuLabels.status.response", {"enabled": applicationSettings.menuLabels});
             }
         }
     }
@@ -134,11 +134,11 @@ Kirigami.AbstractApplicationWindow {
 
     Timer {
         interval: 20000
-        running: GlobalSettings.autoConnect && OVOSController.status != OVOSController.Open
+        running: OVOS.GlobalSettings.autoConnect && GuiBusClient.status != GuiBusClient.Open
         triggeredOnStart: true
         onTriggered: {
             console.log("Trying to connect to OVOS");
-            OVOSController.start();
+            GuiBusClient.start();
             slidingPanel.close();
             // updateSchemeList would be called on OVOSPlugin.Configuration if available
         }
@@ -278,7 +278,7 @@ Kirigami.AbstractApplicationWindow {
                 pullDownMenuFlickableArea.returnToBounds()
             }
 
-            // Template renderer (replaces OVOS.SkillView)
+            // Template renderer (replaces OVOS.NamespaceView)
             Rectangle {
                 id: mainView
                 Kirigami.Theme.colorSet: Kirigami.Theme.Complementary

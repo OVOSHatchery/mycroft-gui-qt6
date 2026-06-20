@@ -10,6 +10,7 @@ target_link_libraries(openvoiceshellplugin
     Qt6::DBus
     KF6::GuiAddons
     KF6::ConfigWidgets
+    KF6::CoreAddons
 )
 
 install(TARGETS openvoiceshellplugin DESTINATION ${KDE_INSTALL_QMLDIR}/OVOSPlugin)

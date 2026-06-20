@@ -1,15 +1,17 @@
 #ifndef OVOSTHEME_H
 #define OVOSTHEME_H
 
-#include <Kirigami/PlatformTheme>
-#include <Kirigami/KirigamiPluginFactory>
+#include <Kirigami/Platform/PlatformTheme>
+#include <Kirigami/Platform/PlatformPluginFactory>
 
 #include <QObject>
 #include <QIcon>
 #include <QColor>
 #include <QFileSystemWatcher>
+#include <QPointer>
+#include <QWindow>
 
-class OvosTheme : public Kirigami::PlatformTheme
+class OvosTheme : public Kirigami::Platform::PlatformTheme
 {
     Q_OBJECT
     QPalette lightPalette;

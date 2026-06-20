@@ -1,24 +1,25 @@
 import QtQuick
-import QtWebEngine 1.8
+import QtWebEngine
+import OVOS.GUI 1.0 as OVOS
 
-Item {
+OVOS.Page {
     id: root
 
-    property string html:         sessionData.html         || ""
-    property string resource_url: sessionData.resource_url || "about:blank"
+    property string html:         namespaceData ? (namespaceData.html         || "") : ""
+    property string resource_url: namespaceData ? (namespaceData.resource_url || "about:blank") : "about:blank"
 
     WebEngineView {
+        id: webview
         anchors.fill: parent
-        onHtmlChanged: {
-            if (html.length > 0) {
-                loadHtml(html, resource_url)
+
+        function updateContent() {
+            if (root.html.length > 0) {
+                webview.loadHtml(root.html, root.resource_url)
             }
         }
 
-        Component.onCompleted: {
-            if (html.length > 0) {
-                loadHtml(html, resource_url)
-            }
-        }
+        Component.onCompleted: updateContent()
     }
+
+    onHtmlChanged: webview.updateContent()
 }

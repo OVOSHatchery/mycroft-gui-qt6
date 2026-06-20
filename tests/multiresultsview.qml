@@ -1,7 +1,7 @@
 import QtQuick 2.5
 import QtQuick.Controls 2.4
 import QtQuick.Layouts 1.3
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 ColumnLayout {
     width: 500
@@ -11,10 +11,10 @@ ColumnLayout {
         id: input
         Layout.fillWidth: true
         onAccepted: {
-            OVOS.OVOSController.sendText(input.text)
+            OVOS.GuiBusClient.sendText(input.text)
         }
     }
-    Component.onCompleted: OVOS.OVOSController.start();
+    Component.onCompleted: OVOS.GuiBusClient.start();
 
     ScrollView {
         id: scroll
@@ -28,18 +28,18 @@ ColumnLayout {
                 width: scroll.width - 20
                 columns: 2
                 //horizontalSpacing: 5
-                OVOS.StackSkillView {
+                OVOS.StackNamespaceView {
                     Layout.rowSpan: 2
                     clip:true
                     width: 400
                     height: 800
                 }
-                OVOS.StackSkillView {
+                OVOS.StackNamespaceView {
                     clip: true
                     width: 800
                     height: 400
                 }
-                OVOS.StackSkillView {
+                OVOS.StackNamespaceView {
                     clip: true
                     width: 400
                     height: 400

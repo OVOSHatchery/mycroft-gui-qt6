@@ -92,6 +92,11 @@ enum class WireMessage {
     // The actual event type is in the "event_type" field of the JSON payload.
     FORWARD_ASSISTANT,      // "mycroft.gui.forward.assistant"
     FORWARD_SHELL,          // "mycroft.gui.forward.shell"
+
+    // Client → Server: first-class wire messages for user input
+    CLIENT_UTTERANCE,       // "gui.client.utterance"
+    CLIENT_CONFIRM_RESPONSE,// "gui.client.confirm.response"
+    CLIENT_SELECT_RESPONSE, // "gui.client.select.response"
 };
 
 inline WireMessage wireFromString(const QString &s) {
@@ -109,6 +114,9 @@ inline WireMessage wireFromString(const QString &s) {
     if (s == QLatin1String("gui.clear.namespace"))          return WireMessage::CLEAR_NAMESPACE;
     if (s == QLatin1String("mycroft.gui.forward.assistant")) return WireMessage::FORWARD_ASSISTANT;
     if (s == QLatin1String("mycroft.gui.forward.shell"))    return WireMessage::FORWARD_SHELL;
+    if (s == QLatin1String("gui.client.utterance"))         return WireMessage::CLIENT_UTTERANCE;
+    if (s == QLatin1String("gui.client.confirm.response"))  return WireMessage::CLIENT_CONFIRM_RESPONSE;
+    if (s == QLatin1String("gui.client.select.response"))   return WireMessage::CLIENT_SELECT_RESPONSE;
     return static_cast<WireMessage>(-1);
 }
 
@@ -128,6 +136,9 @@ inline const char* toString(WireMessage m) {
         case WireMessage::CLEAR_NAMESPACE:     return "gui.clear.namespace";
         case WireMessage::FORWARD_ASSISTANT:  return "mycroft.gui.forward.assistant";
         case WireMessage::FORWARD_SHELL:     return "mycroft.gui.forward.shell";
+        case WireMessage::CLIENT_UTTERANCE:        return "gui.client.utterance";
+        case WireMessage::CLIENT_CONFIRM_RESPONSE: return "gui.client.confirm.response";
+        case WireMessage::CLIENT_SELECT_RESPONSE:  return "gui.client.select.response";
         default: return "UNKNOWN_WIRE";
     }
 }
@@ -175,6 +186,12 @@ enum class ShellEvent {
     // Hints
     HINTS_GET,                  // "gui.hints.get"
     HINTS_GET_RESPONSE,         // "gui.hints.get.response"
+
+    // Player
+    PLAYER_PLAY,                // "gui.player.play"
+    PLAYER_PAUSE,               // "gui.player.pause"
+    PLAYER_STOP,                // "gui.player.stop"
+    PLAYER_SEEK,                // "gui.player.seek"
 };
 
 inline ShellEvent shellFromString(const QString &s) {
@@ -197,6 +214,10 @@ inline ShellEvent shellFromString(const QString &s) {
     if (s == QLatin1String("gui.config.set"))                  return ShellEvent::CONFIG_SET;
     if (s == QLatin1String("gui.hints.get"))                   return ShellEvent::HINTS_GET;
     if (s == QLatin1String("gui.hints.get.response"))          return ShellEvent::HINTS_GET_RESPONSE;
+    if (s == QLatin1String("gui.player.play"))                 return ShellEvent::PLAYER_PLAY;
+    if (s == QLatin1String("gui.player.pause"))                return ShellEvent::PLAYER_PAUSE;
+    if (s == QLatin1String("gui.player.stop"))                 return ShellEvent::PLAYER_STOP;
+    if (s == QLatin1String("gui.player.seek"))                 return ShellEvent::PLAYER_SEEK;
     return static_cast<ShellEvent>(-1);
 }
 
@@ -221,6 +242,10 @@ inline const char* toString(ShellEvent e) {
         case ShellEvent::CONFIG_SET:                return "gui.config.set";
         case ShellEvent::HINTS_GET:                 return "gui.hints.get";
         case ShellEvent::HINTS_GET_RESPONSE:        return "gui.hints.get.response";
+        case ShellEvent::PLAYER_PLAY:               return "gui.player.play";
+        case ShellEvent::PLAYER_PAUSE:              return "gui.player.pause";
+        case ShellEvent::PLAYER_STOP:               return "gui.player.stop";
+        case ShellEvent::PLAYER_SEEK:               return "gui.player.seek";
         default: return "UNKNOWN_SHELL";
     }
 }
@@ -259,16 +284,16 @@ enum class AssistantEvent {
     // User input (CLIENT -> SERVER)
     RECOGNIZER_UTTERANCE,           // "recognizer_loop:utterance"
 
-    // Skill lifecycle
+    // Namespace lifecycle
     STOP_HANDLED,                   // "mycroft.stop.handled" / "mycroft.stop"
     INTENT_FAILURE,                 // "complete_intent_failure"
     UTTERANCE_HANDLED,              // "ovos.utterance.handled"
     UTTERANCE_CANCELLED,            // "ovos.utterance.cancelled"
-    SKILL_HANDLER_START,            // "mycroft.skill.handler.start"
-    SKILL_HANDLER_COMPLETE,         // "mycroft.skill.handler.complete"
+    NAMESPACE_HANDLER_START,        // "mycroft.skill.handler.start"
+    NAMESPACE_HANDLER_COMPLETE,     // "mycroft.skill.handler.complete"
 
     // Core lifecycle
-    SKILLS_LOADED_RESPONSE,         // "mycroft.skills.all_loaded.response"
+    NAMESPACES_LOADED_RESPONSE,     // "mycroft.skills.all_loaded.response"
     READY,                          // "mycroft.ready"
 
     // Screen
@@ -323,9 +348,9 @@ inline AssistantEvent assistantFromString(const QString &s) {
     if (s == QLatin1String("complete_intent_failure"))            return AssistantEvent::INTENT_FAILURE;
     if (s == QLatin1String("ovos.utterance.handled"))             return AssistantEvent::UTTERANCE_HANDLED;
     if (s == QLatin1String("ovos.utterance.cancelled"))           return AssistantEvent::UTTERANCE_CANCELLED;
-    if (s == QLatin1String("mycroft.skill.handler.start"))        return AssistantEvent::SKILL_HANDLER_START;
-    if (s == QLatin1String("mycroft.skill.handler.complete"))     return AssistantEvent::SKILL_HANDLER_COMPLETE;
-    if (s == QLatin1String("mycroft.skills.all_loaded.response")) return AssistantEvent::SKILLS_LOADED_RESPONSE;
+    if (s == QLatin1String("mycroft.skill.handler.start"))        return AssistantEvent::NAMESPACE_HANDLER_START;
+    if (s == QLatin1String("mycroft.skill.handler.complete"))     return AssistantEvent::NAMESPACE_HANDLER_COMPLETE;
+    if (s == QLatin1String("mycroft.skills.all_loaded.response")) return AssistantEvent::NAMESPACES_LOADED_RESPONSE;
     if (s == QLatin1String("mycroft.ready"))                      return AssistantEvent::READY;
     if (s == QLatin1String("screen.close.idle.event"))            return AssistantEvent::SCREEN_CLOSE_IDLE_EVENT;
     // Enclosure eyes
@@ -375,9 +400,9 @@ inline const char* toString(AssistantEvent e) {
         case AssistantEvent::INTENT_FAILURE:                return "complete_intent_failure";
         case AssistantEvent::UTTERANCE_HANDLED:             return "ovos.utterance.handled";
         case AssistantEvent::UTTERANCE_CANCELLED:           return "ovos.utterance.cancelled";
-        case AssistantEvent::SKILL_HANDLER_START:           return "mycroft.skill.handler.start";
-        case AssistantEvent::SKILL_HANDLER_COMPLETE:        return "mycroft.skill.handler.complete";
-        case AssistantEvent::SKILLS_LOADED_RESPONSE:        return "mycroft.skills.all_loaded.response";
+        case AssistantEvent::NAMESPACE_HANDLER_START:       return "mycroft.skill.handler.start";
+        case AssistantEvent::NAMESPACE_HANDLER_COMPLETE:    return "mycroft.skill.handler.complete";
+        case AssistantEvent::NAMESPACES_LOADED_RESPONSE:    return "mycroft.skills.all_loaded.response";
         case AssistantEvent::READY:                         return "mycroft.ready";
         case AssistantEvent::SCREEN_CLOSE_IDLE_EVENT:       return "screen.close.idle.event";
         case AssistantEvent::ENCLOSURE_EYES_ON:             return "enclosure.eyes.on";

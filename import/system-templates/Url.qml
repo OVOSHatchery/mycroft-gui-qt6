@@ -1,10 +1,11 @@
 import QtQuick
-import QtWebEngine 1.8
+import QtWebEngine
+import OVOS.GUI 1.0 as OVOS
 
-Item {
+OVOS.Page {
     id: root
 
-    property string url: sessionData.url || "about:blank"
+    property string url: namespaceData ? (namespaceData.url || "about:blank") : "about:blank"
 
     WebEngineView {
         anchors.fill: parent

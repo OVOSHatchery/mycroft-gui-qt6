@@ -1,13 +1,13 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import OVOS.GUI 1.0 as OVOS
 
-Item {
+OVOS.Page {
     id: root
 
-    property var tracks:       sessionData.tracks        || []
-    property int currentIndex: sessionData.current_index !== undefined
-                               ? sessionData.current_index : 0
+    property var tracks:       namespaceData ? (namespaceData.tracks        || []) : []
+    property int currentIndex: namespaceData ? (namespaceData.current_index !== undefined ? namespaceData.current_index : 0) : 0
 
     ColumnLayout {
         anchors.fill: parent
@@ -24,14 +24,14 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true
-            model: tracks
+            model: root.tracks
             spacing: 2
 
             delegate: ItemDelegate {
                 id: trackDelegate
-                width: parent.width
+                width: ListView.view.width
 
-                readonly property bool isCurrent: index === currentIndex
+                readonly property bool isCurrent: index === root.currentIndex
 
                 background: Rectangle {
                     color: trackDelegate.isCurrent
@@ -82,7 +82,7 @@ Item {
                     }
                 }
 
-                onClicked: triggerEvent("playlist.play", {
+                onClicked: root.triggerGuiEvent("playlist.play", {
                     "playlistData": {
                         "uri":        modelData.uri        || "",
                         "title":      modelData.title      || "",

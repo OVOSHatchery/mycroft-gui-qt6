@@ -166,6 +166,7 @@ void VideoProviderService::durationUpdated(qint64 duration)
 
 void VideoProviderService::positionUpdated(qint64 position)
 {
+    m_position = position;
     emit positionChanged(position);
 }
 

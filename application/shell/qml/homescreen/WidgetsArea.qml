@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 Row {
     id: widgetsRow
@@ -54,7 +54,7 @@ Row {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                OVOS.OVOSController.sendRequest("ovos.gui.show.active.timers", {})
+                OVOS.GuiBusClient.sendRequest("ovos.gui.show.active.timers", {})
             }
         }
     }
@@ -71,7 +71,7 @@ Row {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                OVOS.OVOSController.sendRequest("ovos.gui.show.active.alarms", {})
+                OVOS.GuiBusClient.sendRequest("ovos.gui.show.active.alarms", {})
             }
         }
     }

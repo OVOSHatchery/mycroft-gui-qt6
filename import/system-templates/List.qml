@@ -1,12 +1,13 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import OVOS.GUI 1.0 as OVOS
 
-Item {
+OVOS.Page {
     id: root
 
-    property string title: sessionData.title || ""
-    property var    items: sessionData.items || []
+    property string title: namespaceData ? (namespaceData.title || "") : ""
+    property var    items: namespaceData ? (namespaceData.items || []) : []
 
     ColumnLayout {
         anchors.fill: parent
@@ -14,8 +15,8 @@ Item {
         spacing: 8
 
         Label {
-            visible: title.length > 0
-            text: title
+            visible: root.title.length > 0
+            text: root.title
             font.pixelSize: 20
             font.weight: Font.DemiBold
             Layout.fillWidth: true
@@ -25,10 +26,10 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true
-            model: items
+            model: root.items
 
             delegate: ItemDelegate {
-                width: parent.width
+                width: ListView.view.width
                 contentItem: ColumnLayout {
                     spacing: 2
                     Label {

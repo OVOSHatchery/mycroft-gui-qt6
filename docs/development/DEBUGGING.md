@@ -50,8 +50,8 @@ QT_LOGGING_RULES="*.debug=true" mycroft-gui-app
 Add temporary debug output:
 
 ```cpp
-// ovoscontroller.cpp
-void OVOSController::onWebSocketConnected() {
+// guibusclient.cpp
+void GuiBusClient::onWebSocketConnected() {
     qDebug() << "WebSocket connected!";
     qDebug() << "Server:" << m_socket.peerName();
     qDebug() << "Port:" << m_socket.peerPort();
@@ -138,7 +138,7 @@ In Debugger → Locals & Expressions:
 ### Example Debugging Session
 
 ```
-File: import/ovoscontroller.cpp
+File: import/guibusclient.cpp
 Line: onWebSocketConnected()
 
 1. Set breakpoint on m_connected = true;
@@ -165,7 +165,7 @@ make clean && make
 gdb ./mycroft-gui-app
 
 # In gdb prompt:
-(gdb) break OVOSController::onWebSocketConnected
+(gdb) break GuiBusClient::onWebSocketConnected
 (gdb) run
 # ... app runs until breakpoint hits ...
 (gdb) print m_socket.peerName()
@@ -214,7 +214,7 @@ make test VERBOSE=1
 
 Direct leak of 256 byte(s) in 1 object(s) allocated from:
     #0 0x7ffff7a6d099 in operator new (/lib/libc.so.6+...)
-    #1 0x5555557a1b3c in OVOSController::connect() ...
+    #1 0x5555557a1b3c in GuiBusClient::connect() ...
 ```
 
 ### Detect Use-After-Free
@@ -496,7 +496,7 @@ qWarning() << "Failed to connect:" << errorString;
 
 Detailed logging:
 ```cpp
-qDebug() << "OVOSController::onWebSocketConnected()";
+qDebug() << "GuiBusClient::onWebSocketConnected()";
 qDebug() << "  Server:" << m_socket.peerName();
 qDebug() << "  Port:" << m_socket.peerPort();
 qDebug() << "  Connected:" << m_connected;
@@ -533,7 +533,7 @@ gdbserver :1234 ./mycroft-gui-app
 # On development machine
 gdb ./mycroft-gui-app
 (gdb) target remote <target-ip>:1234
-(gdb) break OVOSController::connect
+(gdb) break GuiBusClient::connect
 (gdb) continue
 ```
 

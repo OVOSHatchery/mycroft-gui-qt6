@@ -21,7 +21,7 @@ import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
 import QtQuick.Window
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 Controls.Control {
     id: root

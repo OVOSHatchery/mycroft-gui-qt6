@@ -16,7 +16,7 @@
  */
 
 import QtQuick
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 SliderControl {
     id: root
@@ -32,12 +32,12 @@ SliderControl {
     }
 
     onChangeValueChanged: {
-        OVOS.OVOSController.sendRequest("mycroft.volume.set", {"percent": changeValue});
+        OVOS.GuiBusClient.sendRequest("mycroft.volume.set", {"percent": changeValue});
         feedbackTimer.restart()
     }
 
     Connections {
-        target: OVOS.OVOSController
+        target: OVOS.GuiBusClient
 
         onIntentRecevied: {
             if (type == "mycroft.volume.display") {

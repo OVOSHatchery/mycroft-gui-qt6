@@ -19,8 +19,8 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
-import QtGraphicalEffects
-import OVOS 1.0 as OVOS
+import Qt5Compat.GraphicalEffects
+import OVOS.GUI 1.0 as OVOS
 
 Delegate {
     id: root

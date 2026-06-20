@@ -1,21 +1,22 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import OVOS.GUI 1.0 as OVOS
 
-Item {
+OVOS.Page {
     id: root
 
-    property bool   success: sessionData.success !== undefined ? sessionData.success : true
-    property string label:   sessionData.label   || ""
+    property bool   success: namespaceData ? (namespaceData.success !== undefined ? namespaceData.success : true) : true
+    property string label:   namespaceData ? (namespaceData.label   || "") : ""
 
     ColumnLayout {
         anchors.centerIn: parent
         spacing: 16
 
         Text {
-            text:  success ? "✓" : "✗"
+            text:  root.success ? "✓" : "✗"
             font.pixelSize: 96
-            color: success ? "#4caf50" : "#f44336"
+            color: root.success ? "#4caf50" : "#f44336"
             Layout.alignment: Qt.AlignHCenter
 
             SequentialAnimation on opacity {
@@ -25,8 +26,8 @@ Item {
         }
 
         Label {
-            visible: label.length > 0
-            text: label
+            visible: root.label.length > 0
+            text: root.label
             font.pixelSize: 20
             Layout.alignment: Qt.AlignHCenter
             wrapMode: Text.WordWrap

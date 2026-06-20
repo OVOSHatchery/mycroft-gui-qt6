@@ -11,7 +11,7 @@
 // #include <KIconLoader>
 
 OvosTheme::OvosTheme(QObject *parent)
-    : PlatformTheme(parent)
+    : Kirigami::Platform::PlatformTheme(parent)
 {
     setupFileWatch();
     syncColors();
@@ -135,16 +135,16 @@ void OvosTheme::syncWindow(){
 
 bool OvosTheme::event(QEvent *event)
 {
-    if (event->type() == Kirigami::PlatformThemeEvents::DataChangedEvent::type) {
+    if (event->type() == Kirigami::Platform::PlatformThemeEvents::DataChangedEvent::type) {
         syncColors();
     }
-    if (event->type() == Kirigami::PlatformThemeEvents::ColorSetChangedEvent::type) {
+    if (event->type() == Kirigami::Platform::PlatformThemeEvents::ColorSetChangedEvent::type) {
         syncColors();
     }
-    if (event->type() == Kirigami::PlatformThemeEvents::ColorGroupChangedEvent::type) {
+    if (event->type() == Kirigami::Platform::PlatformThemeEvents::ColorGroupChangedEvent::type) {
         syncColors();
     }
-    return PlatformTheme::event(event);
+    return Kirigami::Platform::PlatformTheme::event(event);
 }
 
 void OvosTheme::readConfig()

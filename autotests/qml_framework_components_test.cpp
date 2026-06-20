@@ -277,5 +277,5 @@ void QmlFrameworkComponentsTest::testDeprecationNotices()
     }
 }
 
-QTEST_APPLESS_MAIN(QmlFrameworkComponentsTest)
+QTEST_MAIN(QmlFrameworkComponentsTest)
 #include "qml_framework_components_test.moc"

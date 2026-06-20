@@ -29,7 +29,7 @@
 import QtQuick
 import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 // Design Decision: Keep AbstractDelegate pattern instead of Kirigami Page
 // AbstractDelegate provides a lightweight, composable base for skill UI without

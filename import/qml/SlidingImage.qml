@@ -24,7 +24,7 @@ import org.kde.kirigami as Kirigami
  * like in the following example.
  *
  * @code
- *  OVOS.Delegate {
+ *  OVOS.Page {
  *      background: OVOS.SlidingImage {
  *          source: "foo.jpg"
  *      }

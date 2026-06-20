@@ -20,9 +20,9 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as Controls
 import org.kde.kirigami 2.4 as Kirigami
 
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
-OVOS.Delegate {
+OVOS.Page {
     id: root
     skillBackgroundSource: "https://source.unsplash.com/1920x1080/?+books"
 
@@ -40,7 +40,7 @@ OVOS.Delegate {
             contentItem: Image {
                 id: image
                 
-                source: sessionData.image
+                source: namespaceData.image
             }
             background: Rectangle {
                 color: Kirigami.Theme.textColor
@@ -48,11 +48,11 @@ OVOS.Delegate {
             }
         }
         Kirigami.Heading {
-            text: sessionData.title
+            text: namespaceData.title
         }
         Controls.Label {
             Layout.fillWidth: true
-            text: sessionData.text
+            text: namespaceData.text
             wrapMode: Text.WordWrap
         }
         Item {

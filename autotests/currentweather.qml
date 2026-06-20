@@ -20,17 +20,17 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as Controls
 import org.kde.kirigami 2.4 as Kirigami
 
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
-OVOS.Delegate {
+OVOS.Page {
     skillBackgroundSource: "https://source.unsplash.com/1920x1080/?+sun"
 
     function updateTemperature(temp) {
-        sessionData.temperature = temp;
+        namespaceData.temperature = temp;
     }
 
     function deleteProperty() {
-        sessionData.to_delete = null;
+        namespaceData.to_delete = null;
     }
 
     ColumnLayout {
@@ -39,15 +39,15 @@ OVOS.Delegate {
             text: "Today"
         }
         Kirigami.Icon {
-            source: sessionData.icon
+            source: namespaceData.icon
             Layout.preferredWidth: Kirigami.Units.iconSizes.huge
             Layout.preferredHeight: Layout.preferredWidth
         }
         Controls.Label {
-            text: "icon: " + sessionData.icon
+            text: "icon: " + namespaceData.icon
         }
         Controls.Label {
-            text: "temperature: " + sessionData.temperature
+            text: "temperature: " + namespaceData.temperature
         }
         Item {
             Layout.fillHeight: true

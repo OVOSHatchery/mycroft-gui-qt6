@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 Control {
     id: nightTimeOverlayRoot
@@ -11,7 +11,7 @@ Control {
     Kirigami.Theme.colorSet: Kirigami.Theme.View
 
     property bool horizontalMode: nightTimeOverlayRoot.width > nightTimeOverlayRoot.height ? 1 : 0
-    property var time_string: sessionData.time_string ? sessionData.time_string.replace(":", "꞉") : ""
+    property var time_string: namespaceData.time_string ? namespaceData.time_string.replace(":", "꞉") : ""
 
     background: Rectangle {
         width: idleRoot.width

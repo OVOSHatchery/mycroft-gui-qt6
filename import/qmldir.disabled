@@ -1,9 +1,0 @@
-module OVOS
-plugin ovosplugin
-classname OVOSPlugin
-
-typeinfo plugins.qmltypes
-
-designersupported
-depends QtQuick.Controls 2.0
-depends QtGraphicalEffects 1.0

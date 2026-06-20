@@ -3,11 +3,11 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 Item {
     id: mainPageControl
-    property bool dropDownMenuHintPersistence: sessionData.persistent_menu_hint ? sessionData.persistent_menu_hint : false
+    property bool dropDownMenuHintPersistence: namespaceData.persistent_menu_hint ? namespaceData.persistent_menu_hint : false
 
     Control {
         anchors.fill: parent

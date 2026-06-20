@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import Qt5Compat.GraphicalEffects
 import org.kde.kirigami as Kirigami
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 Popup {
     id: shutdownMenuPopup
@@ -117,7 +117,7 @@ Popup {
                         anchors.fill: parent
 
                         onClicked: {
-                            OVOS.OVOSController.sendRequest("system.shutdown", {"display": true})
+                            OVOS.GuiBusClient.sendRequest("system.shutdown", {"display": true})
                             shutdownMenuPopup.close()
                         }
                         onPressed: {
@@ -182,7 +182,7 @@ Popup {
                         anchors.fill: parent
 
                         onClicked: {
-                            OVOS.OVOSController.sendRequest("system.reboot", {"display": true})
+                            OVOS.GuiBusClient.sendRequest("system.reboot", {"display": true})
                             shutdownMenuPopup.close()
                         }
                         onPressed: {

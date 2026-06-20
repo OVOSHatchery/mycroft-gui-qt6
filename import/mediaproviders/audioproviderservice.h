@@ -58,6 +58,7 @@ public:
     void mediaContinue();
     void mediaRestart();
     void mediaSeek(qint64 seekValue);
+    qint64 position() const { return m_position; }
 
 public Q_SLOTS:
     void notifyBufferingMedia();
@@ -86,6 +87,7 @@ private:
     QAudioFormat m_format;
     QUrl m_currentMediaUrl;
     QVector<double> m_spectrum;
+    qint64 m_position = 0;
 };
 
 #endif //AUDIOPROVIDERSERVICE_H

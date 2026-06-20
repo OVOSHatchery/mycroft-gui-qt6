@@ -18,7 +18,7 @@
 
 import QtQuick 2.15
 import QtQuick.Controls 2.15
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 /* Class used to simulate the homescreen in cases where we're not using minimal shell
  */
@@ -28,9 +28,9 @@ Item {
     Button {
         anchors.centerIn: parent
         text: "start"
-        visible: OVOS.OVOSController.status == OVOS.OVOSController.Closed
+        visible: OVOS.GuiBusClient.status == OVOS.GuiBusClient.Closed
         onClicked: (mouse)=> { 
-            OVOS.OVOSController.start();
+            OVOS.GuiBusClient.start();
         }
     }
 
@@ -39,7 +39,7 @@ Item {
         anchors.centerIn: parent
         width: Math.min(parent.width, parent.height) * 0.7
         height: Math.min(parent.width, parent.height) * 0.7
-        visible: OVOS.OVOSController.status == OVOS.OVOSController.Open
+        visible: OVOS.GuiBusClient.status == OVOS.GuiBusClient.Open
         showSecondsHand: true
         Timer {
             interval: 1000

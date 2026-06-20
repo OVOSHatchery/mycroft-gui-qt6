@@ -5,7 +5,7 @@
  * media) is now managed by the GUI adapter plugin on the Python side.  This QML
  * object subscribes to the bus events that the adapter emits and exposes the
  * data as plain properties so HomescreenLoader (and Homescreen.qml) can bind to them
- * without touching sessionData or the SkillView namespace machinery.
+ * without touching namespaceData or the NamespaceView namespace machinery.
  *
  * Bus events consumed (emitted by the GUI adapter's HomescreenManager):
  *   homescreen.data.time            { time_string, date_string, weekday_string, ... }
@@ -21,7 +21,7 @@
  */
 
 import QtQuick
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 QtObject {
     id: homescreenController
@@ -73,7 +73,7 @@ QtObject {
 
     // Subscribe to bus events
     Connections {
-        target: OVOS.OVOSController
+        target: OVOS.GuiBusClient
         onIntentRecevied: {
             switch (type) {
             case "homescreen.data.time":

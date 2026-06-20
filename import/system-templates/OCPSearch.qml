@@ -1,13 +1,14 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import OVOS.GUI 1.0 as OVOS
 
-Item {
+OVOS.Page {
     id: root
 
-    property string searchTerm: sessionData.search_term || ""
-    property var    results:    sessionData.results      || []
-    property var    skillCards: sessionData.skill_cards  || []
+    property string searchTerm: namespaceData ? (namespaceData.search_term || "") : ""
+    property var    results:    namespaceData ? (namespaceData.results      || []) : []
+    property var    skillCards: namespaceData ? (namespaceData.skill_cards  || []) : []
 
     ColumnLayout {
         anchors.fill: parent
@@ -20,8 +21,8 @@ Item {
             spacing: 8
 
             Label {
-                text: searchTerm.length > 0 ? qsTr("Results for \"%1\"").arg(searchTerm)
-                                            : qsTr("Search Results")
+                text: root.searchTerm.length > 0 ? qsTr("Results for \"%1\"").arg(root.searchTerm)
+                                                 : qsTr("Search Results")
                 font.pixelSize: 20
                 font.weight: Font.DemiBold
                 Layout.fillWidth: true
@@ -31,13 +32,13 @@ Item {
 
         // Skill source chips (horizontal scroll)
         ListView {
-            visible: skillCards.length > 0
+            visible: root.skillCards && root.skillCards.length > 0
             Layout.fillWidth: true
             height: 40
             orientation: ListView.Horizontal
             spacing: 8
             clip: true
-            model: skillCards
+            model: root.skillCards
 
             delegate: Button {
                 height: 36
@@ -52,11 +53,11 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             clip: true
-            model: results
+            model: root.results
             spacing: 2
 
             delegate: ItemDelegate {
-                width: parent.width
+                width: ListView.view.width
 
                 contentItem: RowLayout {
                     spacing: 12
@@ -96,7 +97,7 @@ Item {
                     }
                 }
 
-                onClicked: triggerEvent("search.play", {
+                onClicked: root.triggerGuiEvent("search.play", {
                     "playlistData": {
                         "uri":        modelData.uri        || "",
                         "title":      modelData.title      || "",
