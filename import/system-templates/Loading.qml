@@ -1,11 +1,12 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import OVOS.GUI 1.0 as OVOS
 
-Item {
+OVOS.Page {
     id: root
 
-    property string label: sessionData.label || ""
+    property string label: namespaceData ? (namespaceData.label || "") : ""
 
     ColumnLayout {
         anchors.centerIn: parent
@@ -18,8 +19,8 @@ Item {
         }
 
         Label {
-            visible: label.length > 0
-            text: label
+            visible: root.label.length > 0
+            text: root.label
             font.pixelSize: 18
             Layout.alignment: Qt.AlignHCenter
         }

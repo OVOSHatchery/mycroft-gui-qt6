@@ -7,7 +7,7 @@
         <file>qml/PaginatedText.qml</file>
         <file>qml/ProportionalDelegate.qml</file>
         <file>qml/ScrollableDelegate.qml</file>
-        <file>qml/SkillView.qml</file>
+        <file>qml/NamespaceView.qml</file>
         <file>qml/SlideShow.qml</file>
         <file>qml/SlidingImage.qml</file>
         <file>qml/StatusIndicator.qml</file>
@@ -18,5 +18,33 @@
         <file>qml/BusyIndicator.qml</file>
         <file>qml/MarqueeText.qml</file>
         <file>qml/private/ImageBackground.qml</file>
+        
+        <file>system-templates/Alarm.qml</file>
+        <file>system-templates/AnimatedImage.qml</file>
+        <file>system-templates/AudioPlayer.qml</file>
+        <file>system-templates/Clock.qml</file>
+        <file>system-templates/Confirm.qml</file>
+        <file>system-templates/Error.qml</file>
+        <file>system-templates/Face.qml</file>
+        <file>system-templates/Grid.qml</file>
+        <file>system-templates/HomeScreen.qml</file>
+        <file>system-templates/Html.qml</file>
+        <file>system-templates/Idle.qml</file>
+        <file>system-templates/Image.qml</file>
+        <file>system-templates/List.qml</file>
+        <file>system-templates/Loading.qml</file>
+        <file>system-templates/Map.qml</file>
+        <file>system-templates/MediaPlayer.qml</file>
+        <file>system-templates/OCPNowPlaying.qml</file>
+        <file>system-templates/OCPPlaylist.qml</file>
+        <file>system-templates/OCPSearch.qml</file>
+        <file>system-templates/Select.qml</file>
+        <file>system-templates/Status.qml</file>
+        <file>system-templates/Table.qml</file>
+        <file>system-templates/Text.qml</file>
+        <file>system-templates/Timer.qml</file>
+        <file>system-templates/Url.qml</file>
+        <file>system-templates/VideoPlayer.qml</file>
+        <file>system-templates/Weather.qml</file>
     </qresource>
 </RCC>

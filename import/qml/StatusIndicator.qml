@@ -17,9 +17,9 @@
  */
 
 import QtQuick
-import QtGraphicalEffects
+import Qt5Compat.GraphicalEffects
 import org.kde.kirigami as Kirigami
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 Item {
     id: root
@@ -163,49 +163,40 @@ Item {
     ]
 
     Connections {
-        target: OVOS.OVOSController
-        onListeningChanged: {
-            if (OVOS.OVOSController.listening) {
+        target: OVOS.GuiBusClient
+        function onIsListeningChanged() {
+            if (OVOS.GuiBusClient.listening) {
                 root.state = "waiting";
             } else {
                 fadeTimer.restart();
             }
         }
-        onNotUnderstood: {
+        function onNotUnderstood() {
             root.state = "idle"
             root.state = "error";
         }
-        onFallbackTextRecieved: {
+        function onUtteranceManagedBySkill(skill) {
             if (skill.length > 0) {
                 root.state = "ok";
             }
         }
-        onServerReadyChanged: {
-            if (OVOS.OVOSController.serverReady) {
+        function onServerReadyChanged() {
+            if (OVOS.GuiBusClient.serverReady) {
                 root.state = "ok";
             }
         }
-        onStatusChanged: {
-            switch (OVOS.OVOSController.status) {
-            case OVOS.OVOSController.Open:
-                root.state = OVOS.OVOSController.serverReady ? "ok" : "loading";
+        function onSocketStatusChanged() {
+            switch (OVOS.GuiBusClient.status) {
+            case OVOS.GuiBusClient.Open:
+                root.state = OVOS.GuiBusClient.serverReady ? "ok" : "loading";
                 break;
-            case OVOS.OVOSController.Connecting:
+            case OVOS.GuiBusClient.Connecting:
                 root.state = "loading";
                 break;
-            case OVOS.OVOSController.Error:
+            case OVOS.GuiBusClient.Error:
             default:
                 root.state = "error";
                 break;
-            }
-        }
-        onCurrentIntentChanged: {
-            if (OVOS.OVOSController.currentIntent.length == 0) {
-                if (root.state == "loading") {
-                    root.state = "idle";
-                }
-            } else {
-                root.state = "loading";
             }
         }
     }

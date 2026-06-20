@@ -4,7 +4,7 @@ import QtQuick.Window
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
 import QtQuick.Layouts
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 Control {
     id: appEntryDelegate
@@ -57,7 +57,7 @@ Control {
             delBackground.color = Qt.darker(Kirigami.Theme.backgroundColor, 2)
             appBarRoot.close()
             OVOS.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
-            OVOS.OVOSController.sendRequest(model.action, {})
+            OVOS.GuiBusClient.sendRequest(model.action, {})
         }
     }
 }

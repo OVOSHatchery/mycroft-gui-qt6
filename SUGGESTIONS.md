@@ -1,29 +1,38 @@
-# SUGGESTIONS — mycroft-gui-qt6
+# SUGGESTIONS — ovos-gui-qt6
 
-## Priority 1: Correctness
+## Priority 1: Stability & Features ("The Greatness Plan")
 
-1. **Add session data cleanup on disconnect** — Clear `m_skillData`, `m_activeSkillsModel`, and `m_translatorsForSkill` when WebSocket disconnects. Prevents stale state on reconnect.
+1. **Developer HUD (Heads-Up Display)** — Implement an overlay toggled via command (e.g. `/hud`) that displays real-time protocol messages, the active namespace stack, and GUI performance metrics.
+   - Target: `application/main.qml`, `import/guibusclient.cpp`
 
-2. **Migrate MediaService to Qt6 Multimedia** — Replace deprecated `QAbstractVideoSurface` with `QVideoSink`, `QAudioProbe` with `QAudioOutput`. Current code uses Qt5 APIs that are removed in Qt6.
+2. **Recursive Namespace Data Models** — Enhance `SESSION_SET` handling in `GuiNamespace` to recursively convert nested data structures into reactive models, enabling deep QML bindings.
+   - Target: `import/guinamespace.cpp`
 
-3. **Add exponential backoff to reconnect timer** — Currently retries every 1s forever. Add backoff (1s, 2s, 4s, 8s... up to 30s max) to reduce CPU when server is unavailable.
+3. **Dynamic Theming Engine** — Extend `GlobalSettings` to load an external `theme.json` and support the `gui.color_scheme.set` message for skill-specific UI overrides.
+   - Target: `import/globalsettings.cpp`, `theme/ovostheme.cpp`
 
-## Priority 2: Testing
+4. **Shared Element Transitions** — Standardize page transitions in `NamespaceView` to support smooth animations for shared assets (like album art) between different pages.
+   - Target: `import/qml/NamespaceView.qml`
 
-4. **Add E2E integration tests** — Create tests that connect to a real ovos-gui service + legacy-plugin adapter. Verify full message flow end-to-end.
+## Priority 2: Developer Experience (DX)
 
-5. **Add message ordering tests** — Verify behavior when messages arrive out of order (e.g., session data before skill activation).
+5. **Enhanced `demotest` CLI** — Update the `demotest` tool to accept arguments for testing specific templates (e.g. `./demotest --template Weather`) and add a file-system watcher for "Live Reload" during development.
+   - Target: `autotests/demotest.cpp`
 
-6. **Regenerate `plugins.qmltypes`** — Run `qmlplugindump` against the built plugin to generate accurate type info for IDE completion.
+6. **IDE Autocompletion** — Regenerate `plugins.qmltypes` to match the new monolithic `OVOS.GUI 1.0` API, ensuring developers get accurate suggestions in QtCreator and VSCode.
+   - Target: `import/plugins.qmltypes`
 
-## Priority 3: Protocol
+## Priority 3: Security
 
-7. **Formalize hints protocol server-side** — The `gui.hints.get` / `gui.hints.get.response` messages are defined in the Qt client but need corresponding handler in ovos-gui service and legacy-plugin adapter.
+7. **Secure Secret Storage** — Migrate auth tokens and sensitive configurations from environment variables to the system keyring (via Secret Service API or similar).
+   - Target: `import/guibusclient.cpp`, `import/globalsettings.cpp`
 
-8. **Add protocol version negotiation** — Client currently sends `qt_version` in `mycroft.gui.connected` but there's no protocol version field. Adding one would enable graceful feature detection.
+---
 
-## Priority 4: Performance
+## Resolved Suggestions (2026-03-13)
 
-9. **Batch session data updates** — When multiple `mycroft.session.set` messages arrive rapidly, batch them into a single QML property update cycle to reduce rendering overhead.
-
-10. **Add message compression** — For large session data payloads, consider WebSocket per-message deflate extension.
+- **Monolithic Consolidation**: Successfully eliminated shared library dependencies and bundled all resources.
+- **Naming Cleanup**: Renamed `Skill` -> `Namespace`, `Controller` -> `GuiBusClient`, `Delegate` -> `Page` for architectural accuracy.
+- **Asynchronous Media Loading**: Eliminated blocking network calls in `MediaService`.
+- **Restored Shell Mode**: Fixed KF6 compatibility and re-enabled `application/shell` in the build.
+- **Automated UI Demos**: Implemented `demotest` and `run_demos.sh` for headless verification.

@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import Qt5Compat.GraphicalEffects
 import org.kde.kirigami as Kirigami
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 Rectangle {
     id: rootAnimator
@@ -16,7 +16,7 @@ Rectangle {
     visible: false
 
     Connections {
-        target: OVOS.OVOSController
+        target: OVOS.GuiBusClient
         onIntentRecevied: {
             switch(type){
             case "recognizer_loop:wakeword":

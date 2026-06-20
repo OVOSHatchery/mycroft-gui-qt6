@@ -55,57 +55,52 @@ configure_file(
 )
 
 # Source files
-set(mycroft_gui_SRCS
-    import/abstractdelegate.cpp
-    import/abstractskillview.cpp
-    import/ovoscontroller.cpp
-    import/activeskillsmodel.cpp
-    import/delegatesmodel.cpp
-    import/sessiondatamap.cpp
-    import/sessiondatamodel.cpp
-    import/filereader.cpp
-    import/globalsettings.cpp
+set(OVOS_GUI_COMMON_SRCS
+    ${CMAKE_SOURCE_DIR}/import/guipage.cpp
+    ${CMAKE_SOURCE_DIR}/import/guinamespace.cpp
+    ${CMAKE_SOURCE_DIR}/import/guibusclient.cpp
+    ${CMAKE_SOURCE_DIR}/import/namespacemodel.cpp
+    ${CMAKE_SOURCE_DIR}/import/pagemodel.cpp
+    ${CMAKE_SOURCE_DIR}/import/namespacedatamap.cpp
+    ${CMAKE_SOURCE_DIR}/import/namespacedatamodel.cpp
+    ${CMAKE_SOURCE_DIR}/import/filereader.cpp
+    ${CMAKE_SOURCE_DIR}/import/globalsettings.cpp
+    ${CMAKE_SOURCE_DIR}/import/mediaservice.cpp
+    ${CMAKE_SOURCE_DIR}/import/mediaproviders/videoproviderservice.cpp
+    ${CMAKE_SOURCE_DIR}/import/mediaproviders/audioproviderservice.cpp
+    ${CMAKE_SOURCE_DIR}/import/mediaproviders/audiostreamdevice.cpp
+    ${CMAKE_SOURCE_DIR}/import/mediaproviders/thirdparty/fftcalc.cpp
+    ${CMAKE_SOURCE_DIR}/import/mediaproviders/thirdparty/fft.cpp
 )
+
+add_library(OvosGuiCommon STATIC ${OVOS_GUI_COMMON_SRCS})
+target_include_directories(OvosGuiCommon PUBLIC ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_SOURCE_DIR}/import)
+
+target_link_libraries(OvosGuiCommon PUBLIC
+    Qt${QT_MAJOR_VERSION}::Core
+    Qt${QT_MAJOR_VERSION}::Qml
+    Qt${QT_MAJOR_VERSION}::Quick
+    Qt${QT_MAJOR_VERSION}::Network
+    Qt${QT_MAJOR_VERSION}::WebSockets
+    Qt${QT_MAJOR_VERSION}::Multimedia
+    Qt${QT_MAJOR_VERSION}::Gui
+    KF6::Kirigami
+    KF6::CoreAddons
+)
+
+# Allow position independent code for the static library
+set_target_properties(OvosGuiCommon PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 
 # System templates directory
 if(NOT OVOS_SYSTEM_TEMPLATES_DIR)
     set(OVOS_SYSTEM_TEMPLATES_DIR "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DATAROOTDIR}/ovos-gui/system-templates")
 endif()
+target_compile_definitions(OvosGuiCommon PUBLIC OVOS_SYSTEM_TEMPLATES_DIR="${OVOS_SYSTEM_TEMPLATES_DIR}")
 add_definitions(-DOVOS_SYSTEM_TEMPLATES_DIR="${OVOS_SYSTEM_TEMPLATES_DIR}")
 
-# QML resources
-qt6_add_resources(mycroft_gui_SRCS import/ovos.qrc)
-
-# Main library
-add_library(mycroft-gui-qt6 SHARED ${mycroft_gui_SRCS})
-
-# Include directory for generated headers
-target_include_directories(mycroft-gui-qt6 PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
-
-target_link_libraries(mycroft-gui-qt6
-    PUBLIC
-        Qt6::Core
-        Qt6::Qml
-        Qt6::Quick
-        Qt6::Network
-        Qt6::WebSockets
-        Qt6::Multimedia
-        Qt6::Gui
-    PRIVATE
-        KF6::Kirigami
-        KF6::CoreAddons
-)
-
-if(KF6Plasma_FOUND)
-    target_link_libraries(mycroft-gui-qt6 PRIVATE KF6::Plasma)
-endif()
-
-if(KF6KIO_FOUND)
-    target_link_libraries(mycroft-gui-qt6 PRIVATE KF6::KIOWidgets)
-endif()
-
 # Compiler flags
-target_compile_options(mycroft-gui-qt6 PRIVATE
+add_compile_options(
     -Wall
     -Wextra
     -Werror=format
@@ -113,41 +108,26 @@ target_compile_options(mycroft-gui-qt6 PRIVATE
 )
 
 # Qt6 specific settings
-set_target_properties(mycroft-gui-qt6 PROPERTIES
-    CXX_STANDARD 17
-    CXX_STANDARD_REQUIRED ON
-)
-
-# Build the GUI component library (replaces QML plugin system)
-add_subdirectory(import)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Application, shell plugin, theme, and color schemes
 include(KDEInstallDirs)
 include(KDECMakeSettings)
+
 add_subdirectory(application)
-# Shell plugin requires additional KDE components - skip for now
-#add_subdirectory(application/shell)
-# Theme has KF6 compatibility issues - skip for now
-#add_subdirectory(theme)
+add_subdirectory(application/shell)
+add_subdirectory(theme)
 add_subdirectory(schemes)
 
 # Tests
 enable_testing()
 add_subdirectory(autotests)
 
-# Installation
-install(TARGETS ovos-gui-app
-    RUNTIME DESTINATION bin
-)
-
-install(TARGETS mycroft-gui-qt6
-    LIBRARY DESTINATION lib
-    RUNTIME DESTINATION bin
-)
-
-# QML plugin
-install(DIRECTORY import/
-    DESTINATION lib/qt6/qml/Mycroft
+# System templates (SYSTEM: URI scheme resources)
+install(DIRECTORY import/system-templates/
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/ovos-gui/system-templates
+    FILES_MATCHING PATTERN "*.qml"
 )
 
 # Documentation

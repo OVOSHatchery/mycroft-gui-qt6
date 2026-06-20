@@ -4,7 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 Rectangle {
     id: mediaWidgetDisplayRoot
@@ -121,7 +121,7 @@ Rectangle {
         MediaWidgetButton {
             buttonIcon: "drag-surface"
             onClicked: {
-                OVOS.OVOSController.sendRequest("ovos.common_play.home", {})
+                OVOS.GuiBusClient.sendRequest("ovos.common_play.home", {})
             }
         }
     }

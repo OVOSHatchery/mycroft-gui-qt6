@@ -20,17 +20,17 @@ import QtQuick
 import QtQuick.Controls as Controls
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 /**
  * Contains an slideshow object that can autoplay each slide and loop
  * This can be used inside any mycroft delegate like in the following example.
  *
  * @code
- *  OVOS.Delegate {
+ *  OVOS.Page {
  *      ...
  *      OVOS.SlideShow {
- *              id: root model: sessionData.exampleModel // model with slideshow data
+ *              id: root model: namespaceData.exampleModel // model with slideshow data
  *              anchors.fill: parent
  *              interval: 5000 // time to switch between slides 
  *              running: true // can be set to false if one wants to swipe manually 

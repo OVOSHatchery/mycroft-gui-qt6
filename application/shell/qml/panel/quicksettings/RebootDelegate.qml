@@ -18,14 +18,14 @@
 import QtQuick
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 Delegate {
     iconSource: "qrc://icons/system-reboot"
     text: qsTr("Reboot Services")
 
     onClicked: {
-        OVOS.OVOSController.sendRequest("system.mycroft.service.restart", {})
+        OVOS.GuiBusClient.sendRequest("system.mycroft.service.restart", {})
     }
 }
 

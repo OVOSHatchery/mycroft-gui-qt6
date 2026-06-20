@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 Rectangle {
     color: "transparent"
@@ -70,7 +70,7 @@ Rectangle {
 
             Kirigami.Icon {
                 id: weatherItemIcon
-                source: Qt.resolvedUrl(getWeatherImagery(sessionData.weather_code))
+                source: Qt.resolvedUrl(getWeatherImagery(namespaceData.weather_code))
                 width: parent.height * 0.90
                 height: width
                 anchors.right: parent.right
@@ -97,7 +97,7 @@ Rectangle {
 
             Text {
                 id: weatherItem
-                text: sessionData.weather_temp + "°"
+                text: namespaceData.weather_temp + "°"
                 width: parent.width
                 height: parent.height
                 fontSizeMode: Text.Fit

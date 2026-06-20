@@ -1,19 +1,20 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import OVOS.GUI 1.0 as OVOS
 
-Item {
+OVOS.Page {
     id: root
 
-    property string image:            sessionData.image            || ""
-    property string title:            sessionData.title            || ""
-    property string caption:          sessionData.caption          || ""
-    property string fill:             sessionData.fill             || "fit"
-    property string background_color: sessionData.background_color || "transparent"
+    property string image:            namespaceData ? (namespaceData.image            || "") : ""
+    property string title:            namespaceData ? (namespaceData.title            || "") : ""
+    property string caption:          namespaceData ? (namespaceData.caption          || "") : ""
+    property string fill:             namespaceData ? (namespaceData.fill             || "fit") : "fit"
+    property string background_color: namespaceData ? (namespaceData.background_color || "transparent") : "transparent"
 
     Rectangle {
         anchors.fill: parent
-        color: background_color
+        color: root.background_color
 
         ColumnLayout {
             anchors.fill: parent
@@ -21,8 +22,8 @@ Item {
             spacing: 4
 
             Label {
-                visible: title.length > 0
-                text: title
+                visible: root.title.length > 0
+                text: root.title
                 font.pixelSize: 20
                 font.weight: Font.DemiBold
                 Layout.fillWidth: true
@@ -32,10 +33,10 @@ Item {
             AnimatedImage {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                source: image
+                source: root.image
                 fillMode: {
-                    if (fill === "crop")    return Image.PreserveAspectCrop
-                    if (fill === "stretch") return Image.Stretch
+                    if (root.fill === "crop")    return Image.PreserveAspectCrop
+                    if (root.fill === "stretch") return Image.Stretch
                     return Image.PreserveAspectFit
                 }
                 playing: true
@@ -43,8 +44,8 @@ Item {
             }
 
             Label {
-                visible: caption.length > 0
-                text: caption
+                visible: root.caption.length > 0
+                text: root.caption
                 font.pixelSize: 14
                 Layout.fillWidth: true
                 wrapMode: Text.WordWrap

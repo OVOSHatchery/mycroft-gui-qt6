@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 Rectangle {
     id: popbox
@@ -141,7 +141,7 @@ Rectangle {
                 anchors.fill: parent
                 onClicked: {
                     if (currentNotification.action){
-                        OVOS.OVOSController.sendRequest(currentNotification.action, currentNotification.callback_data)
+                        OVOS.GuiBusClient.sendRequest(currentNotification.action, currentNotification.callback_data)
                         popbox.destroy()
                     }
                 }
@@ -177,7 +177,7 @@ Rectangle {
                 }
 
                 onClicked: {
-                    OVOS.OVOSController.sendRequest("ovos.notification.api.pop.clear.delete", {"notification": currentNotification})
+                    OVOS.GuiBusClient.sendRequest("ovos.notification.api.pop.clear.delete", {"notification": currentNotification})
                     popbox.destroy()
                 }
             }

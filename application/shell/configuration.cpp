@@ -255,7 +255,9 @@ void Configuration::setSelectedSchemePath(QString &mSelectedSchemePath)
 
 bool Configuration::isSchemeValid(){
     QFile inFile(m_selectedSchemePath);
-    inFile.open(QIODevice::ReadOnly|QIODevice::Text);
+    if (!inFile.open(QIODevice::ReadOnly|QIODevice::Text)) {
+        return false;
+    }
     QByteArray data = inFile.readAll();
     inFile.close();
 
@@ -270,7 +272,9 @@ bool Configuration::isSchemeValid(){
 QVariantMap Configuration::getScheme(QString &schemePath)
 {
     QFile inFile(schemePath);
-    inFile.open(QIODevice::ReadOnly|QIODevice::Text);
+    if (!inFile.open(QIODevice::ReadOnly|QIODevice::Text)) {
+        return QVariantMap();
+    }
     QByteArray data = inFile.readAll();
     inFile.close();
     QJsonDocument doc = QJsonDocument::fromJson(data);
@@ -281,7 +285,9 @@ QVariantMap Configuration::getScheme(QString &schemePath)
 void Configuration::setScheme(QString schemeName, QString schemePath, QString schemeStyle)
 {
     QFile inFile(schemePath);
-    inFile.open(QIODevice::ReadOnly|QIODevice::Text);
+    if (!inFile.open(QIODevice::ReadOnly|QIODevice::Text)) {
+        return;
+    }
     QByteArray data = inFile.readAll();
     inFile.close();
     QJsonDocument doc = QJsonDocument::fromJson(data);

@@ -18,7 +18,7 @@
  */
 
 import QtQuick
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 SliderBase {
     id: root
@@ -34,7 +34,7 @@ SliderBase {
 
     onChangeValueChanged: {
         if (volSync){
-            OVOS.OVOSController.sendRequest("mycroft.volume.set", {"percent": (changeValue / 100)});
+            OVOS.GuiBusClient.sendRequest("mycroft.volume.set", {"percent": (changeValue / 100)});
         } else {
             volSync = true
         }
@@ -42,23 +42,23 @@ SliderBase {
 
     onIconClicked: {
         if(muted) {
-            OVOS.OVOSController.sendRequest("mycroft.volume.unmute", {});
+            OVOS.GuiBusClient.sendRequest("mycroft.volume.unmute", {});
             muted = false
         } else {
-            OVOS.OVOSController.sendRequest("mycroft.volume.mute", {});
+            OVOS.GuiBusClient.sendRequest("mycroft.volume.mute", {});
             muted = true
         }
     }
 
     Component.onCompleted: {
-        OVOS.OVOSController.sendRequest("mycroft.volume.get", {});
+        OVOS.GuiBusClient.sendRequest("mycroft.volume.get", {});
     }
 
     Connections {
-        target: OVOS.OVOSController
+        target: OVOS.GuiBusClient
         onSocketStatusChanged: {
-            if (OVOS.OVOSController.status == OVOS.OVOSController.Open) {
-                OVOS.OVOSController.sendRequest("mycroft.volume.get", {});
+            if (OVOS.GuiBusClient.status == OVOS.GuiBusClient.Open) {
+                OVOS.GuiBusClient.sendRequest("mycroft.volume.get", {});
             }
         }
         onIntentRecevied: {

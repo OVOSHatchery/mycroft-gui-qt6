@@ -4,7 +4,7 @@ import QtQuick.Window
 import org.kde.kirigami as Kirigami
 import QtQuick.Layouts
 import "quicksettings"
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 Item {
     id: pullControlRoot
@@ -39,7 +39,7 @@ Item {
 
         onMenuOpenChanged: {
             if(menuOpen) {
-                OVOS.OVOSController.sendRequest("mycroft.volume.get", {})
+                OVOS.GuiBusClient.sendRequest("mycroft.volume.get", {})
             }
         }
 

@@ -19,7 +19,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 // DEPRECATED: Do not use for new skills. Use template-based system instead.
 // See docs/QML_AUDIT_AND_MIGRATION.md for migration guidance.

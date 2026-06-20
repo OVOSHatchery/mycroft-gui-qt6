@@ -1,12 +1,13 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import OVOS.GUI 1.0 as OVOS
 
-Item {
+OVOS.Page {
     id: root
 
-    property string label:  sessionData.label  || "An error occurred"
-    property string detail: sessionData.detail || ""
+    property string label:  namespaceData ? (namespaceData.label  || "An error occurred") : "An error occurred"
+    property string detail: namespaceData ? (namespaceData.detail || "") : ""
 
     ColumnLayout {
         anchors.centerIn: parent
@@ -21,7 +22,7 @@ Item {
         }
 
         Label {
-            text: label
+            text: root.label
             font.pixelSize: 20
             font.weight: Font.DemiBold
             wrapMode: Text.WordWrap
@@ -30,8 +31,8 @@ Item {
         }
 
         Label {
-            visible: detail.length > 0
-            text: detail
+            visible: root.detail.length > 0
+            text: root.detail
             font.pixelSize: 14
             opacity: 0.7
             wrapMode: Text.WordWrap

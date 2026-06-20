@@ -19,7 +19,7 @@
 import QtQuick
 import Qt5Compat.GraphicalEffects
 import org.kde.kirigami as Kirigami
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 Item {
     id: root
@@ -163,9 +163,9 @@ Item {
     ]
 
     Connections {
-        target: OVOS.OVOSController
+        target: OVOS.GuiBusClient
         onListeningChanged: {
-            if (OVOS.OVOSController.listening) {
+            if (OVOS.GuiBusClient.listening) {
                 root.state = "waiting";
             } else {
                 fadeTimer.restart();
@@ -181,26 +181,26 @@ Item {
             }
         }
         onServerReadyChanged: {
-            if (OVOS.OVOSController.serverReady) {
+            if (OVOS.GuiBusClient.serverReady) {
                 root.state = "ok";
             }
         }
         onStatusChanged: {
-            switch (OVOS.OVOSController.status) {
-            case OVOS.OVOSController.Open:
-                root.state = OVOS.OVOSController.serverReady ? "ok" : "loading";
+            switch (OVOS.GuiBusClient.status) {
+            case OVOS.GuiBusClient.Open:
+                root.state = OVOS.GuiBusClient.serverReady ? "ok" : "loading";
                 break;
-            case OVOS.OVOSController.Connecting:
+            case OVOS.GuiBusClient.Connecting:
                 root.state = "loading";
                 break;
-            case OVOS.OVOSController.Error:
+            case OVOS.GuiBusClient.Error:
             default:
                 root.state = "error";
                 break;
             }
         }
         onCurrentIntentChanged: {
-            if (OVOS.OVOSController.currentIntent.length == 0) {
+            if (OVOS.GuiBusClient.currentIntent.length == 0) {
                 if (root.state == "loading") {
                     root.state = "idle";
                 }

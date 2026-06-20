@@ -22,7 +22,7 @@ import QtQuick.Templates 2.12 as Templates
 import QtQuick.Layouts
 import QtMultimedia
 import org.kde.kirigami as Kirigami
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 // DEPRECATED: This component duplicates system-templates/VideoPlayer.qml functionality.
 // Use the system template (SYSTEM_media_player or SYSTEM_video_player) instead.
@@ -149,7 +149,7 @@ Item {
                 icon.name: "go-previous-symbolic"
                 z: 1000
                 onClicked: {
-                    OVOS.OVOSController.sendRequest("mycroft.gui.screen.close", {});
+                    OVOS.GuiBusClient.sendRequest("mycroft.gui.screen.close", {});
                     video.stop();
                 }
             }

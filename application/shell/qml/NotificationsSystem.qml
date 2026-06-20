@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import QtQuick.Window
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 Column {
     id: notificationsSys
@@ -20,7 +20,7 @@ Column {
     property var controlledNotificationObject
 
     Connections {
-        target: OVOS.OVOSController
+        target: OVOS.GuiBusClient
 
         onIntentRecevied: {
             if (type == "ovos.notification.notification_data") {
@@ -45,7 +45,7 @@ Column {
     Connections {
         target: notificationsSys
         onClearNotificationSessionData: {
-            OVOS.OVOSController.sendRequest("ovos.notification.api.pop.clear", {"notification": notificationsSys.notificationData})
+            OVOS.GuiBusClient.sendRequest("ovos.notification.api.pop.clear", {"notification": notificationsSys.notificationData})
         }
     }
 

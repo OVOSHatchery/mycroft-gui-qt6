@@ -18,7 +18,9 @@
 #include "audioproviderservice.h"
 
 AudioProviderService::AudioProviderService(QObject *parent)
-    : QObject(parent)
+    : QObject(parent),
+      m_audioStreamDevice(nullptr),
+      m_audioSink(nullptr)
 {
     QAudioDevice info(QMediaDevices::defaultAudioOutput());
     m_format = info.preferredFormat();
@@ -28,13 +30,18 @@ AudioProviderService::AudioProviderService(QObject *parent)
 
 AudioProviderService::~AudioProviderService()
 {
-    m_audioSink->deleteLater();
-    m_audioStreamDevice->deleteLater();
+    if (m_audioSink) {
+        m_audioSink->deleteLater();
+    }
+    if (m_audioStreamDevice) {
+        m_audioStreamDevice->deleteLater();
+    }
     emit destroyedService();
 }
 
 void AudioProviderService::syncStates()
 {
+    if (!m_audioSink) return;
     switch (m_audioSink->state()) {
     case QAudio::ActiveState:
         m_currentPlaybackState = AudioProviderService::PlayingState;
@@ -54,6 +61,17 @@ void AudioProviderService::syncStates()
 
 void AudioProviderService::mediaPlay(const QUrl &url)
 {
+    if (m_audioSink) {
+        m_audioSink->stop();
+        m_audioSink->deleteLater();
+        m_audioSink = nullptr;
+    }
+    if (m_audioStreamDevice) {
+        m_audioStreamDevice->stop();
+        m_audioStreamDevice->deleteLater();
+        m_audioStreamDevice = nullptr;
+    }
+
     m_audioStreamDevice = new AudioStreamDevice(this);
     emit mediaStateChanged(m_currentMediaState);
     emit playBackStateChanged(m_currentPlaybackState);
@@ -85,10 +103,16 @@ void AudioProviderService::mediaPlay(const QUrl &url)
 
 void AudioProviderService::mediaStop()
 {
-    m_audioStreamDevice->stop();
-    m_audioSink->stop();
-    m_audioSink->deleteLater();
-    m_audioStreamDevice->deleteLater();
+    if (m_audioStreamDevice) {
+        m_audioStreamDevice->stop();
+        m_audioStreamDevice->deleteLater();
+        m_audioStreamDevice = nullptr;
+    }
+    if (m_audioSink) {
+        m_audioSink->stop();
+        m_audioSink->deleteLater();
+        m_audioSink = nullptr;
+    }
     m_currentPlaybackState = AudioProviderService::StoppedState;
     emit playBackStateChanged(m_currentPlaybackState);
     m_currentMediaState = AudioProviderService::NoMedia;
@@ -97,16 +121,20 @@ void AudioProviderService::mediaStop()
 
 void AudioProviderService::mediaPause()
 {
-    m_audioSink->suspend();
-    m_currentPlaybackState = AudioProviderService::PausedState;
-    emit playBackStateChanged(m_currentPlaybackState);
+    if (m_audioSink) {
+        m_audioSink->suspend();
+        m_currentPlaybackState = AudioProviderService::PausedState;
+        emit playBackStateChanged(m_currentPlaybackState);
+    }
 }
 
 void AudioProviderService::mediaContinue()
 {
-    m_audioSink->resume();
-    m_currentPlaybackState = AudioProviderService::PlayingState;
-    emit playBackStateChanged(m_currentPlaybackState);
+    if (m_audioSink) {
+        m_audioSink->resume();
+        m_currentPlaybackState = AudioProviderService::PlayingState;
+        emit playBackStateChanged(m_currentPlaybackState);
+    }
 }
 
 void AudioProviderService::mediaRestart()
@@ -116,11 +144,13 @@ void AudioProviderService::mediaRestart()
 
 void AudioProviderService::mediaSeek(qint64 seekValue)
 {
-    seekValue = seekValue - (seekValue % 1000);
-    m_audioSink->suspend();
-    m_audioStreamDevice->seek(seekValue);
-    m_audioStreamDevice->seekFrom(seekValue);
-    m_audioSink->resume();
+    if (m_audioSink && m_audioStreamDevice) {
+        seekValue = seekValue - (seekValue % 1000);
+        m_audioSink->suspend();
+        m_audioStreamDevice->seek(seekValue);
+        m_audioStreamDevice->seekFrom(seekValue);
+        m_audioSink->resume();
+    }
 }
 
 void AudioProviderService::notifyBufferingMedia()
@@ -151,10 +181,16 @@ void AudioProviderService::notifyEndOfMedia()
 
 void AudioProviderService::notifyInvalidMedia()
 {
-    m_audioSink->suspend();
+    if (m_audioSink) {
+        m_audioSink->suspend();
+    }
     QTimer::singleShot(2000, this, [this](){
-        m_audioStreamDevice->stop();
-        m_audioSink->stop();
+        if (m_audioStreamDevice) {
+            m_audioStreamDevice->stop();
+        }
+        if (m_audioSink) {
+            m_audioSink->stop();
+        }
         m_currentPlaybackState = AudioProviderService::StoppedState;
         emit playBackStateChanged(m_currentPlaybackState);
     });
@@ -174,5 +210,6 @@ void AudioProviderService::durationUpdated(qint64 duration)
 
 void AudioProviderService::positionUpdated(qint64 position)
 {
+    m_position = position;
     emit positionChanged(position);
 }

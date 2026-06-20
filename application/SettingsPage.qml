@@ -20,7 +20,7 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as Controls
 import org.kde.kirigami 2.19 as Kirigami
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 Kirigami.ScrollablePage {
     title: "Settings"
@@ -85,7 +85,7 @@ Kirigami.ScrollablePage {
                 
                 onClicked:(mouse)=> { 
                     OVOS.GlobalSettings.webSocketAddress = webSocketAddressField.text
-                    OVOS.OVOSController.reconnect()
+                    OVOS.GuiBusClient.reconnect()
                 }
             }
            
@@ -99,7 +99,7 @@ Kirigami.ScrollablePage {
                 onClicked:(mouse)=> {
                     webSocketAddressField.text = "ws://0.0.0.0"
                     OVOS.GlobalSettings.webSocketAddress = webSocketAddressField.text
-                    OVOS.OVOSController.reconnect()
+                    OVOS.GuiBusClient.reconnect()
                 }
             }
         }

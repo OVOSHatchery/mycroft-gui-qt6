@@ -78,5 +78,25 @@
         <file alias="icons/wireless.svg">shell/icons/wireless.svg</file>
         <file alias="icons/scrub.png">shell/icons/scrub.png</file>
         <file alias="sounds/flicked.wav">shell/sounds/flicked.wav</file>
+        <file alias="settings/display_settings.qml">shell/qml/settings/display_settings.qml</file>
+        <file alias="settings/wallpaper_settings.qml">shell/qml/settings/wallpaper_settings.qml</file>
+        <file alias="settings/homescreen_settings.qml">shell/qml/settings/homescreen_settings.qml</file>
+        <file alias="settings/ssh_settings.qml">shell/qml/settings/ssh_settings.qml</file>
+        <file alias="settings/developer_settings.qml">shell/qml/settings/developer_settings.qml</file>
+        <file alias="settings/factory_settings.qml">shell/qml/settings/factory_settings.qml</file>
+        <file alias="settings/images/back.png">shell/qml/settings/images/back.png</file>
+        <file alias="settings/images/back.svg">shell/qml/settings/images/back.svg</file>
+        <file alias="settings/images/display.svg">shell/qml/settings/images/display.svg</file>
+        <file alias="settings/images/home.svg">shell/qml/settings/images/home.svg</file>
+        <file alias="settings/images/info.svg">shell/qml/settings/images/info.svg</file>
+        <file alias="settings/images/next.svg">shell/qml/settings/images/next.svg</file>
+        <file alias="settings/images/paint.svg">shell/qml/settings/images/paint.svg</file>
+        <file alias="settings/images/power.svg">shell/qml/settings/images/power.svg</file>
+        <file alias="settings/images/restart.svg">shell/qml/settings/images/restart.svg</file>
+        <file alias="settings/images/settings.png">shell/qml/settings/images/settings.png</file>
+        <file alias="settings/images/ssh.svg">shell/qml/settings/images/ssh.svg</file>
+        <file alias="settings/images/switch-green.svg">shell/qml/settings/images/switch-green.svg</file>
+        <file alias="settings/images/switch-red.svg">shell/qml/settings/images/switch-red.svg</file>
+        <file alias="settings/images/tick.svg">shell/qml/settings/images/tick.svg</file>
     </qresource>
 </RCC>

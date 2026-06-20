@@ -59,6 +59,7 @@ public:
     void mediaContinue();
     void mediaRestart();
     void mediaSeek(qint64 seekValue);
+    qint64 position() const { return m_position; }
     QVideoSink *videoSink() const;
     QObject *videoOutput() const;
     void setVideoSink(QVideoSink *videoSink);
@@ -92,6 +93,7 @@ private:
     QAudioOutput *m_audioOutput;
     QUrl m_currentMediaUrl;
     QAudioFormat m_format;
+    qint64 m_position = 0;
 };
 
 #endif //AUDIOPROVIDERSERVICE_H

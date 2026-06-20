@@ -1,17 +1,18 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import OVOS.GUI 1.0 as OVOS
 
-Item {
+OVOS.Page {
     id: root
 
-    property string title:     sessionData.title     || ""
-    property string artist:    sessionData.artist    || ""
-    property string album:     sessionData.album     || ""
-    property string thumbnail: sessionData.thumbnail || ""
-    property bool   playing:   sessionData.playing   !== undefined ? sessionData.playing   : false
-    property var    duration:  sessionData.duration  !== undefined ? sessionData.duration  : 0
-    property var    position:  sessionData.position  !== undefined ? sessionData.position  : 0
+    property string title:     namespaceData ? (namespaceData.title     || "") : ""
+    property string artist:    namespaceData ? (namespaceData.artist    || "") : ""
+    property string album:     namespaceData ? (namespaceData.album     || "") : ""
+    property string thumbnail: namespaceData ? (namespaceData.thumbnail || "") : ""
+    property bool   playing:   namespaceData ? (namespaceData.playing   !== undefined ? namespaceData.playing   : false) : false
+    property var    duration:  namespaceData ? (namespaceData.duration  !== undefined ? namespaceData.duration  : 0)     : 0
+    property var    position:  namespaceData ? (namespaceData.position  !== undefined ? namespaceData.position  : 0)     : 0
 
     function formatMs(ms) {
         var s = Math.floor(ms / 1000)
@@ -26,8 +27,8 @@ Item {
         spacing: 16
 
         Image {
-            visible: thumbnail.length > 0
-            source: thumbnail
+            visible: root.thumbnail.length > 0
+            source: root.thumbnail
             width: 200; height: 200
             Layout.alignment: Qt.AlignHCenter
             fillMode: Image.PreserveAspectFit
@@ -35,7 +36,7 @@ Item {
         }
 
         Label {
-            text: title
+            text: root.title
             font.pixelSize: 22
             font.weight: Font.DemiBold
             Layout.fillWidth: true
@@ -44,8 +45,8 @@ Item {
         }
 
         Label {
-            visible: artist.length > 0
-            text: artist
+            visible: root.artist.length > 0
+            text: root.artist
             font.pixelSize: 16
             opacity: 0.8
             Layout.fillWidth: true
@@ -54,8 +55,8 @@ Item {
         }
 
         Label {
-            visible: album.length > 0
-            text: album
+            visible: root.album.length > 0
+            text: root.album
             font.pixelSize: 14
             opacity: 0.6
             Layout.fillWidth: true
@@ -64,22 +65,22 @@ Item {
         }
 
         ProgressBar {
-            visible: duration > 0
-            from: 0; to: duration
-            value: position
+            visible: root.duration > 0
+            from: 0; to: root.duration
+            value: root.position
             Layout.fillWidth: true
         }
 
         RowLayout {
-            visible: duration > 0
+            visible: root.duration > 0
             Layout.fillWidth: true
-            Label { text: formatMs(position); font.pixelSize: 12 }
+            Label { text: formatMs(root.position); font.pixelSize: 12 }
             Item  { Layout.fillWidth: true }
-            Label { text: formatMs(duration); font.pixelSize: 12 }
+            Label { text: formatMs(root.duration); font.pixelSize: 12 }
         }
 
         Label {
-            text: playing ? "▶ Playing" : "⏸ Paused"
+            text: root.playing ? "▶ Playing" : "⏸ Paused"
             font.pixelSize: 14
             opacity: 0.7
             Layout.alignment: Qt.AlignHCenter

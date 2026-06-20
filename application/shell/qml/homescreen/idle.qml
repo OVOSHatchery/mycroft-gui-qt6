@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 import "." as Local
 
 Item {
@@ -24,11 +24,11 @@ Item {
     }
 
     // -----------------------------------------------------------------------
-    // sessionData shim — sub-components (DayMonthDisplay, WeatherArea, etc.)
-    // reference sessionData.xxx via QML scope lookup.  This QtObject makes
+    // namespaceData shim — sub-components (DayMonthDisplay, WeatherArea, etc.)
+    // reference namespaceData.xxx via QML scope lookup.  This QtObject makes
     // all the same keys available without changing those files.
     // -----------------------------------------------------------------------
-    property QtObject sessionData: QtObject {
+    property QtObject namespaceData: QtObject {
         property string time_string:         homescreenController.timeString
         property string date_string:         homescreenController.dateString
         property string weekday_string:      homescreenController.weekdayString
@@ -94,9 +94,9 @@ Item {
     // -----------------------------------------------------------------------
     function triggerGuiEvent(eventName, data) {
         if (eventName === "homescreen.swipe.change.wallpaper") {
-            OVOS.OVOSController.sendRequest("ovos.wallpaper.manager.change.wallpaper", {})
+            OVOS.GuiBusClient.sendRequest("ovos.wallpaper.manager.change.wallpaper", {})
         } else {
-            OVOS.OVOSController.sendRequest(eventName, data || {})
+            OVOS.GuiBusClient.sendRequest(eventName, data || {})
         }
     }
 
@@ -149,17 +149,17 @@ Item {
     // Bus events not related to homescreen data
     // -----------------------------------------------------------------------
     Connections {
-        target: OVOS.OVOSController
+        target: OVOS.GuiBusClient
         onIntentRecevied: {
             if (type == "phal.brightness.control.auto.night.mode.enabled") {
                 mainView.currentIndex = 0
             } else if (type == "ovos.homescreen.main_view.current_index.set") {
                 mainView.currentIndex = data.current_index
-                OVOS.OVOSController.sendRequest(
+                OVOS.GuiBusClient.sendRequest(
                     "ovos.homescreen.main_view.current_index.get.response",
                     {"current_index": mainView.currentIndex})
             } else if (type == "ovos.homescreen.main_view.current_index.get") {
-                OVOS.OVOSController.sendRequest(
+                OVOS.GuiBusClient.sendRequest(
                     "ovos.homescreen.main_view.current_index.get.response",
                     {"current_index": mainView.currentIndex})
             }
@@ -242,7 +242,7 @@ Item {
                 } else if (mainView.currentIndex == 1) {
                     mainView.currentIndex = 2
                 }
-                OVOS.OVOSController.sendRequest(
+                OVOS.GuiBusClient.sendRequest(
                     "ovos.homescreen.main_view.current_index.get.response",
                     {"current_index": mainView.currentIndex})
             }
@@ -315,7 +315,7 @@ Item {
                 } else if (mainView.currentIndex == 2) {
                     mainView.currentIndex = 1
                 }
-                OVOS.OVOSController.sendRequest(
+                OVOS.GuiBusClient.sendRequest(
                     "ovos.homescreen.main_view.current_index.get.response",
                     {"current_index": mainView.currentIndex})
             }
@@ -473,7 +473,7 @@ Item {
                     onClicked: {
                         OVOS.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
                         sendAllNotificationActions()
-                        OVOS.OVOSController.sendRequest("ovos.notification.api.storage.clear", {})
+                        OVOS.GuiBusClient.sendRequest("ovos.notification.api.storage.clear", {})
                     }
                 }
             }
@@ -547,7 +547,7 @@ Item {
         if (!notificationModel || !notificationModel.storedmodel) return
         notificationModel.storedmodel.forEach(function(modelData) {
             if (modelData.action !== "") {
-                OVOS.OVOSController.sendRequest(modelData.action, modelData.callback_data)
+                OVOS.GuiBusClient.sendRequest(modelData.action, modelData.callback_data)
             }
         })
     }

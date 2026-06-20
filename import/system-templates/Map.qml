@@ -1,41 +1,45 @@
 import QtQuick
 import QtQuick.Controls
-import QtLocation 5.12
-import QtPositioning 5.12
+import QtLocation
+import QtPositioning
+import OVOS.GUI 1.0 as OVOS
 
-Item {
+OVOS.Page {
     id: root
 
-    property real   latitude:  sessionData.latitude  !== undefined ? sessionData.latitude  : 0.0
-    property real   longitude: sessionData.longitude !== undefined ? sessionData.longitude : 0.0
-    property int    zoom:      sessionData.zoom       !== undefined ? sessionData.zoom      : 12
-    property string label:     sessionData.label     || ""
+    property real   latitude:  namespaceData ? (namespaceData.latitude  !== undefined ? namespaceData.latitude  : 0.0) : 0.0
+    property real   longitude: namespaceData ? (namespaceData.longitude !== undefined ? namespaceData.longitude : 0.0) : 0.0
+    property int    zoom:      namespaceData ? (namespaceData.zoom      !== undefined ? namespaceData.zoom      : 12)  : 12
+    property string label:     namespaceData ? (namespaceData.label     || "") : ""
 
     Plugin {
         id: mapPlugin
         name: "osm"
-        PluginParameter { name: "osm.useragent"; value: "OVOS-GUI" }
+        // Use default OSM plugin parameters for Qt 6
     }
 
     Map {
         anchors.fill: parent
         plugin: mapPlugin
-        center: QtPositioning.coordinate(latitude, longitude)
-        zoomLevel: zoom
+        center: QtPositioning.coordinate(root.latitude, root.longitude)
+        zoomLevel: root.zoom
 
         MapQuickItem {
-            visible: label.length > 0
-            coordinate: QtPositioning.coordinate(latitude, longitude)
+            visible: root.label.length > 0
+            coordinate: QtPositioning.coordinate(root.latitude, root.longitude)
             anchorPoint.x: pin.width / 2
             anchorPoint.y: pin.height
             sourceItem: Column {
-                Image {
+                Rectangle {
                     id: pin
-                    source: "qrc:/qt-project.org/imports/QtLocation/images/location-marker.png"
-                    width: 32; height: 32
+                    width: 24; height: 24
+                    radius: 12
+                    color: "red"
+                    border.color: "white"
+                    border.width: 2
                 }
                 Label {
-                    text: label
+                    text: root.label
                     background: Rectangle { color: "white"; radius: 3 }
                     padding: 2
                 }

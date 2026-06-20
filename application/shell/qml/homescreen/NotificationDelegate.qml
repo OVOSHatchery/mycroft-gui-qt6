@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import OVOS 1.0 as OVOS
+import OVOS.GUI 1.0 as OVOS
 
 Rectangle {
     id: delegate
@@ -38,9 +38,9 @@ Rectangle {
                     onClicked: {
                         OVOS.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
                         if (modelData.action != "") {
-                            OVOS.OVOSController.sendRequest(modelData.action, modelData.callback_data)
+                            OVOS.GuiBusClient.sendRequest(modelData.action, modelData.callback_data)
                         }
-                        OVOS.OVOSController.sendRequest("ovos.notification.api.storage.clear.item", {"notification": modelData})
+                        OVOS.GuiBusClient.sendRequest("ovos.notification.api.storage.clear.item", {"notification": modelData})
                     }
                 }
             }
@@ -66,9 +66,9 @@ Rectangle {
                     onClicked: {
                         OVOS.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
                         if (modelData.action != "") {
-                            OVOS.OVOSController.sendRequest(modelData.action, modelData.callback_data)
+                            OVOS.GuiBusClient.sendRequest(modelData.action, modelData.callback_data)
                         }
-                        OVOS.OVOSController.sendRequest("ovos.notification.api.storage.clear.item", {"notification": modelData})
+                        OVOS.GuiBusClient.sendRequest("ovos.notification.api.storage.clear.item", {"notification": modelData})
                     }
                 }
             }
@@ -103,9 +103,9 @@ Rectangle {
                 onClicked: {
                     OVOS.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
                     if (modelData.action != "") {
-                            OVOS.OVOSController.sendRequest(modelData.action, modelData.callback_data)
+                            OVOS.GuiBusClient.sendRequest(modelData.action, modelData.callback_data)
                     }
-                    OVOS.OVOSController.sendRequest("ovos.notification.api.storage.clear.item", {"notification": modelData})
+                    OVOS.GuiBusClient.sendRequest("ovos.notification.api.storage.clear.item", {"notification": modelData})
                 }
             }
         }

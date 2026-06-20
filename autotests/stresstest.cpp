@@ -21,15 +21,15 @@
 #include <QAbstractItemModel>
 #include <QQuickView>
 #include <QQmlEngine>
-#include "../import/ovoscontroller.h"
-#include "../import/abstractdelegate.h"
+#include "../import/guibusclient.h"
+#include "../import/guipage.h"
 #include "../import/filereader.h"
 #include "../import/globalsettings.h"
-#include "../import/activeskillsmodel.h"
-#include "../import/delegatesmodel.h"
-#include "../import/abstractskillview.h"
-#include "../import/sessiondatamap.h"
-#include "../import/sessiondatamodel.h"
+#include "../import/namespacemodel.h"
+#include "../import/pagemodel.h"
+#include "../import/guinamespace.h"
+#include "../import/namespacedatamap.h"
+#include "../import/namespacedatamodel.h"
 
 class ServerTest : public QObject
 {
@@ -47,12 +47,12 @@ private Q_SLOTS:
 
 
 private:
-    AbstractDelegate *delegateForSkill(const QString &skill, const QUrl &url);
-    QList <AbstractDelegate *>delegatesForSkill(const QString &skill);
+    GuiPage *delegateForSkill(const QString &skill, const QUrl &url);
+    QList <GuiPage *>delegatesForSkill(const QString &skill);
 
     //Client
-    OVOSController *m_controller;
-    AbstractSkillView *m_view;
+    GuiBusClient *m_controller;
+    GuiNamespace *m_view;
 
     QQuickView *m_window;
 
@@ -86,14 +86,14 @@ static QObject *mycroftControllerSingletonProvider(QQmlEngine *engine, QJSEngine
     Q_UNUSED(engine);
     Q_UNUSED(scriptEngine);
 
-    return OVOSController::instance();
+    return GuiBusClient::instance();
 }
 
 
 
-AbstractDelegate *ServerTest::delegateForSkill(const QString &skill, const QUrl &url)
+GuiPage *ServerTest::delegateForSkill(const QString &skill, const QUrl &url)
 {
-    DelegatesModel *delegatesModel = m_view->activeSkills()->delegatesModelForSkill(skill);
+    PageModel *delegatesModel = m_view->activeNamespaces()->pageModelForNamespace(skill);
     if (!delegatesModel) {
         return nullptr;
     }
@@ -106,9 +106,9 @@ AbstractDelegate *ServerTest::delegateForSkill(const QString &skill, const QUrl 
     return nullptr;
 }
 
-QList <AbstractDelegate *>ServerTest::delegatesForSkill(const QString &skill)
+QList <GuiPage *>ServerTest::delegatesForSkill(const QString &skill)
 {
-    DelegatesModel *delegatesModel = m_view->activeSkills()->delegatesModelForSkill(skill);
+    PageModel *delegatesModel = m_view->activeNamespaces()->pageModelForNamespace(skill);
 
     if (!delegatesModel) {
         return {};
@@ -124,9 +124,9 @@ void ServerTest::initTestCase()
     m_guiServerSocket = new QWebSocketServer(QStringLiteral("gui"),
                                             QWebSocketServer::NonSecureMode, this);
     m_guiServerSocket->listen(QHostAddress::Any, 1818);
-    m_controller = OVOSController::instance();
+    m_controller = GuiBusClient::instance();
     //TODO: delete
-    //m_view = new AbstractSkillView;
+    //m_view = new GuiNamespace;
     m_window = new QQuickView;
 
     bool pluginFound = false;
@@ -139,11 +139,11 @@ void ServerTest::initTestCase()
     }
 
     if (!pluginFound) {
-        qmlRegisterSingletonType<OVOSController>("Mycroft", 1, 0, "MycroftController", mycroftControllerSingletonProvider);
+        qmlRegisterSingletonType<GuiBusClient>("Mycroft", 1, 0, "MycroftController", mycroftControllerSingletonProvider);
         qmlRegisterSingletonType<GlobalSettings>("Mycroft", 1, 0, "GlobalSettings", globalSettingsSingletonProvider);
         qmlRegisterSingletonType<FileReader>("Mycroft", 1, 0, "FileReader", fileReaderSingletonProvider);
-        qmlRegisterType<AbstractSkillView>("Mycroft", 1, 0, "AbstractSkillView");
-        qmlRegisterType<AbstractDelegate>("Mycroft", 1, 0, "AbstractDelegate");
+        qmlRegisterType<GuiNamespace>("Mycroft", 1, 0, "GuiNamespace");
+        qmlRegisterType<GuiPage>("Mycroft", 1, 0, "GuiPage");
 
         qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/AudioPlayer.qml")), "Mycroft", 1, 0, "AudioPlayer");
         qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/AutoFitLabel.qml")), "Mycroft", 1, 0, "AutoFitLabel");
@@ -157,9 +157,9 @@ void ServerTest::initTestCase()
         qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/StatusIndicator.qml")), "Mycroft", 1, 0, "StatusIndicator");
         qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/VideoPlayer.qml")), "Mycroft", 1, 0, "VideoPlayer");
 
-        qmlRegisterUncreatableType<ActiveSkillsModel>("Mycroft", 1, 0, "ActiveSkillsModel", QStringLiteral("You cannot instantiate items of type ActiveSkillsModel"));
-        qmlRegisterUncreatableType<DelegatesModel>("Mycroft", 1, 0, "DelegatesModel", QStringLiteral("You cannot instantiate items of type DelegatesModel"));
-        qmlRegisterUncreatableType<SessionDataMap>("Mycroft", 1, 0, "SessionDataMap", QStringLiteral("You cannot instantiate items of type SessionDataMap"));
+        qmlRegisterUncreatableType<NamespaceModel>("Mycroft", 1, 0, "NamespaceModel", QStringLiteral("You cannot instantiate items of type NamespaceModel"));
+        qmlRegisterUncreatableType<PageModel>("Mycroft", 1, 0, "PageModel", QStringLiteral("You cannot instantiate items of type PageModel"));
+        qmlRegisterUncreatableType<NamespaceDataMap>("Mycroft", 1, 0, "NamespaceDataMap", QStringLiteral("You cannot instantiate items of type NamespaceDataMap"));
 
         qmlRegisterType(QUrl::fromLocalFile(QFINDTESTDATA(QStringLiteral("../import/qml/Delegate.qml"))), "Mycroft", 1, 0, "Delegate");
 
@@ -175,17 +175,17 @@ void ServerTest::initTestCase()
         qWarning() << m_window->errors();
     }
     m_window->show();
-    m_view = qobject_cast<AbstractSkillView *>(m_window->rootObject());
+    m_view = qobject_cast<GuiNamespace *>(m_window->rootObject());
     QVERIFY(m_view);
 
-    new QAbstractItemModelTester(m_view->activeSkills(), QAbstractItemModelTester::FailureReportingMode::QtTest, this);
+    new QAbstractItemModelTester(m_view->activeNamespaces(), QAbstractItemModelTester::FailureReportingMode::QtTest, this);
 }
 
 //TODO: test a spotty connection
 void ServerTest::testGuiConnection()
 {
     QSignalSpy newConnectionSpy(m_mainServerSocket, &QWebSocketServer::newConnection);
-    QSignalSpy controllerSocketStatusChangedSpy(m_controller, &OVOSController::socketStatusChanged);
+    QSignalSpy controllerSocketStatusChangedSpy(m_controller, &GuiBusClient::socketStatusChanged);
     m_controller->start();
 
     //wait the server received a connection and the client got connected state
@@ -196,7 +196,7 @@ void ServerTest::testGuiConnection()
     QVERIFY(m_mainWebSocket);
 
     controllerSocketStatusChangedSpy.wait();
-    QCOMPARE(m_controller->status(), OVOSController::Open);
+    QCOMPARE(m_controller->status(), GuiBusClient::Open);
 
     textFromMainSpy.wait();
     auto doc = QJsonDocument::fromJson(textFromMainSpy.first().first().toString().toLatin1());
@@ -216,9 +216,9 @@ void ServerTest::testGuiConnection()
 
 void ServerTest::create100Skills()
 {
-    QSignalSpy skillInsertedSpy(m_view->activeSkills(), &ActiveSkillsModel::rowsInserted);
+    QSignalSpy skillInsertedSpy(m_view->activeNamespaces(), &NamespaceModel::rowsInserted);
 
-    QCOMPARE(m_view->activeSkills()->rowCount(), 0);
+    QCOMPARE(m_view->activeNamespaces()->rowCount(), 0);
 
     const QUrl url(QStringLiteral("file://") + QFINDTESTDATA("delegatewithloader.qml"));
 
@@ -228,7 +228,7 @@ void ServerTest::create100Skills()
         m_guiWebSocket->sendTextMessage(QStringLiteral("{\"type\": \"mycroft.session.list.insert\", \"namespace\": \"mycroft.system.active_skills\", \"position\": 0, \"data\": [{\"skill_id\": \"") + id + QStringLiteral("\"}]}"));
 
         skillInsertedSpy.wait();
-        SessionDataMap *map = m_view->sessionDataForSkill(id);
+        NamespaceDataMap *map = m_view->namespaceDataForNamespace(id);
         QVERIFY(map);
 
         //set data
@@ -244,15 +244,15 @@ void ServerTest::create100Skills()
         m_guiWebSocket->sendTextMessage(QStringLiteral("{\"type\": \"mycroft.session.set\", \"namespace\": \"") + id + QStringLiteral("\", \"data\": {\"temperature\": \"24°C\", \"otherproperty\": \"value\", \"state\": \"subdelegate2\"}}"));
     }
 
-    QCOMPARE(m_view->activeSkills()->rowCount(), 10);
+    QCOMPARE(m_view->activeNamespaces()->rowCount(), 10);
     for (int i = 0; i < 10; ++i) {
-        QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(9-i,0), ActiveSkillsModel::SkillId).toString(), QString::number(i));
+        QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(9-i,0), NamespaceModel::NamespaceId).toString(), QString::number(i));
     }
 }
 
 void ServerTest::move100Skills()
 {
-    QSignalSpy skillMovedSpy(m_view->activeSkills(), &ActiveSkillsModel::rowsMoved);
+    QSignalSpy skillMovedSpy(m_view->activeNamespaces(), &NamespaceModel::rowsMoved);
 
    // QTest::qWait(3000);
     const QUrl url(QStringLiteral("file://") + QFINDTESTDATA("delegatewithloader.qml"));
@@ -268,7 +268,7 @@ void ServerTest::move100Skills()
 
 void ServerTest::delete100Skills()
 {
-    QSignalSpy skillRemovedSpy(m_view->activeSkills(), &ActiveSkillsModel::rowsRemoved);
+    QSignalSpy skillRemovedSpy(m_view->activeNamespaces(), &NamespaceModel::rowsRemoved);
 
    // QTest::qWait(3000);
     const QUrl url(QStringLiteral("file://") + QFINDTESTDATA("delegatewithloader.qml"));
