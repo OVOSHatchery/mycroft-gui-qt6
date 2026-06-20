@@ -18,7 +18,7 @@
 import QtQuick
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
-import Mycroft 1.0 as Mycroft
+import OVOS.GUI 1.0 as OVOS
 
 Delegate {
     id: delegate
@@ -38,7 +38,7 @@ Delegate {
     }
 
     onClicked: {
-        Mycroft.MycroftController.sendRequest(delegate.muted ? "mycroft.mic.unmute" : "mycroft.mic.mute", {});
+        OVOS.GuiBusClient.sendRequest(delegate.muted ? "mycroft.mic.unmute" : "mycroft.mic.mute", {});
         if (delegate.muted) {
             delegate.muted = false
         } else {
@@ -46,12 +46,12 @@ Delegate {
         }
 
         delay(1000, function() {
-            Mycroft.MycroftController.sendRequest("mycroft.mic.get_status", {});
+            OVOS.GuiBusClient.sendRequest("mycroft.mic.get_status", {});
         });
     }
 
     Connections {
-        target: Mycroft.MycroftController
+        target: OVOS.GuiBusClient
 
         onIntentRecevied: {
             if (type == "mycroft.mic.get_status.response") {

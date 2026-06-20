@@ -21,15 +21,15 @@
 #include <QAbstractItemModel>
 #include <QQuickView>
 #include <QQmlEngine>
-#include "../import/mycroftcontroller.h"
-#include "../import/abstractdelegate.h"
+#include "../import/guibusclient.h"
+#include "../import/guipage.h"
 #include "../import/filereader.h"
 #include "../import/globalsettings.h"
-#include "../import/activeskillsmodel.h"
-#include "../import/delegatesmodel.h"
-#include "../import/abstractskillview.h"
-#include "../import/sessiondatamap.h"
-#include "../import/sessiondatamodel.h"
+#include "../import/namespacemodel.h"
+#include "../import/pagemodel.h"
+#include "../import/guinamespace.h"
+#include "../import/namespacedatamap.h"
+#include "../import/namespacedatamodel.h"
 
 class ServerTest : public QObject
 {
@@ -53,12 +53,12 @@ private Q_SLOTS:
     void testSwitchSkill();
 
 private:
-    AbstractDelegate *delegateForSkill(const QString &skill, const QUrl &url);
-    QList <AbstractDelegate *>delegatesForSkill(const QString &skill);
+    GuiPage *delegateForSkill(const QString &skill, const QUrl &url);
+    QList <GuiPage *>delegatesForSkill(const QString &skill);
 
     //Client
-    MycroftController *m_controller;
-    AbstractSkillView *m_view;
+    GuiBusClient *m_controller;
+    GuiNamespace *m_view;
 
     QQuickView *m_window;
 
@@ -92,14 +92,14 @@ static QObject *mycroftControllerSingletonProvider(QQmlEngine *engine, QJSEngine
     Q_UNUSED(engine);
     Q_UNUSED(scriptEngine);
 
-    return MycroftController::instance();
+    return GuiBusClient::instance();
 }
 
 
 
-AbstractDelegate *ServerTest::delegateForSkill(const QString &skill, const QUrl &url)
+GuiPage *ServerTest::delegateForSkill(const QString &skill, const QUrl &url)
 {
-    DelegatesModel *delegatesModel = m_view->activeSkills()->delegatesModelForSkill(skill);
+    PageModel *delegatesModel = m_view->activeNamespaces()->pageModelForNamespace(skill);
     if (!delegatesModel) {
         return nullptr;
     }
@@ -112,9 +112,9 @@ AbstractDelegate *ServerTest::delegateForSkill(const QString &skill, const QUrl 
     return nullptr;
 }
 
-QList <AbstractDelegate *>ServerTest::delegatesForSkill(const QString &skill)
+QList <GuiPage *>ServerTest::delegatesForSkill(const QString &skill)
 {
-    DelegatesModel *delegatesModel = m_view->activeSkills()->delegatesModelForSkill(skill);
+    PageModel *delegatesModel = m_view->activeNamespaces()->pageModelForNamespace(skill);
 
     if (!delegatesModel) {
         return {};
@@ -130,9 +130,9 @@ void ServerTest::initTestCase()
     m_guiServerSocket = new QWebSocketServer(QStringLiteral("gui"),
                                             QWebSocketServer::NonSecureMode, this);
     m_guiServerSocket->listen(QHostAddress::Any, 1818);
-    m_controller = MycroftController::instance();
+    m_controller = GuiBusClient::instance();
     //TODO: delete
-    //m_view = new AbstractSkillView;
+    //m_view = new GuiNamespace;
     m_window = new QQuickView;
     bool pluginFound = false;
     for (const auto &path : m_window->engine()->importPathList()) {
@@ -144,11 +144,11 @@ void ServerTest::initTestCase()
     }
 
     if (!pluginFound) {
-        qmlRegisterSingletonType<MycroftController>("Mycroft", 1, 0, "MycroftController", mycroftControllerSingletonProvider);
+        qmlRegisterSingletonType<GuiBusClient>("Mycroft", 1, 0, "MycroftController", mycroftControllerSingletonProvider);
         qmlRegisterSingletonType<GlobalSettings>("Mycroft", 1, 0, "GlobalSettings", globalSettingsSingletonProvider);
         qmlRegisterSingletonType<FileReader>("Mycroft", 1, 0, "FileReader", fileReaderSingletonProvider);
-        qmlRegisterType<AbstractSkillView>("Mycroft", 1, 0, "AbstractSkillView");
-        qmlRegisterType<AbstractDelegate>("Mycroft", 1, 0, "AbstractDelegate");
+        qmlRegisterType<GuiNamespace>("Mycroft", 1, 0, "GuiNamespace");
+        qmlRegisterType<GuiPage>("Mycroft", 1, 0, "GuiPage");
 
         qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/AudioPlayer.qml")), "Mycroft", 1, 0, "AudioPlayer");
         qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/AutoFitLabel.qml")), "Mycroft", 1, 0, "AutoFitLabel");
@@ -162,9 +162,9 @@ void ServerTest::initTestCase()
         qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/StatusIndicator.qml")), "Mycroft", 1, 0, "StatusIndicator");
         qmlRegisterType(QUrl(QStringLiteral("qrc:/qml/VideoPlayer.qml")), "Mycroft", 1, 0, "VideoPlayer");
 
-        qmlRegisterUncreatableType<ActiveSkillsModel>("Mycroft", 1, 0, "ActiveSkillsModel", QStringLiteral("You cannot instantiate items of type ActiveSkillsModel"));
-        qmlRegisterUncreatableType<DelegatesModel>("Mycroft", 1, 0, "DelegatesModel", QStringLiteral("You cannot instantiate items of type DelegatesModel"));
-        qmlRegisterUncreatableType<SessionDataMap>("Mycroft", 1, 0, "SessionDataMap", QStringLiteral("You cannot instantiate items of type SessionDataMap"));
+        qmlRegisterUncreatableType<NamespaceModel>("Mycroft", 1, 0, "NamespaceModel", QStringLiteral("You cannot instantiate items of type NamespaceModel"));
+        qmlRegisterUncreatableType<PageModel>("Mycroft", 1, 0, "PageModel", QStringLiteral("You cannot instantiate items of type PageModel"));
+        qmlRegisterUncreatableType<NamespaceDataMap>("Mycroft", 1, 0, "NamespaceDataMap", QStringLiteral("You cannot instantiate items of type NamespaceDataMap"));
 
         qmlRegisterType(QUrl::fromLocalFile(QFINDTESTDATA(QStringLiteral("../import/qml/Delegate.qml"))), "Mycroft", 1, 0, "Delegate");
 
@@ -180,17 +180,17 @@ void ServerTest::initTestCase()
         qWarning() << m_window->errors();
     }
     m_window->show();
-    m_view = qobject_cast<AbstractSkillView *>(m_window->rootObject());
+    m_view = qobject_cast<GuiNamespace *>(m_window->rootObject());
     QVERIFY(m_view);
 
-    new QAbstractItemModelTester(m_view->activeSkills(), QAbstractItemModelTester::FailureReportingMode::QtTest, this);
+    new QAbstractItemModelTester(m_view->activeNamespaces(), QAbstractItemModelTester::FailureReportingMode::QtTest, this);
 }
 
 //TODO: test a spotty connection
 void ServerTest::testGuiConnection()
 {
     QSignalSpy newConnectionSpy(m_mainServerSocket, &QWebSocketServer::newConnection);
-    QSignalSpy controllerSocketStatusChangedSpy(m_controller, &MycroftController::socketStatusChanged);
+    QSignalSpy controllerSocketStatusChangedSpy(m_controller, &GuiBusClient::socketStatusChanged);
     m_controller->start();
 
     //wait the server received a connection and the client got connected state
@@ -201,7 +201,7 @@ void ServerTest::testGuiConnection()
     QVERIFY(m_mainWebSocket);
 
     controllerSocketStatusChangedSpy.wait();
-    QCOMPARE(m_controller->status(), MycroftController::Open);
+    QCOMPARE(m_controller->status(), GuiBusClient::Open);
 
     textFromMainSpy.wait();
     auto doc = QJsonDocument::fromJson(textFromMainSpy.first().first().toString().toLatin1());
@@ -221,38 +221,38 @@ void ServerTest::testGuiConnection()
 
 void ServerTest::testActiveSkills()
 {
-    QSignalSpy skillInsertedSpy(m_view->activeSkills(), &ActiveSkillsModel::rowsInserted);
-    QSignalSpy skillMovedSpy(m_view->activeSkills(), &ActiveSkillsModel::rowsMoved);
-    QSignalSpy skillRemovedSpy(m_view->activeSkills(), &ActiveSkillsModel::rowsRemoved);
+    QSignalSpy skillInsertedSpy(m_view->activeNamespaces(), &NamespaceModel::rowsInserted);
+    QSignalSpy skillMovedSpy(m_view->activeNamespaces(), &NamespaceModel::rowsMoved);
+    QSignalSpy skillRemovedSpy(m_view->activeNamespaces(), &NamespaceModel::rowsRemoved);
 
-    QCOMPARE(m_view->activeSkills()->rowCount(), 0);
+    QCOMPARE(m_view->activeNamespaces()->rowCount(), 0);
 
     //Add weather skill
     m_guiWebSocket->sendTextMessage(QStringLiteral("{\"type\": \"mycroft.session.list.insert\", \"namespace\": \"mycroft.system.active_skills\", \"position\": 0, \"data\": [{\"skill_id\": \"mycroft.weather\"}]}"));
 
     skillInsertedSpy.wait();
 
-    QCOMPARE(m_view->activeSkills()->rowCount(), 1);
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(0,0), ActiveSkillsModel::SkillId), QStringLiteral("mycroft.weather"));
+    QCOMPARE(m_view->activeNamespaces()->rowCount(), 1);
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(0,0), NamespaceModel::NamespaceId), QStringLiteral("mycroft.weather"));
 
     //Add food-wizard skill, before weather
     m_guiWebSocket->sendTextMessage(QStringLiteral("{\"type\": \"mycroft.session.list.insert\", \"namespace\": \"mycroft.system.active_skills\", \"position\": 0, \"data\": [{\"skill_id\": \"aiix.food-wizard\"}]}"));
 
     skillInsertedSpy.wait();
 
-    QCOMPARE(m_view->activeSkills()->rowCount(), 2);
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(0,0), ActiveSkillsModel::SkillId), QStringLiteral("aiix.food-wizard"));
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(1,0), ActiveSkillsModel::SkillId), QStringLiteral("mycroft.weather"));
+    QCOMPARE(m_view->activeNamespaces()->rowCount(), 2);
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(0,0), NamespaceModel::NamespaceId), QStringLiteral("aiix.food-wizard"));
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(1,0), NamespaceModel::NamespaceId), QStringLiteral("mycroft.weather"));
 
     //Add timer skill, between food-wizard and weather
     m_guiWebSocket->sendTextMessage(QStringLiteral("{\"type\": \"mycroft.session.list.insert\", \"namespace\": \"mycroft.system.active_skills\", \"position\": 1, \"data\": [{\"skill_id\": \"mycroft.timer\"}]}"));
 
     skillInsertedSpy.wait();
 
-    QCOMPARE(m_view->activeSkills()->rowCount(), 3);
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(0,0), ActiveSkillsModel::SkillId), QStringLiteral("aiix.food-wizard"));
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(1,0), ActiveSkillsModel::SkillId), QStringLiteral("mycroft.timer"));
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(2,0), ActiveSkillsModel::SkillId), QStringLiteral("mycroft.weather"));
+    QCOMPARE(m_view->activeNamespaces()->rowCount(), 3);
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(0,0), NamespaceModel::NamespaceId), QStringLiteral("aiix.food-wizard"));
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(1,0), NamespaceModel::NamespaceId), QStringLiteral("mycroft.timer"));
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(2,0), NamespaceModel::NamespaceId), QStringLiteral("mycroft.weather"));
 
     //Add shopping skill, wiki and weather in the end: weather will be ignored as is already present
     m_guiWebSocket->sendTextMessage(QStringLiteral("{\"type\": \"mycroft.session.list.insert\", \"namespace\": \"mycroft.system.active_skills\", \"position\": 3, \"data\": [{\"skill_id\": \"aiix.shopping-demo\"}, {\"skill_id\": \"mycroft.wiki\"}, {\"skill_id\": \"mycroft.weather\"}]}"));
@@ -260,68 +260,68 @@ void ServerTest::testActiveSkills()
     skillInsertedSpy.wait();
 
     //5 because weather was ignored
-    QCOMPARE(m_view->activeSkills()->rowCount(), 5);
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(0,0), ActiveSkillsModel::SkillId), QStringLiteral("aiix.food-wizard"));
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(1,0), ActiveSkillsModel::SkillId), QStringLiteral("mycroft.timer"));
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(2,0), ActiveSkillsModel::SkillId), QStringLiteral("mycroft.weather"));
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(3,0), ActiveSkillsModel::SkillId), QStringLiteral("aiix.shopping-demo"));
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(4,0), ActiveSkillsModel::SkillId), QStringLiteral("mycroft.wiki"));
+    QCOMPARE(m_view->activeNamespaces()->rowCount(), 5);
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(0,0), NamespaceModel::NamespaceId), QStringLiteral("aiix.food-wizard"));
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(1,0), NamespaceModel::NamespaceId), QStringLiteral("mycroft.timer"));
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(2,0), NamespaceModel::NamespaceId), QStringLiteral("mycroft.weather"));
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(3,0), NamespaceModel::NamespaceId), QStringLiteral("aiix.shopping-demo"));
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(4,0), NamespaceModel::NamespaceId), QStringLiteral("mycroft.wiki"));
 
     //Move timer in first position
     m_guiWebSocket->sendTextMessage(QStringLiteral("{\"type\": \"mycroft.session.list.move\", \"namespace\": \"mycroft.system.active_skills\", \"from\": 2, \"to\": 1, \"items_number\": 1}"));
 
     skillMovedSpy.wait();
 
-    QCOMPARE(m_view->activeSkills()->rowCount(), 5);
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(0,0), ActiveSkillsModel::SkillId), QStringLiteral("aiix.food-wizard"));
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(1,0), ActiveSkillsModel::SkillId), QStringLiteral("mycroft.weather"));
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(2,0), ActiveSkillsModel::SkillId), QStringLiteral("mycroft.timer"));
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(3,0), ActiveSkillsModel::SkillId), QStringLiteral("aiix.shopping-demo"));
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(4,0), ActiveSkillsModel::SkillId), QStringLiteral("mycroft.wiki"));
+    QCOMPARE(m_view->activeNamespaces()->rowCount(), 5);
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(0,0), NamespaceModel::NamespaceId), QStringLiteral("aiix.food-wizard"));
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(1,0), NamespaceModel::NamespaceId), QStringLiteral("mycroft.weather"));
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(2,0), NamespaceModel::NamespaceId), QStringLiteral("mycroft.timer"));
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(3,0), NamespaceModel::NamespaceId), QStringLiteral("aiix.shopping-demo"));
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(4,0), NamespaceModel::NamespaceId), QStringLiteral("mycroft.wiki"));
 
     //Move weather and food-wizard in front
     m_guiWebSocket->sendTextMessage(QStringLiteral("{\"type\": \"mycroft.session.list.move\", \"namespace\": \"mycroft.system.active_skills\", \"from\": 1, \"to\": 0, \"items_number\": 2}"));
 
     skillMovedSpy.wait();
 
-    QCOMPARE(m_view->activeSkills()->rowCount(), 5);
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(0,0), ActiveSkillsModel::SkillId), QStringLiteral("mycroft.weather"));
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(1,0), ActiveSkillsModel::SkillId), QStringLiteral("mycroft.timer"));
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(2,0), ActiveSkillsModel::SkillId), QStringLiteral("aiix.food-wizard"));
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(3,0), ActiveSkillsModel::SkillId), QStringLiteral("aiix.shopping-demo"));
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(4,0), ActiveSkillsModel::SkillId), QStringLiteral("mycroft.wiki"));
+    QCOMPARE(m_view->activeNamespaces()->rowCount(), 5);
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(0,0), NamespaceModel::NamespaceId), QStringLiteral("mycroft.weather"));
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(1,0), NamespaceModel::NamespaceId), QStringLiteral("mycroft.timer"));
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(2,0), NamespaceModel::NamespaceId), QStringLiteral("aiix.food-wizard"));
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(3,0), NamespaceModel::NamespaceId), QStringLiteral("aiix.shopping-demo"));
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(4,0), NamespaceModel::NamespaceId), QStringLiteral("mycroft.wiki"));
 
     //Move timer and food-wizard in the back
     m_guiWebSocket->sendTextMessage(QStringLiteral("{\"type\": \"mycroft.session.list.move\", \"namespace\": \"mycroft.system.active_skills\", \"from\": 1, \"to\": 4, \"items_number\": 2}"));
 
     skillMovedSpy.wait();
 
-    QCOMPARE(m_view->activeSkills()->rowCount(), 5);
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(0,0), ActiveSkillsModel::SkillId), QStringLiteral("mycroft.weather"));
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(1,0), ActiveSkillsModel::SkillId), QStringLiteral("aiix.shopping-demo"));
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(2,0), ActiveSkillsModel::SkillId), QStringLiteral("mycroft.timer"));
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(3,0), ActiveSkillsModel::SkillId), QStringLiteral("aiix.food-wizard"));
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(4,0), ActiveSkillsModel::SkillId), QStringLiteral("mycroft.wiki"));
+    QCOMPARE(m_view->activeNamespaces()->rowCount(), 5);
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(0,0), NamespaceModel::NamespaceId), QStringLiteral("mycroft.weather"));
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(1,0), NamespaceModel::NamespaceId), QStringLiteral("aiix.shopping-demo"));
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(2,0), NamespaceModel::NamespaceId), QStringLiteral("mycroft.timer"));
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(3,0), NamespaceModel::NamespaceId), QStringLiteral("aiix.food-wizard"));
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(4,0), NamespaceModel::NamespaceId), QStringLiteral("mycroft.wiki"));
 
     //Remove shopping-demo and timer
     m_guiWebSocket->sendTextMessage(QStringLiteral("{\"type\": \"mycroft.session.list.remove\", \"namespace\": \"mycroft.system.active_skills\", \"position\": 1, \"items_number\": 2}"));
 
     skillRemovedSpy.wait();
 
-    QCOMPARE(m_view->activeSkills()->rowCount(), 3);
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(0,0), ActiveSkillsModel::SkillId), QStringLiteral("mycroft.weather"));
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(1,0), ActiveSkillsModel::SkillId), QStringLiteral("aiix.food-wizard"));
-    QCOMPARE(m_view->activeSkills()->data(m_view->activeSkills()->index(2,0), ActiveSkillsModel::SkillId), QStringLiteral("mycroft.wiki"));
+    QCOMPARE(m_view->activeNamespaces()->rowCount(), 3);
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(0,0), NamespaceModel::NamespaceId), QStringLiteral("mycroft.weather"));
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(1,0), NamespaceModel::NamespaceId), QStringLiteral("aiix.food-wizard"));
+    QCOMPARE(m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(2,0), NamespaceModel::NamespaceId), QStringLiteral("mycroft.wiki"));
 }
 
 void ServerTest::testSessionData()
 {
-    SessionDataMap *map = m_view->sessionDataForSkill(QStringLiteral("mycroft.weather"));
+    NamespaceDataMap *map = m_view->namespaceDataForNamespace(QStringLiteral("mycroft.weather"));
     QVERIFY(map);
     //No sessiondata for invalid skills
-    QVERIFY(!m_view->sessionDataForSkill(QStringLiteral("invalidskillid")));
+    QVERIFY(!m_view->namespaceDataForNamespace(QStringLiteral("invalidskillid")));
 
-    QSignalSpy dataChangedSpy(map, &SessionDataMap::valueChanged);
+    QSignalSpy dataChangedSpy(map, &NamespaceDataMap::valueChanged);
 
     //set data for weather skill
     m_guiWebSocket->sendTextMessage(QStringLiteral("{\"type\": \"mycroft.session.set\", \"namespace\": \"mycroft.weather\", \"data\": {\"temperature\": \"28°C\", \"icon\": \"weather-clear\", \"forecast\":[{\"when\": \"Monday\", \"temperature\": \"13°C\", \"icon\": \"weather-clouds\"}, {\"when\": \"Tuesday\", \"temperature\": \"24°C\", \"icon\": \"overcast\"}, {\"when\": \"Wednesday\", \"temperature\": \"22°C\", \"icon\": \"weather-showers-day\"}]}}"));
@@ -334,7 +334,7 @@ void ServerTest::testSessionData()
     QCOMPARE(map->value(QStringLiteral("icon")), QStringLiteral("weather-clear"));
 
     //Verify the model contents, setting the whole list means reset of the model
-    SessionDataModel *dm = map->value(QStringLiteral("forecast")).value<SessionDataModel *>();
+    NamespaceDataModel *dm = map->value(QStringLiteral("forecast")).value<NamespaceDataModel *>();
     QVERIFY(dm);
     new QAbstractItemModelTester(dm, QAbstractItemModelTester::FailureReportingMode::QtTest, this);
     QCOMPARE(dm->rowCount(), 3);
@@ -354,12 +354,12 @@ void ServerTest::testSessionData()
 
 void ServerTest::testChangeSessionData()
 {
-    SessionDataMap *map = m_view->sessionDataForSkill(QStringLiteral("mycroft.weather"));
+    NamespaceDataMap *map = m_view->namespaceDataForNamespace(QStringLiteral("mycroft.weather"));
     QVERIFY(map);
-    QVERIFY(!m_view->sessionDataForSkill(QStringLiteral("invalidskillid")));
+    QVERIFY(!m_view->namespaceDataForNamespace(QStringLiteral("invalidskillid")));
 
-    QSignalSpy dataChangedSpy(map, &SessionDataMap::valueChanged);
-    QSignalSpy dataClearedSpy(map, &SessionDataMap::dataCleared);
+    QSignalSpy dataChangedSpy(map, &NamespaceDataMap::valueChanged);
+    QSignalSpy dataClearedSpy(map, &NamespaceDataMap::dataCleared);
 
     //set data for weather skill
     m_guiWebSocket->sendTextMessage(QStringLiteral("{\"type\": \"mycroft.session.set\", \"namespace\": \"mycroft.weather\", \"data\": {\"temperature\": \"24°C\", \"otherproperty\": \"value\"}}"));
@@ -385,12 +385,12 @@ void ServerTest::testChangeSessionData()
     QCOMPARE(map->value(QStringLiteral("otherproperty")), QVariant());
 
     //Change a value in the model of forecasts
-    SessionDataModel *dm = map->value(QStringLiteral("forecast")).value<SessionDataModel *>();
+    NamespaceDataModel *dm = map->value(QStringLiteral("forecast")).value<NamespaceDataModel *>();
     QVERIFY(dm);
-    QSignalSpy modelDataChangedSpy(dm, &SessionDataModel::dataChanged);
-    QSignalSpy modelDataInsertedSpy(dm, &SessionDataModel::rowsInserted);
-    QSignalSpy modelDataMovedSpy(dm, &SessionDataModel::rowsMoved);
-    QSignalSpy modelDataRemovedSpy(dm, &SessionDataModel::rowsRemoved);
+    QSignalSpy modelDataChangedSpy(dm, &NamespaceDataModel::dataChanged);
+    QSignalSpy modelDataInsertedSpy(dm, &NamespaceDataModel::rowsInserted);
+    QSignalSpy modelDataMovedSpy(dm, &NamespaceDataModel::rowsMoved);
+    QSignalSpy modelDataRemovedSpy(dm, &NamespaceDataModel::rowsRemoved);
     m_guiWebSocket->sendTextMessage(QStringLiteral("{\"type\": \"mycroft.session.list.update\", \"namespace\": \"mycroft.weather\", \"property\": \"forecast\", \"position\": 1, \"data\": [{\"temperature\": \"30°C\", \"icon\": \"weather-clear\", \"to_delete\": \"value to delete\"}]}"));
     modelDataChangedSpy.wait();
 
@@ -468,7 +468,7 @@ void ServerTest::testChangeSessionData()
 
 void ServerTest::testShowGui()
 {
-    QSignalSpy skillModelDataChangedSpy(m_view->activeSkills(), &ActiveSkillsModel::dataChanged);
+    QSignalSpy skillModelDataChangedSpy(m_view->activeNamespaces(), &NamespaceModel::dataChanged);
 
     const QUrl url(QStringLiteral("file://") + QFINDTESTDATA("currentweather.qml"));
 
@@ -476,13 +476,13 @@ void ServerTest::testShowGui()
 
     skillModelDataChangedSpy.wait();
 
-    AbstractDelegate *delegate = delegateForSkill(QStringLiteral("mycroft.weather"), url);
+    GuiPage *delegate = delegateForSkill(QStringLiteral("mycroft.weather"), url);
     QVERIFY(delegate);
     QCOMPARE(delegate->skillId(), QStringLiteral("mycroft.weather"));
     QCOMPARE(delegate->qmlUrl(), url);
 
     //check the delegate has the proper data associated
-    SessionDataMap *map = delegate->sessionData();
+    NamespaceDataMap *map = qobject_cast<NamespaceDataMap *>(delegate->namespaceData());
     QVERIFY(map);
     QCOMPARE(map->keys().count(), 4);
     QCOMPARE(map->value(QStringLiteral("temperature")), QStringLiteral("24°C"));
@@ -490,17 +490,17 @@ void ServerTest::testShowGui()
     QCOMPARE(map->value(QStringLiteral("otherproperty")), QVariant());
 
     //try to get the delegate via the model, like qml will do and check they're the same
-    DelegatesModel *dm = m_view->activeSkills()->data(m_view->activeSkills()->index(0, 0), ActiveSkillsModel::Delegates).value<DelegatesModel *>();
+    PageModel *dm = m_view->activeNamespaces()->data(m_view->activeNamespaces()->index(0, 0), NamespaceModel::Pages).value<PageModel *>();
     QVERIFY(dm);
     new QAbstractItemModelTester(dm, QAbstractItemModelTester::FailureReportingMode::QtTest, this);
-    AbstractDelegate *delegate2 = dm->data(dm->index(0, 0), DelegatesModel::DelegateUi).value<AbstractDelegate *>();
+    GuiPage *delegate2 = dm->data(dm->index(0, 0), PageModel::PageUi).value<GuiPage *>();
     QCOMPARE(delegate, delegate2);
 }
 
 void ServerTest::testClientToServerData()
 {
     const QUrl url(QStringLiteral("file://") + QFINDTESTDATA("currentweather.qml"));
-    AbstractDelegate *delegate = delegateForSkill(QStringLiteral("mycroft.weather"), url);
+    GuiPage *delegate = delegateForSkill(QStringLiteral("mycroft.weather"), url);
     QVERIFY(delegate);
 
     QSignalSpy propertySpy(m_guiWebSocket, &QWebSocket::textMessageReceived);
@@ -526,7 +526,7 @@ void ServerTest::testClientToServerData()
 
 void ServerTest::testShowSecondGuiPage()
 {
-    QSignalSpy skillModelDataChangedSpy(m_view->activeSkills(), &ActiveSkillsModel::dataChanged);
+    QSignalSpy skillModelDataChangedSpy(m_view->activeNamespaces(), &NamespaceModel::dataChanged);
 
     const QUrl url(QStringLiteral("file://") + QFINDTESTDATA("forecast.qml"));
     //wait a moment before showing it there
@@ -536,7 +536,7 @@ void ServerTest::testShowSecondGuiPage()
 
     skillModelDataChangedSpy.wait();
 
-    AbstractDelegate *delegate = delegateForSkill(QStringLiteral("mycroft.weather"), url);
+    GuiPage *delegate = delegateForSkill(QStringLiteral("mycroft.weather"), url);
     QVERIFY(delegate);
     QCOMPARE(delegate->skillId(), QStringLiteral("mycroft.weather"));
     QCOMPARE(delegate->qmlUrl(), url);
@@ -544,11 +544,11 @@ void ServerTest::testShowSecondGuiPage()
 
 void ServerTest::testEventsFromServer()
 {
-    AbstractDelegate *delegate = delegatesForSkill(QStringLiteral("mycroft.weather")).first();
+    GuiPage *delegate = delegatesForSkill(QStringLiteral("mycroft.weather")).first();
     QVERIFY(delegate);
     QCOMPARE(delegate->skillId(), QStringLiteral("mycroft.weather"));
 
-    QSignalSpy eventSpy(delegate, &AbstractDelegate::guiEvent);
+    QSignalSpy eventSpy(delegate, &GuiPage::guiEvent);
 
     //An event of the weather skill
     m_guiWebSocket->sendTextMessage(QStringLiteral("{\"type\": \"mycroft.events.triggered\", \"namespace\": \"mycroft.weather\", \"event_name\": \"show_alert\", \"data\": {\"alert_name\": \"blizzard\", \"condition\": \"severe\"}}"));
@@ -581,7 +581,7 @@ void ServerTest::testEventsFromServer()
 
 void ServerTest::testEventsFromClient()
 {
-    AbstractDelegate *delegate = delegatesForSkill(QStringLiteral("mycroft.weather")).first();
+    GuiPage *delegate = delegatesForSkill(QStringLiteral("mycroft.weather")).first();
     QVERIFY(delegate);
     QCOMPARE(delegate->skillId(), QStringLiteral("mycroft.weather"));
 
@@ -619,21 +619,21 @@ void ServerTest::testMoveGuiPage()
     QUrl currentUrl = QUrl::fromLocalFile(QFINDTESTDATA("currentweather.qml"));
     QUrl forecastUrl = QUrl::fromLocalFile(QFINDTESTDATA("forecast.qml"));
 
-    DelegatesModel *delegatesModel = m_view->activeSkills()->delegatesModelForSkill(QStringLiteral("mycroft.weather"));
+    PageModel *delegatesModel = m_view->activeNamespaces()->pageModelForNamespace(QStringLiteral("mycroft.weather"));
     QVERIFY(delegatesModel);
     
-    QSignalSpy rowsMovedSpy(delegatesModel, &DelegatesModel::rowsMoved);
+    QSignalSpy rowsMovedSpy(delegatesModel, &PageModel::rowsMoved);
 
     m_guiWebSocket->sendTextMessage(QStringLiteral("{\"type\": \"mycroft.gui.list.move\", \"namespace\": \"mycroft.weather\", \"items_number\": 1, \"from\": 1, \"to\": 0}"));
     QTest::qWait(1000);
 
     rowsMovedSpy.wait();
 
-    AbstractDelegate *delegate = delegatesModel->data(delegatesModel->index(0,0), DelegatesModel::DelegateUi).value<AbstractDelegate *>();
+    GuiPage *delegate = delegatesModel->data(delegatesModel->index(0,0), PageModel::PageUi).value<GuiPage *>();
     QVERIFY(delegate);
     QCOMPARE(delegate->qmlUrl(), forecastUrl);
 
-    AbstractDelegate *delegate2 = delegatesModel->data(delegatesModel->index(1,0), DelegatesModel::DelegateUi).value<AbstractDelegate *>();
+    GuiPage *delegate2 = delegatesModel->data(delegatesModel->index(1,0), PageModel::PageUi).value<GuiPage *>();
     QVERIFY(delegate2);
     QCOMPARE(delegate2->qmlUrl(), currentUrl);
 }
@@ -643,13 +643,13 @@ void ServerTest::testRemoveGuiPage()
     QUrl currentUrl = QUrl::fromLocalFile(QFINDTESTDATA("currentweather.qml"));
     QUrl forecastUrl = QUrl::fromLocalFile(QFINDTESTDATA("forecast.qml"));
 
-    AbstractDelegate *delegate = delegateForSkill(QStringLiteral("mycroft.weather"), forecastUrl);
+    GuiPage *delegate = delegateForSkill(QStringLiteral("mycroft.weather"), forecastUrl);
 
-    DelegatesModel *delegatesModel = m_view->activeSkills()->delegatesModelForSkill(QStringLiteral("mycroft.weather"));
+    PageModel *delegatesModel = m_view->activeNamespaces()->pageModelForNamespace(QStringLiteral("mycroft.weather"));
     QVERIFY(delegatesModel);
     QCOMPARE(delegatesModel->rowCount(), 2);
     
-    QSignalSpy rowsRemovedSpy(delegatesModel, &DelegatesModel::rowsRemoved);
+    QSignalSpy rowsRemovedSpy(delegatesModel, &PageModel::rowsRemoved);
     QSignalSpy destroyedSpy(delegate, &QObject::destroyed);
 
     m_guiWebSocket->sendTextMessage(QStringLiteral("{\"type\": \"mycroft.gui.list.remove\", \"namespace\": \"mycroft.weather\", \"items_number\": 1, \"position\": 0}"));
@@ -658,7 +658,7 @@ void ServerTest::testRemoveGuiPage()
     rowsRemovedSpy.wait();
 
     QCOMPARE(delegatesModel->rowCount(), 1);
-    delegate = delegatesModel->data(delegatesModel->index(0,0), DelegatesModel::DelegateUi).value<AbstractDelegate *>();
+    delegate = delegatesModel->data(delegatesModel->index(0,0), PageModel::PageUi).value<GuiPage *>();
     QVERIFY(delegate);
     QCOMPARE(delegate->qmlUrl(), currentUrl);
 
@@ -668,15 +668,15 @@ void ServerTest::testRemoveGuiPage()
 
 void ServerTest::testSwitchSkill()
 {
-    SessionDataMap *map = m_view->sessionDataForSkill(QStringLiteral("mycroft.wiki"));
+    NamespaceDataMap *map = m_view->namespaceDataForNamespace(QStringLiteral("mycroft.wiki"));
     QVERIFY(map);
 
-    DelegatesModel *delegatesModel = m_view->activeSkills()->delegatesModelForSkill(QStringLiteral("mycroft.wiki"));
+    PageModel *delegatesModel = m_view->activeNamespaces()->pageModelForNamespace(QStringLiteral("mycroft.wiki"));
     QVERIFY(delegatesModel);
 
-    QSignalSpy dataChangedSpy(map, &SessionDataMap::valueChanged);
-    QSignalSpy skillMovedSpy(m_view->activeSkills(), &ActiveSkillsModel::rowsMoved);
-    QSignalSpy delegateInsertedSpy(delegatesModel, &DelegatesModel::rowsInserted);
+    QSignalSpy dataChangedSpy(map, &NamespaceDataMap::valueChanged);
+    QSignalSpy skillMovedSpy(m_view->activeNamespaces(), &NamespaceModel::rowsMoved);
+    QSignalSpy delegateInsertedSpy(delegatesModel, &PageModel::rowsInserted);
 
     QUrl url = QUrl::fromLocalFile(QFINDTESTDATA("wiki.qml"));
 

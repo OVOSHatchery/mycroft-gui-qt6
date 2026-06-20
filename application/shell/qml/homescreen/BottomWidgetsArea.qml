@@ -4,7 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import Mycroft 1.0 as Mycroft
+import OVOS.GUI 1.0 as OVOS
 
 Item {
     id: bottomWidgetsAreaRootItem
@@ -31,7 +31,7 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right        
         anchors.verticalCenter: parent.verticalCenter
-        height: Mycroft.Units.gridUnit * 5        
+        height: OVOS.Units.gridUnit * 5        
         visible: idleRoot.mediaWidgetEnabled
         enabled: idleRoot.mediaWidgetEnabled
         verticalMode: bottomWidgetsAreaRootItem.verticalMode

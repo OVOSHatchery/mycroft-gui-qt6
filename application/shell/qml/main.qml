@@ -23,18 +23,20 @@ import QtQuick.Controls
 import Qt5Compat.GraphicalEffects
 import org.kde.kirigami as Kirigami
 import QtQuick.Window
-import Mycroft 1.0 as Mycroft
 import QtQuick.Controls.Material 2.0
 import "./panel" as Panel
 import "./osd" as Osd
-import OVOSPlugin 1.0 as OVOSPlugin
+
+// Direct imports (replacing module system)
+import "qrc:/qml/Units.qml" as Units
+import "qrc:/qml/SoundEffects.qml" as SoundEffects
 
 Kirigami.AbstractApplicationWindow {
     id: root
     visible: true
     visibility: "Maximized"
     flags: Qt.FramelessWindowHint
-    property var controllerStatus: Mycroft.MycroftController.status
+    property var controllerStatus: GuiBusClient.status
     property bool platformEGLFS: true
     property bool slidingPanelShouldOpen: false
 
@@ -55,18 +57,9 @@ Kirigami.AbstractApplicationWindow {
         }
         Kirigami.Units.longDuration = 100;
         Kirigami.Units.shortDuration = 100;
-        palette.mid = OVOSPlugin.Configuration.secondaryColor
-        palette.dark = Qt.darker(OVOSPlugin.Configuration.secondaryColor, 1.2)
-    }
-
-    Connections {
-        target: OVOSPlugin.Configuration
-        onSchemeChanged: {
-          contentsRect.visible = false
-          contentsRect.visible = true
-          palette.mid = OVOSPlugin.Configuration.secondaryColor
-          palette.dark = Qt.darker(OVOSPlugin.Configuration.secondaryColor, 1.2)
-        }
+        // Color scheme defaults (configuration would come from OVOSPlugin if available)
+        palette.mid = "#6e6e6e"
+        palette.dark = Qt.darker("#6e6e6e", 1.2)
     }
 
     Connections {
@@ -86,8 +79,8 @@ Kirigami.AbstractApplicationWindow {
     }
 
     Connections {
-        target: Mycroft.MycroftController
-        onIntentRecevied: {
+        target: GuiBusClient
+        onProtocolMessageReceived: {
             if (type == "ovos.shell.exec.factory.reset") {
                 var script_to_run_path = data.script
                 resetOperations.runResetOperations(script_to_run_path)
@@ -111,14 +104,14 @@ Kirigami.AbstractApplicationWindow {
                 mainView.grabToImage(function(result) {
                     result.saveToFile(filepath);
                 });
-                Mycroft.MycroftController.sendRequest("ovos.display.screenshot.get.response", {"result": filepath});
+                GuiBusClient.sendRequest("ovos.display.screenshot.get.response", {"result": filepath});
             }
             if (type == "ovos.shell.get.menuLabels.status") {
-                Mycroft.MycroftController.sendRequest("ovos.shell.get.menuLabels.status.response", {"enabled": applicationSettings.menuLabels});
+                GuiBusClient.sendRequest("ovos.shell.get.menuLabels.status.response", {"enabled": applicationSettings.menuLabels});
             }
             if (type == "ovos.shell.set.menuLabels") {
                 applicationSettings.menuLabels = data.enabled
-                Mycroft.MycroftController.sendRequest("ovos.shell.get.menuLabels.status.response", {"enabled": applicationSettings.menuLabels});
+                GuiBusClient.sendRequest("ovos.shell.get.menuLabels.status.response", {"enabled": applicationSettings.menuLabels});
             }
         }
     }
@@ -141,13 +134,13 @@ Kirigami.AbstractApplicationWindow {
 
     Timer {
         interval: 20000
-        running: Mycroft.GlobalSettings.autoConnect && Mycroft.MycroftController.status != Mycroft.MycroftController.Open
+        running: OVOS.GlobalSettings.autoConnect && GuiBusClient.status != GuiBusClient.Open
         triggeredOnStart: true
         onTriggered: {
-            console.log("Trying to connect to Mycroft");
-            Mycroft.MycroftController.start();
+            console.log("Trying to connect to OVOS");
+            GuiBusClient.start();
             slidingPanel.close();
-            OVOSPlugin.Configuration.updateSchemeList();
+            // updateSchemeList would be called on OVOSPlugin.Configuration if available
         }
     }
 
@@ -240,7 +233,7 @@ Kirigami.AbstractApplicationWindow {
                 height: Kirigami.Units.gridUnit * 3
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.margins: Mycroft.Units.gridUnit * 2
+                anchors.margins: Units.gridUnit * 2
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: parent.height * 0.25
                 refSlidingPanel: slidingPanel.position
@@ -285,12 +278,14 @@ Kirigami.AbstractApplicationWindow {
                 pullDownMenuFlickableArea.returnToBounds()
             }
 
-            Mycroft.SkillView {
+            // Template renderer (replaces OVOS.NamespaceView)
+            Rectangle {
                 id: mainView
                 Kirigami.Theme.colorSet: Kirigami.Theme.Complementary
                 width: contentsRect.width
                 height: contentsRect.height
                 z: 2
+                color: "black"
 
                 Rectangle {
                     anchors.bottom: parent.top
@@ -307,7 +302,7 @@ Kirigami.AbstractApplicationWindow {
 
                     onVisibleChanged: {
                         if(visible && (pullDownMenuFlickableArea.contentY < -height * 0.15)){
-                            Mycroft.SoundEffects.playClickedSound("qrc:/sounds/flicked.wav")
+                            SoundEffects.playClickedSound("qrc:/sounds/flicked.wav")
                         }
                     }
                 }

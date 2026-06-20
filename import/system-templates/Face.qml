@@ -1,10 +1,11 @@
 import QtQuick
 import QtQuick.Layouts
+import OVOS.GUI 1.0 as OVOS
 
-Item {
+OVOS.Page {
     id: root
 
-    property bool sleeping: sessionData.sleeping !== undefined ? sessionData.sleeping : false
+    property bool sleeping: namespaceData ? (namespaceData.sleeping !== undefined ? namespaceData.sleeping : false) : false
 
     Rectangle {
         anchors.centerIn: parent
@@ -19,15 +20,15 @@ Item {
             spacing: 40
 
             Rectangle {
-                width: 30; height: sleeping ? 4 : 30
-                radius: sleeping ? 2 : 15
+                width: 30; height: root.sleeping ? 4 : 30
+                radius: root.sleeping ? 2 : 15
                 color: "#333"
                 Behavior on height { NumberAnimation { duration: 300 } }
             }
 
             Rectangle {
-                width: 30; height: sleeping ? 4 : 30
-                radius: sleeping ? 2 : 15
+                width: 30; height: root.sleeping ? 4 : 30
+                radius: root.sleeping ? 2 : 15
                 color: "#333"
                 Behavior on height { NumberAnimation { duration: 300 } }
             }

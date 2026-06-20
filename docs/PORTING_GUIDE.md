@@ -51,15 +51,15 @@ set(CMAKE_AUTORCC ON)
 #### QML Registration
 ```cpp
 // Qt5
-class MycroftController : public QObject {
+class OVOSController : public QObject {
     Q_OBJECT
 };
 
 // In main.cpp
-qmlRegisterType<MycroftController>("Mycroft", 1, 0, "MycroftController");
+qmlRegisterType<OVOSController>("OVOS", 1, 0, "OVOSController");
 
 // Qt6 - Use declarative macro
-class MycroftController : public QObject {
+class OVOSController : public QObject {
     Q_OBJECT
     QML_ELEMENT
 };

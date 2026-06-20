@@ -20,67 +20,61 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as QQC2
 import org.kde.kirigami 2.19 as Kirigami
-import Mycroft 1.0 as Mycroft
-import Qt5Compat.GraphicalEffects
+import OVOS.GUI 1.0 as OVOS
 
 Kirigami.Page {
     title: "Hints"
     objectName: "hints"
-    property var modelCreatedObject
-    property var filteredModel
+    property var hintsModel: []
+    property var filteredModel: []
+
+    /*
+     * PROTOCOL: Hints are requested from ovos-core via the message bus.
+     *
+     * CLIENT → SERVER:
+     *   type: "gui.hints.get"
+     *   data: {}
+     *
+     * SERVER → CLIENT:
+     *   type: "gui.hints.get.response"
+     *   data: {
+     *     "hints": [
+     *       {
+     *         "title": "Weather Skill",
+     *         "image": "https://...",
+     *         "category": "Daily",
+     *         "examples": ["What's the weather?", "Will it rain tomorrow?"]
+     *       },
+     *       ...
+     *     ]
+     *   }
+     */
 
     Component.onCompleted: {
-        createHintModel()
+        OVOS.GuiBusClient.sendRequest("gui.hints.get", {})
     }
 
-    function createHintModel(){
-        var hintList = []
-        var defaultFold = '/opt/mycroft/skills'
-        var fileToFind = "README.md"
-        var getList = Mycroft.FileReader.checkForMeta(defaultFold, fileToFind)
-        for(var i=0; i < getList.length; i++){
-            var fileName = getList[i] + "/" + fileToFind;
-            var fileParse = Mycroft.FileReader.read(fileName);
-            console.log("Loading hints from", fileName);
-            var matchedRegex = getDataFromRegex(fileName, fileParse, /<img[^>]*src='([^']*)'.*\/>\s(.*)/g)
-            var matchedExamples = getDataFromRegex(fileName, fileParse, /## Examples.*\n.*"(.*)"\n\*\s"(.*)"/g)
-            var matchedCategory = getDataFromRegex(fileName, fileParse, /## Category.*\n\*\*(.*)\*\*/g)
-            if(matchedRegex !== null && matchedRegex.length > 0 && matchedExamples !== null && matchedExamples.length > 0 && matchedCategory !== null && matchedCategory.length > 0) {
-                console.log("All good. \n");
-                var metaFileObject = {
-                    imgSrc: matchedRegex[1],
-                    title: matchedRegex[2],
-                    category: matchedCategory[1],
-                    examples: matchedExamples
+    Connections {
+        target: OVOS.GuiBusClient
+        function onSocketMessageReceived(type, data) {
+            if (type === "gui.hints.get.response") {
+                var hints = data["hints"]
+                if (hints && hints.length > 0) {
+                    hintsModel = hints
+                    filteredModel = hints
                 }
-                hintList.push(metaFileObject);
             }
         }
-        modelCreatedObject = hintList
-        filteredModel = modelCreatedObject
-    }
-
-    function getDataFromRegex(fileName, fileText, matchRegex){
-        var re = new RegExp(matchRegex);
-        var match = re.exec(fileText);
-        if (match === null || match.length == 0) {
-            console.log("README.md file is not properly defined, it's missing data for the following regex:");
-            console.log(re);
-            console.log("Please fix the README.md file of the skill");
-            console.log("This warning is for skill developers");
-            console.log("if you are not a developer, fill a bug on the corresponding skill.\n");
-        }
-        return match;
     }
 
     function filterModel(text) {
         var result = []
-        for (var i = 0; i < modelCreatedObject.length; i++) {
-            var obj = modelCreatedObject[i];
-            if (obj.title.toLowerCase().includes(text)
-            || obj.category.toLowerCase().includes(text)
-            || obj.examples[0].toLowerCase().includes(text)
-            || obj.examples[1].toLowerCase().includes(text)) {
+        for (var i = 0; i < hintsModel.length; i++) {
+            var obj = hintsModel[i];
+            var searchText = text.toLowerCase()
+            if (obj.title.toLowerCase().includes(searchText)
+                || obj.category.toLowerCase().includes(searchText)
+                || obj.examples.join(" ").toLowerCase().includes(searchText)) {
                 result.push(obj)
             }
         }
@@ -95,7 +89,7 @@ Kirigami.Page {
             placeholderText: qsTr("Search:")
             Layout.fillWidth: true
             onTextChanged: {
-                filteredModel = filterModel(text.toLowerCase())
+                filteredModel = filterModel(text)
             }
         }
 
@@ -109,10 +103,10 @@ Kirigami.Page {
                 anchors.fill: parent
 
                 delegate: HintsDelegate {
-                    imageSource: modelData.imgSrc
-                    title: modelData.title
-                    examples: modelData.examples
-                    category: modelData.category
+                    imageSource: modelData.image || ""
+                    title: modelData.title || ""
+                    examples: modelData.examples || []
+                    category: modelData.category || ""
                 }
             }
         }

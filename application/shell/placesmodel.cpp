@@ -297,7 +297,9 @@ void PlacesModel::update()
     process.waitForFinished();
 
     QFile file(QStringLiteral("/tmp/partsmodel.json"));
-    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return;
+    }
     QByteArray data = file.readAll();
     file.close();
     

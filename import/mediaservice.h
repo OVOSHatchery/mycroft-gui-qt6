@@ -28,7 +28,7 @@
 #include <QVideoSink>
 #include <QQmlEngine>
 
-#include "mycroftcontroller.h"
+#include "guibusclient.h"
 #include "mediaproviders/audioproviderservice.h"
 #include "mediaproviders/videoproviderservice.h"
 
@@ -82,13 +82,13 @@ public:
     void unloadVideoProvider(MediaService::UnloadStateReason reason);
     void changeProvider(MediaService::ProviderServiceType serviceType);
     void syncStates();
-    bool evaluateUrl(const QString &url);
     Q_INVOKABLE MediaService::PlaybackState servicePlayBackState() const;
     Q_INVOKABLE MediaService::MediaState serviceMediaState() const;
     QVideoSink* videoSink() const;
-    void setVideoSink(QVideoSink *newVideoSink);
+    Q_INVOKABLE void setVideoSink(QVideoSink *newVideoSink);
     QObject* videoOutput() const;
     void setVideoOutput(QObject *newVideoOutput);
+    void onMainSocketIntentReceived(const QString &type, const QVariantMap &data);
 
     // AudioProvider Specific Expose To QML
     QVector<double> spectrum() const;
@@ -154,6 +154,9 @@ private slots:
     void updateMediaStateVideoProvider(VideoProviderService::MediaState mediaState);
 
 private:
+    void continueMediaLoadUrl(const QString &url, MediaService::ProviderServiceType serviceType);
+    void handleInvalidMedia();
+
     ProviderServiceType m_selectedProviderService;
     PlaybackState m_currentPlaybackState;
     MediaState m_currentMediaState;
@@ -163,8 +166,7 @@ private:
     QPointer<QVideoSink> m_videoSink;
     QPointer<QObject> m_videoOutput;
 
-    MycroftController *m_controller;
-    void onMainSocketIntentReceived(const QString &type, const QVariantMap &data);
+    GuiBusClient *m_controller;
 
     QString m_loadedUrl;
     QString m_receivedUrl;

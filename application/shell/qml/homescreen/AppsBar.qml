@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import Mycroft 1.0 as Mycroft
+import OVOS.GUI 1.0 as OVOS
 
 Item {
     id: appBarRoot
@@ -94,18 +94,18 @@ Item {
 
                     Rectangle {
                         id: launcherAreaHandler
-                        width: appBarRoot.parentItem.horizontalMode ? Mycroft.Units.gridUnit * 3 : Mycroft.Units.gridUnit * 2
-                        height: Mycroft.Units.gridUnit * 0.5
+                        width: appBarRoot.parentItem.horizontalMode ? OVOS.Units.gridUnit * 3 : OVOS.Units.gridUnit * 2
+                        height: OVOS.Units.gridUnit * 0.5
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.left: parent.left
                         anchors.leftMargin: 8
                         color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.5)
-                        radius: Mycroft.Units.gridUnit
+                        radius: OVOS.Units.gridUnit
 
                         MouseArea {
                             anchors.fill: parent
                             onClicked: {
-                                Mycroft.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
+                                OVOS.SoundEffects.playClickedSound(Qt.resolvedUrl("sounds/clicked.wav"))
                                 appBarRoot.close()
                             }
 

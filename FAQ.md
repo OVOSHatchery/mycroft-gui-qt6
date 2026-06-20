@@ -53,6 +53,24 @@ Yes. Qt6 shell mode includes all features of the Qt5 shell: homescreen, widgets,
 
 Minimum: 512 MB RAM, 1 GHz CPU, touchscreen or pointer device. Modern embedded systems like Mycroft Mark 2 and Raspberry Pi 3+ work well. Qt6 requires 64-bit architecture.
 
+## Protocol Layers
+
+### What protocol layers exist on the GUI WebSocket?
+
+Three layers, each with its own enum in `guibusmessages.h`:
+
+1. **Wire (`WireMessage`)** — `mycroft.*` messages: session sync, GUI list operations, namespace management, and the new `FORWARD_ASSISTANT`/`FORWARD_SHELL` wrapper messages.
+2. **Shell (`ShellEvent`)** — `gui.*` messages: hints, page interaction, connected status.
+3. **Assistant (`AssistantEvent`)** — Forwarded bus events (wakeword, speaking state, etc.) wrapped inside a `mycroft.gui.forward.assistant` wire message with an `event_type` field.
+
+### How are assistant events (wakeword, speaking state) sent to Qt clients?
+
+They are wrapped in a `mycroft.gui.forward.assistant` wire message with an `event_type` field. Bare assistant events on the wire produce a warning — they must be wrapped explicitly. See `WireMessage::FORWARD_ASSISTANT` in `guibusmessages.h` and the `handleAssistantEvent()` private method in `ovoscontroller.cpp`.
+
+### How do Qt clients request voice command hints?
+
+Send `gui.hints.get` on the WebSocket. The adapter responds with `gui.hints.get.response` containing `{"hints": [...]}`.
+
 ## See Also
 - [QUICK_FACTS.md](QUICK_FACTS.md) — Machine-readable reference
 - [AUDIT.md](AUDIT.md) — Known issues

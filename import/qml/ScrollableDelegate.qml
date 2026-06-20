@@ -19,7 +19,7 @@
 import QtQuick
 import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
-import Mycroft 1.0 as Mycroft
+import OVOS.GUI 1.0 as OVOS
 
 // ScrollableDelegate formally inherits from Delegate, providing a scrollable content area
 // while maintaining all Delegate theming and behavior (padding, background colors, etc.).

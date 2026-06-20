@@ -4,7 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import Mycroft 1.0 as Mycroft
+import OVOS.GUI 1.0 as OVOS
 
 Rectangle {
     id: mediaWidgetDisplayRoot
@@ -12,7 +12,7 @@ Rectangle {
     border.color: Qt.darker(Kirigami.Theme.backgroundColor, 1.5)
     border.width: 1
     radius: 8
-    readonly property var audioService: Mycroft.MediaService
+    readonly property var audioService: OVOS.MediaService
     property var spectrum: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     property var spectrumModelLength: audioService.spectrum.length
     property bool verticalMode: false
@@ -43,7 +43,7 @@ Rectangle {
 
     RowLayout {
         anchors.fill: parent
-        anchors.margins: Mycroft.Units.gridUnit * 0.3
+        anchors.margins: OVOS.Units.gridUnit * 0.3
 
         MediaWidgetButton {
             buttonIcon: idleRoot.mediaWidgetState == "playing" ? "media-playback-pause" : "media-playback-start"
@@ -66,7 +66,7 @@ Rectangle {
         Rectangle {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.margins: Mycroft.Units.gridUnit * 0.3
+            Layout.margins: OVOS.Units.gridUnit * 0.3
             radius: 8
             color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.1)
             clip: true
@@ -91,14 +91,14 @@ Rectangle {
                 }
             }
 
-            Mycroft.MarqueeText {
+            OVOS.MarqueeText {
                 id: titleText
                 anchors.fill: parent
-                anchors.leftMargin: Mycroft.Units.gridUnit * 0.2
-                anchors.rightMargin: Mycroft.Units.gridUnit * 0.2
+                anchors.leftMargin: OVOS.Units.gridUnit * 0.2
+                anchors.rightMargin: OVOS.Units.gridUnit * 0.2
                 text: idleRoot.mediaWidgetData.title + " - " + idleRoot.mediaWidgetData.artist
                 color: Qt.rgba(Kirigami.Theme.textColor.r, Kirigami.Theme.textColor.g, Kirigami.Theme.textColor.b, 0.7)
-                font.pixelSize: mediaWidgetDisplayRoot.verticalMode ? Mycroft.Units.gridUnit * 1 : Mycroft.Units.gridUnit * 2
+                font.pixelSize: mediaWidgetDisplayRoot.verticalMode ? OVOS.Units.gridUnit * 1 : OVOS.Units.gridUnit * 2
                 rightToLeft: true
                 speed: 9000
                 delay: 2000
@@ -121,7 +121,7 @@ Rectangle {
         MediaWidgetButton {
             buttonIcon: "drag-surface"
             onClicked: {
-                Mycroft.MycroftController.sendRequest("ovos.common_play.home", {})
+                OVOS.GuiBusClient.sendRequest("ovos.common_play.home", {})
             }
         }
     }

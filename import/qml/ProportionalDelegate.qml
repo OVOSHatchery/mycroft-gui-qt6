@@ -19,7 +19,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
-import Mycroft 1.0 as Mycroft
+import OVOS.GUI 1.0 as OVOS
 
 // DEPRECATED: Do not use for new skills. Use template-based system instead.
 // See docs/QML_AUDIT_AND_MIGRATION.md for migration guidance.
@@ -37,7 +37,7 @@ Delegate {
     bottomPadding: Math.min(root.width, root.height)/15 + root.parent.extraBottomPadding
 
     //contentItemAutoHeight: false
-    contentItem: Mycroft.BoxLayout {
+    contentItem: OVOS.BoxLayout {
         id: layout
 
         // Design Decision: Use proportional spacing (root.spacing) instead of zero

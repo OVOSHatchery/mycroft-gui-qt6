@@ -76,16 +76,16 @@ mycroft-gui-qt6/
 ├── CMakeLists.txt              # Build configuration
 ├── import/
 │   ├── *.h / *.cpp            # C++ sources (13 files)
-│   │   ├── mycroftcontroller.cpp         # WebSocket connection
-│   │   ├── abstractskillview.cpp         # Skill UI container
-│   │   ├── abstractdelegate.cpp          # Base delegate
+│   │   ├── guibusclient.cpp         # WebSocket connection
+│   │   ├── guinamespace.cpp         # Skill UI container
+│   │   ├── guipage.cpp          # Base delegate
 │   │   ├── guibusmessages.h              # Message type enum
 │   │   └── ...
 │   ├── system-templates/       # 25 OVOS templates (QML)
 │   │   ├── Text.qml, Image.qml, Weather.qml, ...
 │   │   └── ...
 │   ├── qml/                    # 17 framework components
-│   │   ├── SkillView.qml, AudioPlayer.qml, ...
+│   │   ├── NamespaceView.qml, AudioPlayer.qml, ...
 │   │   └── ...
 │   ├── qmldir                  # QML module registration
 │   └── mycroft.qrc             # Resource file (templates)
@@ -116,7 +116,7 @@ Found a bug? Report it on GitHub with:
 
 Example:
 ```
-Title: Bug: MycroftController fails to reconnect after network loss
+Title: Bug: GuiBusClient fails to reconnect after network loss
 
 Steps:
 1. Start mycroft-gui-app
@@ -150,8 +150,8 @@ Proposed Solution:
 - Restore on startup using QSettings
 
 Code outline:
-void MycroftController::saveWindowGeometry() { /* ... */ }
-void MycroftController::restoreWindowGeometry() { /* ... */ }
+void GuiBusClient::saveWindowGeometry() { /* ... */ }
+void GuiBusClient::restoreWindowGeometry() { /* ... */ }
 ```
 
 ### 3. Code Contributions
@@ -179,7 +179,7 @@ void MycroftController::restoreWindowGeometry() { /* ... */ }
 
 4. **Commit with clear message**
    ```bash
-   git commit -m "fix: MycroftController reconnects after network loss
+   git commit -m "fix: GuiBusClient reconnects after network loss
 
    - Track connection state with Timer
    - Auto-reconnect on disconnection signal
@@ -244,13 +244,13 @@ EOF
 
 **Example (correct style):**
 ```cpp
-// mycroftcontroller.h
-class MycroftController : public QObject {
+// guibusclient.h
+class GuiBusClient : public QObject {
     Q_OBJECT
     QML_ELEMENT
 
 public:
-    explicit MycroftController(QObject *parent = nullptr);
+    explicit GuiBusClient(QObject *parent = nullptr);
     void connect();
     void disconnect();
 
@@ -298,9 +298,9 @@ m_socket.close();
 
 **Example (correct style):**
 ```qml
-// SkillView.qml
+// NamespaceView.qml
 import QtQuick
-import Mycroft
+import OVOS
 
 Item {
     id: root
@@ -318,7 +318,7 @@ Item {
 
     ListView {
         anchors.fill: parent
-        model: root.skillView.sessionData
+        model: root.skillView.namespaceData
         // ...
     }
 }
@@ -347,7 +347,7 @@ Related to #issue-number
 
 **Examples:**
 ```
-fix: MycroftController reconnects after network failure
+fix: GuiBusClient reconnects after network failure
 
 - Monitor connection state with QTimer
 - Automatically reconnect when socket disconnects
@@ -359,7 +359,7 @@ Fixes #456
 
 docs: Update ARCHITECTURE.md with signal flow diagram
 
-- Add ASCII diagram showing MycroftController signals
+- Add ASCII diagram showing GuiBusClient signals
 - Document session data flow for new contributors
 - Link to related code sections
 
@@ -389,14 +389,14 @@ If adding a new feature, add tests to `autotests/`:
 ```cpp
 // autotests/myfeature_test.cpp
 #include <QtTest>
-#include "../import/mycroftcontroller.h"
+#include "../import/guibusclient.h"
 
 class MyFeatureTest : public QObject {
     Q_OBJECT
 
 private slots:
     void testNewFeature() {
-        MycroftController controller;
+        GuiBusClient controller;
         // Test the feature
         QVERIFY(controller.newFeature());
     }
@@ -482,22 +482,22 @@ When adding code, document it:
 ### C++ Classes and Methods
 
 ```cpp
-/// MycroftController manages the WebSocket connection to ovos-gui
+/// GuiBusClient manages the WebSocket connection to ovos-gui
 ///
 /// This singleton handles:
 /// - Connecting to ovos-gui service on port 18181
-/// - Routing incoming template messages to SkillViews
+/// - Routing incoming template messages to NamespaceViews
 /// - Forwarding user events (touch, voice) back to skills
 ///
 /// Usage:
 /// \code
-/// auto controller = MycroftController::instance();
-/// connect(controller, &MycroftController::pageShowRequested,
-///         this, &MySkillView::onPageShow);
+/// auto controller = GuiBusClient::instance();
+/// connect(controller, &GuiBusClient::pageShowRequested,
+///         this, &MyNamespaceView::onPageShow);
 /// \endcode
 ///
-/// \sa AbstractSkillView, GuiBusMessages
-class MycroftController : public QObject {
+/// \sa GuiNamespace, GuiBusMessages
+class GuiBusClient : public QObject {
     // ...
 };
 ```
@@ -505,7 +505,7 @@ class MycroftController : public QObject {
 ### QML Components
 
 ```qml
-/// SkillView renders a skill's UI templates
+/// NamespaceView renders a skill's UI templates
 ///
 /// This component is responsible for:
 /// - Loading the appropriate template for the current skill
@@ -514,15 +514,15 @@ class MycroftController : public QObject {
 ///
 /// Example:
 /// \qml
-/// SkillView {
-///     skillView: MycroftController.currentSkillView
+/// NamespaceView {
+///     skillView: GuiBusClient.currentNamespaceView
 ///     isActive: true
 /// }
 /// \endqml
 Item {
     id: root
 
-    /// The AbstractSkillView model managing this skill's data
+    /// The GuiNamespace model managing this skill's data
     required property var skillView
 
     /// Whether this skill view is currently active

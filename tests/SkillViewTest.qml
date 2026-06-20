@@ -2,7 +2,7 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15
 import QtQuick.Window 2.15
-import Mycroft 1.0 as Mycroft
+import OVOS.GUI 1.0 as OVOS
 
 Window {
     id: root
@@ -16,9 +16,9 @@ Window {
     y: deviceHeight ? Screen.desktopAvailableHeight - height : undefined
     color: "black"
 
-    Mycroft.SkillView {
+    OVOS.NamespaceView {
         id: mainView
-        activeSkills.whiteList: singleSkill.length > 0 ? singleSkill : null
+        activeNamespaces.whiteList: singleSkill.length > 0 ? [singleSkill] : []
         anchors.fill: parent
     }
 }

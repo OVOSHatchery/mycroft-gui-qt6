@@ -21,7 +21,7 @@ import QtQuick.Controls as Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
 import QtQuick.Window
-import Mycroft 1.0 as Mycroft
+import OVOS.GUI 1.0 as OVOS
 
 Controls.Control {
     id: root
@@ -31,10 +31,10 @@ Controls.Control {
     property real changeValue
     property bool horizontalMode
 
-    leftPadding: Mycroft.Units.gridUnit * 0.4
-    rightPadding: Mycroft.Units.gridUnit * 0.4
-    topPadding: Mycroft.Units.gridUnit * 0.4
-    bottomPadding: Mycroft.Units.gridUnit * 0.4
+    leftPadding: OVOS.Units.gridUnit * 0.4
+    rightPadding: OVOS.Units.gridUnit * 0.4
+    topPadding: OVOS.Units.gridUnit * 0.4
+    bottomPadding: OVOS.Units.gridUnit * 0.4
 
     onValueChanged: {
         valMeter.value = value / 10
@@ -53,12 +53,12 @@ Controls.Control {
             Kirigami.Icon {
                 id: iconSlider
                 anchors.fill: parent
-                anchors.margins: root.width > 800 ? Mycroft.Units.gridUnit * 0.4 : Mycroft.Units.gridUnit * 0.4
+                anchors.margins: root.width > 800 ? OVOS.Units.gridUnit * 0.4 : OVOS.Units.gridUnit * 0.4
                 color: "white"
                 layer.enabled: true
                 layer.effect: DropShadow {
                     anchors.fill: parent
-                    anchors.margins: root.width > 800 ? Mycroft.Units.gridUnit * 0.4 : Mycroft.Units.gridUnit * 0.4
+                    anchors.margins: root.width > 800 ? OVOS.Units.gridUnit * 0.4 : OVOS.Units.gridUnit * 0.4
                     radius: 8
                     samples: 16
                     verticalOffset: 0

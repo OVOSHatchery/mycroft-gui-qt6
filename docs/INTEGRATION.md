@@ -55,8 +55,7 @@ This is the **first modernized GUI client** in the new OpenVoiceOS architecture.
 {
   "gui": {
     "idle_display_skill": "skill-ovos-homescreen.openvoiceos",
-    "extension": "generic",
-    "default_qt_version": 6  // Updated to 6 for mycroft-gui-qt6
+    "extension": "generic"
   },
   "gui_websocket": {
     "host": "0.0.0.0",
@@ -164,7 +163,7 @@ ovos-gui (Core Service)
 │             mycroft-gui-qt6                          │
 │                                                      │
 │  C++ Core (QML_ELEMENT macro):                      │
-│  - MycroftController (singleton)                    │
+│  - OVOSController (singleton)                    │
 │    - Manages WebSocket connection to port 18181    │
 │    - Receives skill templates & session data       │
 │    - Emits signals for QML layer                   │
@@ -259,7 +258,6 @@ sudo make install
 # Edit ~/.config/mycroft/mycroft.conf:
 {
   "gui": {
-    "default_qt_version": 6,
     "idle_display_skill": "skill-ovos-homescreen.openvoiceos"
   },
   "gui_websocket": {
@@ -405,7 +403,7 @@ When user taps a button in the GUI:
 ```
 mycroft-gui-qt6 (QML Button click)
     │
-    └─ MycroftController::onGuiEvent()
+    └─ OVOSController::onGuiEvent()
          │
          ├─ Translates to ovos-gui event format
          └─ Sends WebSocket message to port 18181
@@ -470,7 +468,7 @@ def handle_message(self, message):
 ### Shell GUI (ovos-shell)
 - **Status**: Active, production-ready
 - **Type**: Kirigami desktop shell (not a standalone app)
-- **Connection**: Uses Mycroft.SkillView QML component
+- **Connection**: Uses OVOS.SkillView QML component
 - **Use Case**: Full desktop environment with homescreen integration
 
 ---
@@ -504,7 +502,7 @@ If you're currently using **mycroft-gui-qt5**:
    // ~/.config/mycroft/mycroft.conf
    {
      "gui": {
-       "default_qt_version": 6  // Add this
+       "idle_display_skill": "skill-ovos-homescreen.openvoiceos"
      }
    }
    ```
@@ -531,7 +529,7 @@ If you're **extending the Qt GUI**:
    ```qml
    // QML usage (Qt6 import syntax)
    import QtQuick
-   import Mycroft
+   import OVOS
 
    MyCustomView {
        // Your UI code
@@ -589,7 +587,7 @@ journalctl -u ovos-gui -f | grep "page.show"
 **Diagnosis:**
 ```bash
 # Check QML can load
-qmlimportscanner -rootPath /usr/local/lib/qt6/qml | grep Mycroft
+qmlimportscanner -rootPath /usr/local/lib/qt6/qml | grep OVOS
 
 # Check library dependencies
 ldd /usr/local/lib/libmycroft-gui-qt6.so | grep Qt6

@@ -38,12 +38,12 @@ Successfully ported mycroft-gui-qt5 (Qt5-based OVOS GUI client) to modern Qt6 wi
 
 ### Phase 2: C++ Source Porting ✅ (2026-03-12)
 - 13 C++ source files copied and ported from Qt5
-- `QML_ELEMENT` macro added to 3 key classes (MycroftController, AbstractSkillView, AbstractDelegate)
+- `QML_ELEMENT` macro added to 3 key classes (OVOSController, AbstractSkillView, AbstractDelegate)
 - Modern Qt6 patterns implemented (Q_ENUM, direct registration)
 - All C++ files compile without errors
 
 **Changes**:
-- MycroftController: singleton controller, adds QML_ELEMENT
+- OVOSController: singleton controller, adds QML_ELEMENT
 - AbstractSkillView: skill view base class, adds QML_ELEMENT  
 - AbstractDelegate: delegate base class, adds QML_ELEMENT
 - Plugin registration optimized for Qt6
@@ -136,13 +136,13 @@ All tests compile without errors and are ready for execution.
 **Total Warnings**: 3 (all minor, resolvable)
 
 1. **QWebSocket::error (Deprecated)**
-   - Location: abstractskillview.cpp:74, mycroftcontroller.cpp:133
+   - Location: abstractskillview.cpp:74, ovoscontroller.cpp:133
    - Issue: Qt6 prefers `errorOccurred` signal
    - Impact: None (still functional in Qt6)
    - Fix: Replace `QWebSocket::error` with `QWebSocket::errorOccurred` in Phase 4 bug fixes
 
 2. **QFile::open (Nodiscard Return)**
-   - Location: mycroftcontroller.cpp:223
+   - Location: ovoscontroller.cpp:223
    - Issue: Return value not checked
    - Impact: None (code continues correctly)
    - Fix: Add `if (!file.open(...))` error handling
@@ -199,7 +199,7 @@ ctest  # Run all tests at once
 ## Files Changed Summary
 
 ### Core C++ (13 files)
-- mycroftcontroller.h/cpp
+- ovoscontroller.h/cpp
 - abstractskillview.h/cpp
 - abstractdelegate.h/cpp
 - activeskillsmodel.h/cpp
@@ -259,7 +259,7 @@ ctest  # Run all tests at once
 ## What Was NOT Changed (By Design)
 
 1. **Protocol**: WebSocket port 18181, message format unchanged
-2. **API**: MycroftController public API remains compatible
+2. **API**: OVOSController public API remains compatible
 3. **QML Logic**: Template functionality preserved
 4. **Session Data Model**: Same structure, Qt6 compatible
 

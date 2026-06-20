@@ -21,7 +21,7 @@ import QtQuick.Controls as Controls
 import QtQuick.Layouts
 import QtMultimedia
 import org.kde.kirigami as Kirigami
-import Mycroft 1.0 as Mycroft
+import OVOS.GUI 1.0 as OVOS
 
 // DEPRECATED: This component duplicates system-templates/AudioPlayer.qml functionality.
 // Use the system template (SYSTEM_media_player or SYSTEM_audio_player) instead.

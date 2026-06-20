@@ -3,13 +3,13 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import Mycroft 1.0 as Mycroft
+import OVOS.GUI 1.0 as OVOS
 
 Rectangle {
     id: timeDisplay
     color: "transparent"
     property bool verticalMode: false
-    property var time_string: sessionData.time_string ? sessionData.time_string.replace(":", "꞉") : ""
+    property var time_string: namespaceData.time_string ? namespaceData.time_string.replace(":", "꞉") : ""
 
     Label {
         id: time

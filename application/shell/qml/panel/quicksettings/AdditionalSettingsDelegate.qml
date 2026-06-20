@@ -18,13 +18,13 @@
 import QtQuick
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
-import Mycroft 1.0 as Mycroft
+import OVOS.GUI 1.0 as OVOS
 
 Delegate {
     iconSource: "qrc://icons/configure"
     text: qsTr("Settings")
     onClicked: {
-        Mycroft.MycroftController.sendRequest("mycroft.device.settings", {})
+        OVOS.GuiBusClient.sendRequest("mycroft.device.settings", {})
     }
 }
 

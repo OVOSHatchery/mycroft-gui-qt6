@@ -114,7 +114,7 @@ ctest --output-on-failure
 **Time**: ~0.05s
 
 **When to run:**
-- After changes to MycroftController
+- After changes to GuiBusClient
 - After modifying WebSocket handling
 - When refactoring message routing
 
@@ -197,8 +197,8 @@ make servertest modeltest stresstest message_routing_test qml_framework_componen
 
 3. **Implement the feature**
    ```cpp
-   // import/mycroftcontroller.cpp
-   bool MycroftController::newFeature() {
+   // import/guibusclient.cpp
+   bool GuiBusClient::newFeature() {
        return true;
    }
    ```
@@ -361,7 +361,7 @@ Create `autotests/myfeature_test.cpp`:
 #include <QObject>
 
 // Include the class you're testing
-#include "../import/mycroftcontroller.h"
+#include "../import/guibusclient.h"
 
 class MyFeatureTest : public QObject {
     Q_OBJECT
@@ -380,21 +380,21 @@ private slots:
     }
 
     void testFeatureBasic() {
-        MycroftController controller;
+        GuiBusClient controller;
 
         // Test basic functionality
         QVERIFY(controller.feature() == true);
     }
 
     void testFeatureWithData() {
-        MycroftController controller;
+        GuiBusClient controller;
 
         // Test with specific data
         QCOMPARE(controller.getValue(), 42);
     }
 
     void testFeatureFailsGracefully() {
-        MycroftController controller;
+        GuiBusClient controller;
 
         // Test error handling
         QVERIFY_EXCEPTION_THROWN(
@@ -448,10 +448,10 @@ QVERIFY_EXCEPTION_THROWN(code, exception) // Exception testing
 
 ```cpp
 void TestMySignals::testSignalEmitted() {
-    MycroftController controller;
+    GuiBusClient controller;
 
     // Verify signal is emitted
-    QSignalSpy spy(&controller, &MycroftController::connectedChanged);
+    QSignalSpy spy(&controller, &GuiBusClient::connectedChanged);
 
     controller.connect();
 
@@ -525,7 +525,7 @@ open coverage_report/index.html
 
 ### Coverage Goals
 
-- ✅ Core classes (MycroftController, AbstractSkillView): 80%+
+- ✅ Core classes (GuiBusClient, GuiNamespace): 80%+
 - ✅ Message routing: 90%+ (critical path)
 - ⚠️ QML: Testing framework constraints limit coverage
 - ✅ Error paths: 100% (catch all failures)

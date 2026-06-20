@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Controls
 import org.kde.kirigami as Kirigami
 import Qt5Compat.GraphicalEffects
-import Mycroft 1.0 as Mycroft
+import OVOS.GUI 1.0 as OVOS
 
 Rectangle {
     id: examplesDisplay
@@ -22,8 +22,8 @@ Rectangle {
 
     RowLayout {
         anchors.fill: parent
-        anchors.margins: Mycroft.Units.gridUnit / 2
-        spacing: Mycroft.Units.gridUnit / 2
+        anchors.margins: OVOS.Units.gridUnit / 2
+        spacing: OVOS.Units.gridUnit / 2
 
         Rectangle {
             color: "transparent"
@@ -57,7 +57,7 @@ Rectangle {
                 maximumLineCount: 3
                 elide: idleRoot.rtlMode ? Text.ElideLeft : Text.ElideRight
                 minimumPixelSize: examplesDisplay.verticalMode ? 15 : 30
-                font.pixelSize: Mycroft.Units.gridUnit * 6
+                font.pixelSize: OVOS.Units.gridUnit * 6
                 horizontalAlignment: idleRoot.rtlMode ? Text.AlignRight : Text.AlignLeft
                 verticalAlignment: Text.AlignVCenter
                 wrapMode: Text.WordWrap

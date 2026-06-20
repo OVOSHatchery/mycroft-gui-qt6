@@ -16,6 +16,7 @@
  */
 
 #include "videoproviderservice.h"
+#include <QDebug>
 
 VideoProviderService::VideoProviderService(QObject *parent)
     : QObject(parent)
@@ -165,6 +166,7 @@ void VideoProviderService::durationUpdated(qint64 duration)
 
 void VideoProviderService::positionUpdated(qint64 position)
 {
+    m_position = position;
     emit positionChanged(position);
 }
 

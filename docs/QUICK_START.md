@@ -101,7 +101,6 @@ nano ~/.config/mycroft/mycroft.conf
 # Add or modify the gui section:
 {
   "gui": {
-    "default_qt_version": 6,
     "idle_display_skill": "skill-ovos-homescreen.openvoiceos"
   },
   "gui_websocket": {

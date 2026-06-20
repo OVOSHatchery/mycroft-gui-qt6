@@ -20,14 +20,14 @@ import QtQuick.Layouts 1.4
 import QtQuick.Controls 2.2 as Controls
 import org.kde.kirigami 2.4 as Kirigami
 
-import Mycroft 1.0 as Mycroft
+import OVOS.GUI 1.0 as OVOS
 
-Mycroft.Delegate {
+OVOS.Page {
     skillBackgroundSource: "https://source.unsplash.com/1920x1080/?+clouds"
     ColumnLayout {
         anchors.fill: parent
         Repeater {
-            model: sessionData.forecast
+            model: namespaceData.forecast
             ColumnLayout {
                 Kirigami.Heading {
                     text: model.when

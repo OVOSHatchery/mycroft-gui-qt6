@@ -1,16 +1,17 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
+import OVOS.GUI 1.0 as OVOS
 
-Item {
+OVOS.Page {
     id: root
 
-    property string question:    sessionData.question    || ""
-    property string confirm_yes: sessionData.confirm_yes || "Yes"
-    property string confirm_no:  sessionData.confirm_no  || "No"
+    property string question:    namespaceData ? (namespaceData.question    || "") : ""
+    property string confirm_yes: namespaceData ? (namespaceData.confirm_yes || "Yes") : "Yes"
+    property string confirm_no:  namespaceData ? (namespaceData.confirm_no  || "No") : "No"
 
     function respond(confirmed) {
-        triggerEvent("confirm.response", {"confirmed": confirmed})
+        root.triggerGuiEvent("confirm.response", {"confirmed": confirmed})
     }
 
     ColumnLayout {
@@ -19,7 +20,7 @@ Item {
         spacing: 24
 
         Label {
-            text: question
+            text: root.question
             font.pixelSize: 22
             wrapMode: Text.WordWrap
             Layout.fillWidth: true
@@ -31,15 +32,15 @@ Item {
             spacing: 24
 
             Button {
-                text: confirm_no
+                text: root.confirm_no
                 font.pixelSize: 16
-                onClicked: respond(false)
+                onClicked: root.respond(false)
             }
 
             Button {
-                text: confirm_yes
+                text: root.confirm_yes
                 font.pixelSize: 16
-                onClicked: respond(true)
+                onClicked: root.respond(true)
             }
         }
     }

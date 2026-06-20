@@ -31,10 +31,12 @@ class GlobalSettings : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString webSocketAddress READ webSocketAddress WRITE setWebSocketAddress NOTIFY webSocketChanged)
+    Q_PROPERTY(int webSocketPort READ webSocketPort WRITE setWebSocketPort NOTIFY webSocketPortChanged)
+    Q_PROPERTY(QString webSocketRoute READ webSocketRoute WRITE setWebSocketRoute NOTIFY webSocketRouteChanged)
     Q_PROPERTY(bool autoConnect READ autoConnect WRITE setAutoConnect NOTIFY autoConnectChanged)
     Q_PROPERTY(bool usesRemoteTTS READ usesRemoteTTS WRITE setUsesRemoteTTS NOTIFY usesRemoteTTSChanged)
     Q_PROPERTY(bool displayRemoteConfig READ displayRemoteConfig WRITE setDisplayRemoteConfig NOTIFY displayRemoteConfigChanged)
-    Q_PROPERTY(bool usePTTClient READ usePTTClient WRITE setUsePTTClient NOTIFY usePTTClient)
+    Q_PROPERTY(bool usePTTClient READ usePTTClient WRITE setUsePTTClient NOTIFY usePTTClientChanged)
     Q_PROPERTY(bool useHivemindProtocol READ useHivemindProtocol WRITE setUseHivemindProtocol NOTIFY useHivemindProtocolChanged)
     Q_PROPERTY(bool useEntryNameSpaceAnimation READ useEntryNameSpaceAnimation WRITE setUseEntryNameSpaceAnimation NOTIFY useEntryNameSpaceAnimationChanged)
     Q_PROPERTY(bool useExitNameSpaceAnimation READ useExitNameSpaceAnimation WRITE setUseExitNameSpaceAnimation NOTIFY useExitNameSpaceAnimationChanged)
@@ -43,11 +45,10 @@ class GlobalSettings : public QObject
 
 public:
     explicit GlobalSettings(QObject *parent=0);
-#ifndef Q_OS_ANDROID
-    SettingPropertyKey(QString, webSocketAddress, setWebSocketAddress, webSocketChanged, QStringLiteral("webSocketAddress"), QStringLiteral("ws://0.0.0.0"))
-#else
-    SettingPropertyKey(QString, webSocketAddress, setWebSocketAddress, webSocketChanged, QStringLiteral("webSocketAddress"), QStringLiteral("ws://104.248.21.254"))
-#endif
+
+    SettingPropertyKey(QString, webSocketAddress, setWebSocketAddress, webSocketChanged, QStringLiteral("webSocketAddress"), QStringLiteral("localhost"))
+    SettingPropertyKey(int, webSocketPort, setWebSocketPort, webSocketPortChanged, QStringLiteral("webSocketPort"), 18181)
+    SettingPropertyKey(QString, webSocketRoute, setWebSocketRoute, webSocketRouteChanged, QStringLiteral("webSocketRoute"), QStringLiteral("/gui"))
 
     bool autoConnect() const;
     void setAutoConnect(bool autoconnect);
@@ -70,6 +71,8 @@ public:
 
 Q_SIGNALS:
     void webSocketChanged();
+    void webSocketPortChanged();
+    void webSocketRouteChanged();
     void autoConnectChanged();
     void usesRemoteTTSChanged();
     void displayRemoteConfigChanged();

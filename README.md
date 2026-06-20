@@ -49,6 +49,13 @@ make -j$(nproc)
 make install
 ```
 
+### Demo Mode
+
+For quick testing of QML templates and GUI functionality without a running OVOS backend, you can use the built-in demo modes. Type these commands into the "Ask OVOS..." input field:
+
+-   **/demo**: Cycles through all system templates one by one every 10 seconds. Useful for verifying individual template rendering.
+-   **/demo2**: Loads all system templates into a single namespace, allowing you to manually swipe left/right (or use arrow keys) to navigate between them. Useful for testing multi-page navigation and template interactions.
+
 ## Architecture
 
 Same as Qt5 version with modernized APIs:

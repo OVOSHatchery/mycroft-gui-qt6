@@ -20,7 +20,7 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import QtQuick.Controls 2.15 as Controls
 import org.kde.kirigami 2.19 as Kirigami
-import Mycroft 1.0 as Mycroft
+import OVOS.GUI 1.0 as OVOS
 
 Kirigami.ScrollablePage {
     title: "Settings"
@@ -41,7 +41,7 @@ Kirigami.ScrollablePage {
             font.bold: true
             color: Kirigami.Theme.textColor;
             Layout.fillWidth: true
-            text: "Mycroft Core Address"
+            text: "OVOS Core Address"
         }
         
         Controls.Label {
@@ -67,7 +67,7 @@ Kirigami.ScrollablePage {
                 Kirigami.Theme.colorSet: nightSwitch.checked ? Kirigami.Theme.Complementary : Kirigami.Theme.Window
                 
                 Component.onCompleted: {
-                    webSocketAddressField.text = Mycroft.GlobalSettings.webSocketAddress
+                    webSocketAddressField.text = OVOS.GlobalSettings.webSocketAddress
                 }
             }
         }
@@ -84,8 +84,8 @@ Kirigami.ScrollablePage {
                 text: "Apply"
                 
                 onClicked:(mouse)=> { 
-                    Mycroft.GlobalSettings.webSocketAddress = webSocketAddressField.text
-                    Mycroft.MycroftController.reconnect()
+                    OVOS.GlobalSettings.webSocketAddress = webSocketAddressField.text
+                    OVOS.GuiBusClient.reconnect()
                 }
             }
            
@@ -98,8 +98,8 @@ Kirigami.ScrollablePage {
                 
                 onClicked:(mouse)=> {
                     webSocketAddressField.text = "ws://0.0.0.0"
-                    Mycroft.GlobalSettings.webSocketAddress = webSocketAddressField.text
-                    Mycroft.MycroftController.reconnect()
+                    OVOS.GlobalSettings.webSocketAddress = webSocketAddressField.text
+                    OVOS.GuiBusClient.reconnect()
                 }
             }
         }
@@ -110,8 +110,8 @@ Kirigami.ScrollablePage {
         
         Controls.Switch {
             text: "Connect Automatically"
-            checked: Mycroft.GlobalSettings.autoConnect
-            onCheckedChanged: Mycroft.GlobalSettings.autoConnect = checked
+            checked: OVOS.GlobalSettings.autoConnect
+            onCheckedChanged: OVOS.GlobalSettings.autoConnect = checked
         }
         
         Controls.Switch {
@@ -119,20 +119,20 @@ Kirigami.ScrollablePage {
             text: "Remote STT"
             checked: applicationSettings.usesRemoteSTT
             onCheckedChanged: applicationSettings.usesRemoteSTT = checked
-            visible: Mycroft.GlobalSettings.displayRemoteConfig
+            visible: OVOS.GlobalSettings.displayRemoteConfig
         }
         
         Controls.Switch {
             text: "Remote TTS"
-            checked: Mycroft.GlobalSettings.usesRemoteTTS
-            onCheckedChanged: Mycroft.GlobalSettings.usesRemoteTTS = checked
-            visible: Mycroft.GlobalSettings.displayRemoteConfig
+            checked: OVOS.GlobalSettings.usesRemoteTTS
+            onCheckedChanged: OVOS.GlobalSettings.usesRemoteTTS = checked
+            visible: OVOS.GlobalSettings.displayRemoteConfig
         }
 
         Controls.Switch {
             text: "Bus Isolation"
-            checked: Mycroft.GlobalSettings.useHivemindProtocol
-            onCheckedChanged: Mycroft.GlobalSettings.useHivemindProtocol = checked
+            checked: OVOS.GlobalSettings.useHivemindProtocol
+            onCheckedChanged: OVOS.GlobalSettings.useHivemindProtocol = checked
         }
     }
 }

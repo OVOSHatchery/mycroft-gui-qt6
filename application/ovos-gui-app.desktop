@@ -1,0 +1,7 @@
+[Desktop Entry]
+Exec=ovos-gui-app
+Icon=ovos
+Type=Application
+StartupNotify=true
+
+Name=OVOS GUI

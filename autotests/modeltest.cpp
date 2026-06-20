@@ -22,15 +22,15 @@
 #include <QQuickView>
 #include <QQmlEngine>
 #include <QAbstractItemModelTester>
-#include "../import/mycroftcontroller.h"
-#include "../import/abstractdelegate.h"
+#include "../import/guibusclient.h"
+#include "../import/guipage.h"
 #include "../import/filereader.h"
 #include "../import/globalsettings.h"
-#include "../import/activeskillsmodel.h"
-#include "../import/delegatesmodel.h"
-#include "../import/abstractskillview.h"
-#include "../import/sessiondatamap.h"
-#include "../import/sessiondatamodel.h"
+#include "../import/namespacemodel.h"
+#include "../import/pagemodel.h"
+#include "../import/guinamespace.h"
+#include "../import/namespacedatamap.h"
+#include "../import/namespacedatamodel.h"
 
 class ModelTest : public QObject
 {
@@ -40,31 +40,31 @@ public Q_SLOTS:
     void initTestCase();
 
 private Q_SLOTS:
-    void testActiveSkillsModel();
-    void testDelegatesModel();
-    void testSessionDataModel();
+    void testNamespaceModel();
+    void testPageModel();
+    void testNamespaceDataModel();
 
 private:
-    AbstractSkillView *m_view;
-    ActiveSkillsModel *m_skillsModel;
-    DelegatesModel *m_delegatesModel;
-    SessionDataModel *m_sessionDataModel;
+    GuiNamespace *m_view;
+    NamespaceModel *m_skillsModel;
+    PageModel *m_delegatesModel;
+    NamespaceDataModel *m_sessionDataModel;
 };
 
 
 void ModelTest::initTestCase()
 {
-    m_view = new AbstractSkillView();
-    m_skillsModel = new ActiveSkillsModel(this);
-    m_delegatesModel = new DelegatesModel(this);
-    m_sessionDataModel = new SessionDataModel(this);
+    m_view = new GuiNamespace();
+    m_skillsModel = new NamespaceModel(this);
+    m_delegatesModel = new PageModel(this);
+    m_sessionDataModel = new NamespaceDataModel(this);
 
     new QAbstractItemModelTester(m_skillsModel, QAbstractItemModelTester::FailureReportingMode::QtTest, this);
     new QAbstractItemModelTester(m_delegatesModel, QAbstractItemModelTester::FailureReportingMode::QtTest, this);
     new QAbstractItemModelTester(m_sessionDataModel, QAbstractItemModelTester::FailureReportingMode::QtTest, this);
 }
 
-void ModelTest::testActiveSkillsModel()
+void ModelTest::testNamespaceModel()
 {
     m_skillsModel->insertSkills(0, QStringList({QStringLiteral("skill0"), QStringLiteral("skill1"), QStringLiteral("skill2"), QStringLiteral("skill3")}));
     m_skillsModel->moveRows(QModelIndex(), 2, 1, QModelIndex(), 1);
@@ -75,19 +75,19 @@ void ModelTest::testActiveSkillsModel()
     m_skillsModel->insertSkills(2, QStringList({QStringLiteral("newSkill")}));
 }
 
-void ModelTest::testDelegatesModel()
+void ModelTest::testPageModel()
 {
     new QAbstractItemModelTester(m_delegatesModel, QAbstractItemModelTester::FailureReportingMode::QtTest, this);
-    m_delegatesModel->insertDelegateLoaders(0, {new DelegateLoader(m_view), new DelegateLoader(m_view), new DelegateLoader(m_view), new DelegateLoader(m_view)});
+    m_delegatesModel->insertDelegateLoaders(0, {new PageLoader(m_view), new PageLoader(m_view), new PageLoader(m_view), new PageLoader(m_view)});
     m_delegatesModel->moveRows(QModelIndex(), 2, 1, QModelIndex(), 1);
     m_delegatesModel->moveRows(QModelIndex(), 2, 2, QModelIndex(), 1);
     m_delegatesModel->moveRows(QModelIndex(), 0, 2, QModelIndex(), 3);
     m_delegatesModel->moveRows(QModelIndex(), 0, 1, QModelIndex(), 4);
     m_delegatesModel->removeRows(1, 2);
-    m_delegatesModel->insertDelegateLoaders(0, {new DelegateLoader(m_view)});
+    m_delegatesModel->insertDelegateLoaders(0, {new PageLoader(m_view)});
 }
 
-void ModelTest::testSessionDataModel()
+void ModelTest::testNamespaceDataModel()
 {
     m_sessionDataModel->insertData(0, QList<QVariantMap> ({{{QStringLiteral("prop"), QStringLiteral("value1")}}, {{QStringLiteral("prop"), QStringLiteral("value2")}},  {{QStringLiteral("prop"), QStringLiteral("value3")}}, {{QStringLiteral("prop"), QStringLiteral("value4")}}}));
     m_sessionDataModel->moveRows(QModelIndex(), 2, 1, QModelIndex(), 1);

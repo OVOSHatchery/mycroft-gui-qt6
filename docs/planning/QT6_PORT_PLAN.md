@@ -30,7 +30,7 @@ Port mycroft-gui-qt5 (Qt5-based GUI client for OpenVoiceOS) to modern Qt6 while 
 - Architecture plan
 - **Phase 2: C++ Source Porting** (libmycroft-gui-qt6.so builds, 6.1 MB)
   - All 13 C++ files ported with QML_ELEMENT macro
-  - MycroftController, AbstractSkillView, AbstractDelegate updated
+  - OVOSController, AbstractSkillView, AbstractDelegate updated
   - Plugin registration refactored for Qt6
   - 3 deprecation warnings identified for Phase 4 fixing
 
@@ -59,12 +59,12 @@ Port mycroft-gui-qt5 (Qt5-based GUI client for OpenVoiceOS) to modern Qt6 while 
 **Files to Port** (13 source files):
 
 1. **Core Headers** (3 files):
-   - `import/mycroftcontroller.h` — Protocol handler, message routing
+   - `import/ovoscontroller.h` — Protocol handler, message routing
    - `import/abstractskillview.h` — Skill view management
    - `import/guibusmessages.h` — Message enum (23 types) - MINIMAL CHANGES
 
 2. **Implementation** (10 files):
-   - `import/mycroftcontroller.cpp` — WebSocket, state changes
+   - `import/ovoscontroller.cpp` — WebSocket, state changes
    - `import/abstractskillview.cpp` — Session data, lifecycle
    - `import/activeskillsmodel.cpp` — Active skills tracking
    - `import/delegatesmodel.cpp` — Model management

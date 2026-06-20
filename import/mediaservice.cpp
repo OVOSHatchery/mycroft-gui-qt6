@@ -19,44 +19,41 @@
 
 MediaService::MediaService(QObject *parent)
     : QObject(parent),
-    m_controller(MycroftController::instance())
+    m_controller(GuiBusClient::instance())
 {
+    m_controller->setMediaService(this);
     m_currentPlaybackState = MediaService::StoppedState;
     m_currentMediaState = MediaService::NoMedia;
     m_selectedProviderService = MediaService::NoProvider;
 
-    if (m_controller->status() == MycroftController::Open){
-        connect(m_controller, &MycroftController::intentRecevied, this,
-                &MediaService::onMainSocketIntentReceived);
-    }
+    // NOTE: intentRecevied signal was removed (dead code from legacy).
+    // MediaService intent handling is done via mycroft.events.triggered instead.
 }
 
 void MediaService::unloadAudioProvider(MediaService::UnloadStateReason reason)
 {
     m_unloadingAudioService = true;
     m_unloadReason = reason;
-    QObject::disconnect(m_audioProviderService, &AudioProviderService::mediaStateChanged, this, &MediaService::updateMediaStateAudioProvider);
-    QObject::disconnect(m_audioProviderService, &AudioProviderService::playBackStateChanged, this, &MediaService::updatePlaybackStateAudioProvider);
-    QObject::disconnect(m_audioProviderService, &AudioProviderService::spectrumChanged, this, &MediaService::updateSpectrum);
-    QObject::disconnect(m_audioProviderService, &AudioProviderService::durationChanged, this, &MediaService::updateDuration);
-    QObject::disconnect(m_audioProviderService, &AudioProviderService::positionChanged, this, &MediaService::updatePosition);
-    QTimer::singleShot(2000, this, [this](){
+    if (m_audioProviderService) {
+        QObject::disconnect(m_audioProviderService, nullptr, this, nullptr);
+        m_audioProviderService->mediaStop();
         m_audioProviderService->deleteLater();
         m_audioProviderService = nullptr;
-        if(m_unloadReason == MediaService::MediaFinished) {
-            emitEndOfMedia();
-        }
-        if(m_unloadReason == MediaService::ServiceUnloaded){
-            m_selectedProviderService = MediaService::NoProvider;
-        }
-        if(m_unloadReason == MediaService::MediaStopped){
-            emit positionChanged(0);
-            emit durationChanged(0);
-        }
-        m_audioServiceProviderInitialized = false;
-        emit audioProviderUnloaded();
-        m_unloadingAudioService = false;
-    });
+    }
+    
+    if(m_unloadReason == MediaService::MediaFinished) {
+        emitEndOfMedia();
+    }
+    if(m_unloadReason == MediaService::ServiceUnloaded){
+        m_selectedProviderService = MediaService::NoProvider;
+    }
+    if(m_unloadReason == MediaService::MediaStopped){
+        emit positionChanged(0);
+        emit durationChanged(0);
+    }
+    m_audioServiceProviderInitialized = false;
+    emit audioProviderUnloaded();
+    m_unloadingAudioService = false;
 }
 
 void MediaService::unloadVideoProvider(MediaService::UnloadStateReason reason)
@@ -115,28 +112,59 @@ MediaService::MediaState MediaService::serviceMediaState() const
 void MediaService::mediaLoadUrl(const QString &url, MediaService::ProviderServiceType serviceType)
 {
     if(serviceType == MediaService::AudioProvider){
-        if(!evaluateUrl(url)) {
-            m_currentMediaState = MediaService::InvalidMedia;
-            emit mediaStateChanged(m_currentMediaState);
-            m_currentMediaState = MediaService::NoMedia;
-            emit mediaStateChanged(m_currentMediaState);
+        QUrl mediaUrl(url);
 
-            m_mediaStateSync.clear();
-            m_mediaStateSync.insert(QStringLiteral("status"), m_currentMediaState);
-            m_controller->sendRequest(QStringLiteral("gui.player.media.service.current.media.status"), m_mediaStateSync);
+        if (!mediaUrl.isValid()) {
+            handleInvalidMedia();
             return;
         }
+
+        if (mediaUrl.isLocalFile()) {
+            continueMediaLoadUrl(url, serviceType);
+            return;
+        }
+
+        QNetworkAccessManager *networkManager = new QNetworkAccessManager(this);
+        QNetworkRequest request(mediaUrl);
+        QNetworkReply *reply = networkManager->head(request);
+
+        QObject::connect(reply, &QNetworkReply::finished, this, [this, url, serviceType, reply, networkManager]() {
+            bool isMediaUrl = (reply->error() == QNetworkReply::NoError);
+            reply->deleteLater();
+            networkManager->deleteLater();
+
+            if (!isMediaUrl) {
+                handleInvalidMedia();
+            } else {
+                continueMediaLoadUrl(url, serviceType);
+            }
+        });
+        return;
     }
+    continueMediaLoadUrl(url, serviceType);
+}
+
+void MediaService::handleInvalidMedia()
+{
+    m_currentMediaState = MediaService::InvalidMedia;
+    emit mediaStateChanged(m_currentMediaState);
+    m_currentMediaState = MediaService::NoMedia;
+    emit mediaStateChanged(m_currentMediaState);
+
+    m_mediaStateSync.clear();
+    m_mediaStateSync.insert(QStringLiteral("status"), m_currentMediaState);
+    m_controller->sendRequest(QStringLiteral("gui.player.media.service.current.media.status"), m_mediaStateSync);
+}
+
+void MediaService::continueMediaLoadUrl(const QString &url, MediaService::ProviderServiceType serviceType)
+{
     m_loadedUrl = url;
     changeProvider(serviceType);
     QTimer::singleShot(1000, this, [this](){
         if(m_selectedProviderService == MediaService::AudioProvider) {
             if(!m_unloadingAudioService) {
                 if(m_audioServiceProviderInitialized && (!(m_unloadReason == MediaService::MediaFinished) || !(m_unloadReason == MediaService::MediaStopped))) {
-                    QEventLoop loop;
-                    connect(this, &MediaService::audioProviderUnloaded, &loop, &QEventLoop::quit);
                     unloadAudioProvider(MediaService::MediaChanged);
-                    loop.exec();
                 }
                 initializeAudioProvider();
                 QUrl audioUrl = QUrl::fromUserInput(m_loadedUrl);
@@ -167,11 +195,7 @@ void MediaService::mediaStop()
         if(m_selectedProviderService == MediaService::AudioProvider) {
             if(m_currentPlaybackState != MediaService::StoppedState){
                 mediaPause();
-                //m_audioProviderService->mediaStop();
-                QEventLoop loop;
-                connect(this, &MediaService::audioProviderUnloaded, &loop, &QEventLoop::quit);
                 unloadAudioProvider(MediaService::MediaStopped);
-                loop.exec();
                 m_currentPlaybackState = MediaService::StoppedState;
                 emit playbackStateChanged(m_currentPlaybackState);
                 m_playbackStateSync.clear();
@@ -437,33 +461,6 @@ void MediaService::updateDuration(qint64 duration)
     emit durationChanged(duration);
 }
 
-bool MediaService::evaluateUrl(const QString& url)
-{
-    QUrl mediaUrl(url);
-
-    if (!mediaUrl.isValid()) {
-        return false;
-    }
-
-    if (mediaUrl.isLocalFile()) {
-        return true;
-    }
-
-    QNetworkAccessManager networkManager;
-    QNetworkRequest request(mediaUrl);
-    QNetworkReply* reply = networkManager.head(request);
-    QEventLoop loop;
-
-    QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-    loop.exec();
-
-    bool isMediaUrl = (reply->error() == QNetworkReply::NoError);
-
-    reply->deleteLater();
-
-    return isMediaUrl;
-}
-
 void MediaService::audioServiceEndOfMedia()
 {
     if(!m_unloadingAudioService) {
@@ -501,10 +498,7 @@ void MediaService::changeProvider(MediaService::ProviderServiceType serviceType)
     }
 
     if(m_selectedProviderService == MediaService::AudioProvider){
-        QEventLoop loop;
-        loop.connect(this, &MediaService::audioProviderUnloaded, &loop, &QEventLoop::quit);
-            unloadAudioProvider(MediaService::ServiceUnloaded);
-        loop.exec();
+        unloadAudioProvider(MediaService::ServiceUnloaded);
     }
 
     m_selectedProviderService = serviceType;
@@ -514,61 +508,90 @@ void MediaService::changeProvider(MediaService::ProviderServiceType serviceType)
 void MediaService::onMainSocketIntentReceived(const QString &type, const QVariantMap &data)
 {
 
-    if(type == QStringLiteral("gui.player.media.service.play")) {
-        m_receivedUrl = data[QStringLiteral("track")].toString();
+    if(type == QStringLiteral("gui.player.play") || type == QStringLiteral("gui.player.media.service.play")) {
+        if (data.contains(QStringLiteral("uri"))) {
+            m_receivedUrl = data[QStringLiteral("uri")].toString();
+        } else {
+            m_receivedUrl = data[QStringLiteral("track")].toString();
+        }
+
         m_repeat = data[QStringLiteral("repeat")].toBool();
 
+        QString mediaType = data[QStringLiteral("type")].toString();
+        if (mediaType == QStringLiteral("video")) {
+            m_selectedProviderService = MediaService::VideoProvider;
+        } else {
+            m_selectedProviderService = MediaService::AudioProvider;
+        }
+
+        mediaLoadUrl(m_receivedUrl, m_selectedProviderService);
         emit mediaLoadUrlRequested();
     }
 
-    if(type == QStringLiteral("gui.player.media.service.pause")) {
+    if(type == QStringLiteral("gui.player.pause") || type == QStringLiteral("gui.player.media.service.pause")) {
         mediaPause();
         emit mediaPauseRequested();
     }
 
-    if(type == QStringLiteral("gui.player.media.service.stop")) {
+    if(type == QStringLiteral("gui.player.stop") || type == QStringLiteral("gui.player.media.service.stop")) {
         mediaStop();
         emit mediaStopRequested();
     }
 
-    if(type == QStringLiteral("gui.player.media.service.resume")) {
+    if(type == QStringLiteral("gui.player.resume") || type == QStringLiteral("gui.player.media.service.resume")) {
         mediaContinue();
         emit mediaContinueRequested();
     }
 
-    if(type == QStringLiteral("gui.player.media.service.set.meta")) {
+    if(type == QStringLiteral("gui.player.seek")) {
+        qint64 delta = data[QStringLiteral("delta")].toLongLong();
+        if (m_selectedProviderService == MediaService::AudioProvider && m_audioProviderService) {
+            mediaSeek(m_audioProviderService->position() + delta);
+        } else if (m_selectedProviderService == MediaService::VideoProvider && m_videoProviderService) {
+            mediaSeek(m_videoProviderService->position() + delta);
+        }
+    }
+
+    if(type == QStringLiteral("gui.player.media.service.set.meta") || (type == QStringLiteral("gui.player.play") && data.contains(QStringLiteral("meta")))) {
+        QVariantMap meta;
+        if (type == QStringLiteral("gui.player.play")) {
+            meta = data[QStringLiteral("meta")].toMap();
+        } else {
+            meta = data;
+        }
+        
         QString metaVal;
 
-        if(data.contains(QStringLiteral("artist"))){
-            metaVal = data[QStringLiteral("artist")].toString();
+        if(meta.contains(QStringLiteral("artist"))){
+            metaVal = meta[QStringLiteral("artist")].toString();
             if(!metaVal.isEmpty()){
                 m_artist = metaVal;
             }
         }
 
-        if(data.contains(QStringLiteral("album"))){
-            metaVal = data[QStringLiteral("album")].toString();
+        if(meta.contains(QStringLiteral("album"))){
+            metaVal = meta[QStringLiteral("album")].toString();
             if(!metaVal.isEmpty()){
                 m_album = metaVal;
             }
         }
 
-        if(data.contains(QStringLiteral("title"))){
-            metaVal = data[QStringLiteral("title")].toString();
+        if(meta.contains(QStringLiteral("title"))){
+            metaVal = meta[QStringLiteral("title")].toString();
             if(!metaVal.isEmpty()){
                 m_title = metaVal;
             }
         }
 
-        if(data.contains(QStringLiteral("track"))){
-            metaVal = data[QStringLiteral("track")].toString();
+        if(meta.contains(QStringLiteral("track"))){
+            metaVal = meta[QStringLiteral("track")].toString();
             if(!metaVal.isEmpty()){
                 m_title = metaVal;
             }
         }
 
-        if(data.contains(QStringLiteral("image"))){
-            metaVal = data[QStringLiteral("image")].toString();
+        if(meta.contains(QStringLiteral("image"))){
+            metaVal = meta[QStringLiteral("image")].toString();
             if(!metaVal.isEmpty()){
                 m_thumbnail = metaVal;
             }

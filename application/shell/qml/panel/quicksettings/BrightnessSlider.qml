@@ -16,7 +16,7 @@
  */
 
 import QtQuick
-import Mycroft 1.0 as Mycroft
+import OVOS.GUI 1.0 as OVOS
 
 SliderBase {
     id: root
@@ -33,14 +33,14 @@ SliderBase {
         applicationSettings.fakeBrightness = changeValue;
         console.log("Fake Brightness Value: " + changeValue)
         if (bSync){
-            Mycroft.MycroftController.sendRequest("phal.brightness.control.sync", {"brightness": changeValue * 100})
+            OVOS.GuiBusClient.sendRequest("phal.brightness.control.sync", {"brightness": changeValue * 100})
         } else {
             bSync = true
         }
     }
 
     Connections {
-        target: Mycroft.MycroftController
+        target: OVOS.GuiBusClient
         onIntentRecevied: {
             if (type == "phal.brightness.control.get.response") {
                 var roundingValue = data.brightness / 100;
