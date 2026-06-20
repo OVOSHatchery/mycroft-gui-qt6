@@ -1,7 +1,16 @@
 name: Build (Qt6 / KF6)
 # Compiles the Qt6/Kirigami client and runs the ctest autotests.
-# This is the gate for human review of the (AI-generated) C++ — it verifies the
-# tree actually builds against a real Qt6 6.5 + KF6 6.0 toolchain on CI runners.
+#
+# This is the verification gate for the (AI-generated) C++: it builds the tree
+# against a real Qt6 6.5+ / KF6 6.x toolchain and runs the end-to-end protocol
+# autotests headless. The C++ cannot be built in the authoring environment, so a
+# green run here is the first real confirmation it compiles and the protocol
+# tests pass.
+#
+# Toolchain: the build runs inside the KDE neon container (kdeneon/all), which
+# ships a current Qt6 + KDE Frameworks 6 from KDE's own repositories. Stock
+# Ubuntu 24.04 (noble) does NOT package KF6 (only KF5), so the apt KF6 packages
+# are installed from the neon repos already present in this image.
 on:
   push:
     branches: [master, dev]
@@ -9,34 +18,57 @@ on:
     branches: [dev, master]
   workflow_dispatch:
 
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build:
+  build-and-test:
+    name: Build (Release) + ctest autotests
     runs-on: ubuntu-24.04
     timeout-minutes: 40
+    container:
+      # KDE neon "user" edition: stable current KF6 + Qt6 on a 24.04 base.
+      image: kdeneon/all:user
+      options: --user root
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      - name: Install Qt6 + KF6 + build tooling
+      - name: Install build tooling + Qt6/KF6 dev headers
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
             cmake ninja-build g++ pkg-config \
             qt6-base-dev qt6-declarative-dev qt6-websockets-dev \
             qt6-multimedia-dev qt6-tools-dev qt6-tools-dev-tools \
-            libqt6svg6-dev qt6-l10n-tools \
+            libqt6svg6-dev \
             extra-cmake-modules \
             libkf6kirigami-dev libkf6coreaddons-dev libkf6guiaddons-dev \
             libkf6config-dev libkf6configwidgets-dev libkf6iconthemes-dev \
             libkf6dbusaddons-dev \
+            qml6-module-qtquick qml6-module-qtquick-window \
             xvfb
 
-      - name: Configure
+      - name: Configure (Release)
         run: cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 
+      # BLOCKING: a build failure fails the job. This is the real gate.
       - name: Build
         run: cmake --build build --parallel
 
-      - name: Run autotests (ctest)
+      # BLOCKING: the end-to-end / ctest step must pass. No `|| true`: any test
+      # failure surfaces as a red job. GUI/QML tests need an X server, so run
+      # headless under xvfb.
+      - name: Run autotests (ctest, headless)
         working-directory: build
-        # GUI/QML tests need an X server; run headless under xvfb.
-        run: xvfb-run -a ctest --output-on-failure || true
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: xvfb-run -a ctest --output-on-failure --timeout 120
+
+      - name: Upload ctest logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ctest-logs
+          path: build/Testing/
+          if-no-files-found: ignore

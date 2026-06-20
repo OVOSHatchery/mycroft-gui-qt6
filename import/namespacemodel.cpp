@@ -76,6 +76,12 @@ void NamespaceModel::insertNamespaces(int position, const QStringList &namespace
     int i = 0;
     for (const auto &namespace_id : filteredList) {
         m_namespaces.insert(position + i, namespace_id);
+        // Each active namespace owns a PageModel that backs its GUI pages.
+        // Without this, pageModelForNamespace() (and therefore every
+        // mycroft.gui.list.* operation) would have nothing to operate on.
+        if (!m_pageModels.contains(namespace_id)) {
+            m_pageModels[namespace_id] = new PageModel(this);
+        }
         ++i;
     }
     endInsertRows();

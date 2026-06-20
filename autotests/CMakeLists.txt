@@ -93,6 +93,21 @@ target_link_libraries(demotest
 
 
 ecm_add_test(
+  protocol_e2e_test.cpp
+
+  TEST_NAME protocol_e2e_test
+
+  LINK_LIBRARIES
+    OvosGuiCommon
+    Qt6::Test
+    Qt6::Qml
+    Qt6::Quick
+    Qt6::Network
+    Qt6::WebSockets
+    Qt6::Multimedia
+)
+
+ecm_add_test(
   message_routing_test.cpp
 
   TEST_NAME message_routing_test
