@@ -43,9 +43,9 @@ jobs:
             qt6-multimedia-dev qt6-tools-dev qt6-tools-dev-tools \
             libqt6svg6-dev \
             extra-cmake-modules \
-            libkf6kirigami-dev libkf6coreaddons-dev libkf6guiaddons-dev \
-            libkf6config-dev libkf6configwidgets-dev libkf6iconthemes-dev \
-            libkf6dbusaddons-dev \
+            kf6-kirigami-dev kf6-kcoreaddons-dev kf6-kguiaddons-dev \
+            kf6-kconfig-dev kf6-kconfigwidgets-dev kf6-kiconthemes-dev \
+            kf6-kdbusaddons-dev \
             qml6-module-qtquick qml6-module-qtquick-window \
             xvfb
 
