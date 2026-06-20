@@ -17,40 +17,15 @@ if(NOT OVOS_SYSTEM_TEMPLATES_DIR)
 endif()
 add_definitions(-DOVOS_SYSTEM_TEMPLATES_DIR="${OVOS_SYSTEM_TEMPLATES_DIR}")
 
-ecm_add_test(
-  servertest.cpp
-
-  TEST_NAME servertest
-
-  LINK_LIBRARIES
-    OvosGuiCommon
-    Qt6::Test
-    Qt6::Qml
-    Qt6::Quick
-    Qt6::Network
-    Qt6::WebSockets
-    Qt6::Multimedia
-)
+# NOTE: the legacy `servertest` and `stresstest` were removed — they drove the
+# old two-socket protocol and loaded `import/qml/SkillView.qml`, both of which
+# this rework deleted. `protocol_e2e_test` is their replacement and exercises the
+# current single-socket session/namespace protocol end to end.
 
 ecm_add_test(
   modeltest.cpp
 
   TEST_NAME modeltest
-
-  LINK_LIBRARIES
-    OvosGuiCommon
-    Qt6::Test
-    Qt6::Qml
-    Qt6::Quick
-    Qt6::Network
-    Qt6::WebSockets
-    Qt6::Multimedia
-)
-
-ecm_add_test(
-  stresstest.cpp
-
-  TEST_NAME stresstest
 
   LINK_LIBRARIES
     OvosGuiCommon
@@ -116,8 +91,12 @@ ecm_add_test(
     Qt6::Test
 )
 
+# Bundle the QML components so the test can resolve them at ":/qml/*.qml".
+qt6_add_resources(qml_framework_RES ${CMAKE_SOURCE_DIR}/import/ovos.qrc)
+
 ecm_add_test(
   qml_framework_components_test.cpp
+  ${qml_framework_RES}
 
   TEST_NAME qml_framework_components_test
 

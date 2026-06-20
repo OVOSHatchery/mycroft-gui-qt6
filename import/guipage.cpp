@@ -43,14 +43,26 @@ void PageLoader::init(const QString &namespace_id, const QUrl &url)
     m_namespaceId = namespace_id;
     m_url = url;
     QQmlEngine *engine = qmlEngine(m_namespaceObj);
-    //This class should be *ALWAYS* created from QML
-    Q_ASSERT(engine);
+    // Normally this object is created from QML and therefore has an engine.
+    // In headless / non-QML contexts (e.g. tests, or a backend with no QML
+    // surface) there is no engine: the namespace/page model state is still
+    // tracked, but there is nothing to render. Bail out gracefully instead of
+    // constructing a QQmlComponent with a null engine, which crashes.
+    if (!engine) {
+        qWarning() << "GuiPage::init: no QML engine for" << url
+                   << "- skipping page item creation (headless/non-QML context)";
+        return;
+    }
 
     QQmlComponent *component = new QQmlComponent(engine, url, m_namespaceObj);
 
     auto createObject = [this, component]() {
         QQmlContext *context = QQmlEngine::contextForObject(m_namespaceObj);
-        Q_ASSERT(context);
+        if (!context) {
+            qWarning() << "GuiPage::init: no QML context for" << m_url
+                       << "- skipping page item creation";
+            return;
+        }
 
         QObject *guiObject = component->beginCreate(context);
         m_pageItem = qobject_cast<QQuickItem *>(guiObject);

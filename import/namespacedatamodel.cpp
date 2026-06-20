@@ -130,11 +130,23 @@ QVariant NamespaceDataModel::data(const QModelIndex &index, int role) const
     }
     const int row = index.row();
 
-    if (row < 0 || row >= m_data.count() || role != Data) {
+    if (row < 0 || row >= m_data.count()) {
         return QVariant();
     }
 
-    return m_data[row];
+    if (role == Data) {
+        return m_data[row];
+    }
+
+    // roleNames() advertises one role per key in the data map; serve those too,
+    // otherwise data(index, key-role) always returns empty even though the role
+    // is exposed to QML / model consumers.
+    const QByteArray key = roleNames().value(role);
+    if (!key.isEmpty() && key != QByteArrayLiteral("data")) {
+        return m_data[row].value(QString::fromUtf8(key));
+    }
+
+    return QVariant();
 }
 
 QHash<int, QByteArray> NamespaceDataModel::roleNames() const
